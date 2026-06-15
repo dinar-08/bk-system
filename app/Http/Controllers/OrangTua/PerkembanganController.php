@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers\OrangTua;
+
+use App\Http\Controllers\Controller;
+use App\Models\Laporan;
+use App\Models\Siswa;
+
+class PerkembanganController extends Controller
+{
+    public function index()
+    {
+        $siswa = Siswa::where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $laporan = Laporan::with([
+            'siswa',
+            'monitoring',
+            'evaluasi',
+        ])
+            ->where('siswa_id', $siswa->id)
+            ->whereIn('status', ['monitoring', 'selesai', 'dirujuk'])
+            ->latest()
+            ->get();
+
+        return view('orang-tua.perkembangan.index', compact('siswa', 'laporan'));
+    }
+
+    public function show(string $id)
+    {
+        $siswa = Siswa::where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $laporan = Laporan::with([
+            'siswa',
+            'pemanggilan',
+            'monitoring',
+            'evaluasi',
+        ])
+            ->where('siswa_id', $siswa->id)
+            ->findOrFail($id);
+
+        return view('orang-tua.perkembangan.show', compact('siswa', 'laporan'));
+    }
+}
