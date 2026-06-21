@@ -40,7 +40,6 @@ class EvaluasiController extends Controller
             'guru_bk_id' => $guruBk->id,
             'tanggal_evaluasi' => $validated['tanggal_evaluasi'],
             'hasil_evaluasi' => $validated['hasil_evaluasi'],
-            'rekomendasi' => '-',
             'status_akhir' => $validated['status_akhir'],
         ]);
 
@@ -67,7 +66,6 @@ class EvaluasiController extends Controller
         $evaluasi->update([
             'tanggal_evaluasi' => $validated['tanggal_evaluasi'],
             'hasil_evaluasi' => $validated['hasil_evaluasi'],
-            'rekomendasi' => '-',
             'status_akhir' => $validated['status_akhir'],
         ]);
 

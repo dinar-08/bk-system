@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -8,14 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ImportSiswaController extends Controller
 {
-    public function index()
-    {
-        return view('admin.import-siswa.index');
-    }
 
     public function store(Request $request)
     {
@@ -27,27 +24,76 @@ class ImportSiswaController extends Controller
         $spreadsheet = IOFactory::load($path);
         $rows = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
-        // Skip header row
+        if (count($rows) < 2) {
+            return back()->withErrors([
+                'file' => 'File Excel harus memiliki header dan minimal satu baris data.',
+            ]);
+        }
+
+        $header = null;
+        $barisHeader = null;
+
+        foreach ($rows as $index => $row) {
+            $hasilDeteksi = $this->deteksiKolom($row);
+
+            if (
+                $hasilDeteksi['nis'] !== null &&
+                $hasilDeteksi['nama'] !== null &&
+                $hasilDeteksi['kelas'] !== null
+            ) {
+                $header = $row;
+                $kolom = $hasilDeteksi;
+                $barisHeader = $index;
+                break;
+            }
+        }
+
+        if ($header === null) {
+            return back()->withErrors([
+                'file' => 'Header Excel tidak ditemukan. Wajib ada kolom NIS, Nama Siswa/Nama, dan Kelas.',
+            ]);
+        }
+
+        $rows = array_slice($rows, $barisHeader);
         array_shift($rows);
+
+        if ($kolom['nis'] === null || $kolom['nama'] === null || $kolom['kelas'] === null) {
+            return back()->withErrors([
+                'file' => 'Header Excel tidak sesuai. Wajib ada kolom NIS, Nama Siswa/Nama, dan Kelas.',
+            ]);
+        }
 
         $berhasil = [];
         $gagal = [];
 
         foreach ($rows as $no => $row) {
-            $rowNum = $no + 2; // +2 karena header di baris 1
+            $rowNum = $no + 2;
 
-            $nis = trim($row['A'] ?? '');
-            $nama = trim($row['B'] ?? '');
-            $kelas = trim($row['C'] ?? '');
+            $nis = trim((string) ($row[$kolom['nis']] ?? ''));
+            $nama = trim((string) ($row[$kolom['nama']] ?? ''));
+            $kelas = trim((string) ($row[$kolom['kelas']] ?? ''));
 
-            // Validasi dasar
+            if ($nis === '' && $nama === '' && $kelas === '') {
+                continue;
+            }
+
             if (empty($nis) || empty($nama) || empty($kelas)) {
-                $gagal[] = ['baris' => $rowNum, 'nis' => $nis ?: '-', 'nama' => $nama ?: '-', 'alasan' => 'Kolom NIS, Nama, atau Kelas kosong'];
+                $gagal[] = [
+                    'baris' => $rowNum,
+                    'nis' => $nis ?: '-',
+                    'nama' => $nama ?: '-',
+                    'alasan' => 'Kolom NIS, Nama, atau Kelas kosong',
+                ];
                 continue;
             }
 
             if (User::where('username', $nis)->exists() || Siswa::where('nis', $nis)->exists()) {
-                $gagal[] = ['baris' => $rowNum, 'nis' => $nis, 'nama' => $nama, 'alasan' => 'NIS sudah terdaftar'];
+                $gagal[] = [
+                    'baris' => $rowNum,
+                    'nis' => $nis,
+                    'nama' => $nama,
+                    'alasan' => 'NIS sudah terdaftar',
+                ];
                 continue;
             }
 
@@ -70,90 +116,101 @@ class ImportSiswaController extends Controller
                         'kelas' => $kelas,
                     ]);
 
-                    $berhasil[] = ['nis' => $nis, 'nama' => $nama, 'kelas' => $kelas, 'password' => $password];
+                    $berhasil[] = [
+                        'nis' => $nis,
+                        'nama' => $nama,
+                        'kelas' => $kelas,
+                        'password' => $password,
+                    ];
                 });
             } catch (\Exception $e) {
-                $gagal[] = ['baris' => $rowNum, 'nis' => $nis, 'nama' => $nama, 'alasan' => 'Error sistem: ' . $e->getMessage()];
+                $gagal[] = [
+                    'baris' => $rowNum,
+                    'nis' => $nis,
+                    'nama' => $nama,
+                    'alasan' => 'Error sistem: ' . $e->getMessage(),
+                ];
             }
         }
 
-        // Simpan hasil ke session untuk ditampilkan + bisa didownload
-        session(['import_hasil' => ['berhasil' => $berhasil, 'gagal' => $gagal]]);
+        session([
+            'import_hasil' => [
+                'berhasil' => $berhasil,
+                'gagal' => $gagal,
+            ],
+        ]);
 
-        return redirect()->route('admin.import-siswa.index')
-            ->with('import_selesai', true);
-    }
-
-    public function downloadTemplate()
-    {
-        $headers = ['Content-Type' => 'application/vnd.ms-excel'];
-        return response()->streamDownload(function () {
-            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-            $sheet->setTitle('Data Siswa');
-            $sheet->setCellValue('A1', 'NIS');
-            $sheet->setCellValue('B1', 'Nama Siswa');
-            $sheet->setCellValue('C1', 'Kelas');
-            // Contoh data
-            $sheet->setCellValue('A2', '12345');
-            $sheet->setCellValue('B2', 'Nama Siswa Contoh');
-            $sheet->setCellValue('C2', '1A');
-
-            // Style header
-            $sheet->getStyle('A1:C1')->getFont()->setBold(true);
-            $sheet->getColumnDimension('A')->setWidth(15);
-            $sheet->getColumnDimension('B')->setWidth(30);
-            $sheet->getColumnDimension('C')->setWidth(10);
-
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save('php://output');
-        }, 'template-import-siswa.xlsx', $headers);
+        return redirect()
+            ->route('admin.siswa.index')
+            ->with('import_selesai', true)
+            ->with('import_hasil', [
+                'berhasil' => $berhasil,
+                'gagal' => $gagal,
+            ]);
     }
 
     public function downloadHasil()
     {
-        $hasil = session('import_hasil', ['berhasil' => [], 'gagal' => []]);
+        $hasil = session('import_hasil', [
+            'berhasil' => [],
+            'gagal' => [],
+        ]);
+
         $berhasil = $hasil['berhasil'];
 
         if (empty($berhasil)) {
             return back()->with('error', 'Tidak ada data hasil import untuk didownload.');
         }
 
-        $headers = ['Content-Type' => 'application/vnd.ms-excel'];
-        return response()->streamDownload(function () use ($berhasil) {
-            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-            $sheet->setTitle('Hasil Import');
-            $sheet->setCellValue('A1', 'NIS');
-            $sheet->setCellValue('B1', 'Nama Siswa');
-            $sheet->setCellValue('C1', 'Kelas');
-            $sheet->setCellValue('D1', 'Password Awal');
-            $sheet->getStyle('A1:D1')->getFont()->setBold(true);
-            $sheet->getStyle('D1')->getFont()->setColor(
-                (new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED))
-            );
+        $pdf = Pdf::loadView('admin.import-siswa.hasil', [
+            'berhasil' => $berhasil,
+            'tanggal' => now()->format('d-m-Y H:i'),
+        ])->setPaper('a4', 'portrait');
 
-            foreach ($berhasil as $i => $row) {
-                $r = $i + 2;
-                $sheet->setCellValue("A{$r}", $row['nis']);
-                $sheet->setCellValue("B{$r}", $row['nama']);
-                $sheet->setCellValue("C{$r}", $row['kelas']);
-                $sheet->setCellValue("D{$r}", $row['password']);
+        return $pdf->download(
+            'hasil-import-siswa-' . now()->format('Ymd-His') . '.pdf'
+        );
+    }
+
+    private function deteksiKolom(array $header): array
+    {
+        $kolom = [
+            'nis' => null,
+            'nama' => null,
+            'kelas' => null,
+        ];
+
+        foreach ($header as $key => $value) {
+            $namaHeader = $this->normalisasiHeader($value);
+
+            if (in_array($namaHeader, ['nis', 'nomorinduksiswa', 'nomorinduk'])) {
+                $kolom['nis'] = $key;
             }
 
-            foreach (['A', 'B', 'C', 'D'] as $col) {
-                $sheet->getColumnDimension($col)->setAutoSize(true);
+            if (in_array($namaHeader, ['nama', 'namasiswa', 'namalengkap', 'namalengkapsiswa'])) {
+                $kolom['nama'] = $key;
             }
 
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save('php://output');
-        }, 'hasil-import-siswa-' . now()->format('Ymd-His') . '.xlsx', $headers);
+            if (in_array($namaHeader, ['kelas', 'rumbel', 'rombonganbelajar'])) {
+                $kolom['kelas'] = $key;
+            }
+        }
+
+        return $kolom;
+    }
+
+    private function normalisasiHeader($value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace([' ', '_', '-', '.', '/'], '', $value);
+
+        return $value;
     }
 
     private function generatePassword(): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
         return substr(str_shuffle(str_repeat($chars, 4)), 0, 8);
     }
 }
-

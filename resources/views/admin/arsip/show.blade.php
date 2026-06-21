@@ -139,8 +139,6 @@
                         <div class="border border-green-200 rounded-xl p-4 bg-green-50">
                             <p class="text-xs font-semibold text-green-700 mb-1">Hasil Evaluasi</p>
                             <p class="text-sm text-slate-700 mb-3">{{ $laporan->evaluasi->hasil_evaluasi }}</p>
-                            <p class="text-xs font-semibold text-green-700 mb-1">Rekomendasi</p>
-                            <p class="text-sm text-slate-700">{{ $laporan->evaluasi->rekomendasi }}</p>
                         </div>
                     @else
                         <p class="text-sm text-slate-400 bg-slate-50 rounded-xl p-3">Belum ada evaluasi.</p>

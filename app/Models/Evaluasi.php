@@ -13,7 +13,6 @@ class Evaluasi extends Model
         'guru_bk_id',
         'tanggal_evaluasi',
         'hasil_evaluasi',
-        'rekomendasi',
         'status_akhir',
     ];
 

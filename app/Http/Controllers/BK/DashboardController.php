@@ -1,10 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\BK;
 
 use App\Http\Controllers\Controller;
 use App\Models\GuruBK;
 use App\Models\Laporan;
-use App\Models\Siswa;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -14,13 +14,18 @@ class DashboardController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->first();
 
         $totalLaporan = Laporan::count();
+
         $monitoringAktif = Laporan::where('status', 'monitoring')->count();
-        $kasusSelesai = Laporan::where('status', 'selesai')->count();
+
+        $permasalahanSelesai = Laporan::where('status', 'selesai')->count();
+
+        $permasalahanDirujuk = Laporan::where('status', 'dirujuk')->count();
 
         $laporanTerbaru = Laporan::with(['siswa', 'guruBk'])
-            ->latest()->take(5)->get();
+            ->latest()
+            ->take(5)
+            ->get();
 
-        // B1: siswa masuk BK per kelas
         $siswaPerKelas = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
             ->select('siswa.kelas', DB::raw('COUNT(DISTINCT laporan.siswa_id) as jumlah'))
             ->groupBy('siswa.kelas')
@@ -28,21 +33,33 @@ class DashboardController extends Controller
             ->pluck('jumlah', 'siswa.kelas')
             ->toArray();
 
-        // B2: pie chart jenis kelamin siswa yang pernah masuk BK
-        $jenisKelamin = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
-            ->select('siswa.jenis_kelamin', DB::raw('COUNT(DISTINCT laporan.siswa_id) as jumlah'))
+        $genderChart = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+            ->selectRaw('siswa.jenis_kelamin, COUNT(*) as total')
             ->groupBy('siswa.jenis_kelamin')
-            ->pluck('jumlah', 'siswa.jenis_kelamin')
-            ->toArray();
+            ->get();
+
+        $kelasChart = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+            ->selectRaw('siswa.kelas, COUNT(*) as total')
+            ->groupBy('siswa.kelas')
+            ->orderByDesc('total')
+            ->get();
+
+        $kategoriChart = Laporan::selectRaw('kategori, COUNT(*) as total')
+            ->groupBy('kategori')
+            ->orderByDesc('total')
+            ->get();
 
         return view('bk.dashboard', compact(
+            'guruBk',
             'totalLaporan',
             'monitoringAktif',
-            'kasusSelesai',
+            'permasalahanSelesai',
+            'permasalahanDirujuk',
             'laporanTerbaru',
             'siswaPerKelas',
-            'jenisKelamin',
-            'guruBk'
+            'genderChart',
+            'kelasChart',
+            'kategoriChart'
         ));
     }
 }

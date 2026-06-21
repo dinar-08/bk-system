@@ -8,6 +8,7 @@
 
     @php
         $laporanPerKategori = $laporan->groupBy('kategori');
+        $limitTampil = 10;
 
         $kategoriConfig = [
             'akademik' => ['label' => 'Akademik', 'gradient' => 'from-blue-600 via-indigo-700 to-slate-900'],
@@ -17,25 +18,37 @@
             'lain-lain' => ['label' => 'Lain-lain', 'gradient' => 'from-slate-600 via-slate-700 to-slate-900'],
         ];
 
-        $defaultCfg = ['label' => 'Tanpa Kategori', 'gradient' => 'from-slate-600 via-slate-700 to-slate-900'];
+        $defaultCfg = [
+            'label' => 'Tanpa Kategori',
+            'gradient' => 'from-slate-600 via-slate-700 to-slate-900',
+        ];
     @endphp
 
-    <form method="GET" action="{{ route('bk.riwayat.index') }}"
-        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
+    <div class="bg-blue-700 -mx-6 px-8 py-5 mb-6">
+        <h2 class="text-white font-bold text-xl">Riwayat Permasalahan Siswa</h2>
+        <p class="text-blue-100 text-sm mt-1">{{ $laporan->count() }} kasus ditemukan</p>
+    </div>
+
+    <form id="filterRiwayat" method="GET" action="{{ route('bk.riwayat.index') }}"
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-7">
+
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+
             <div>
                 <label class="text-xs font-medium text-slate-600 block mb-1">Nama Siswa</label>
-                <input type="text" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..."
-                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <input type="text" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..." autocomplete="off"
+                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
 
             <div>
                 <label class="text-xs font-medium text-slate-600 block mb-1">Kelas</label>
                 <select name="kelas"
-                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">Semua Kelas</option>
                     @foreach($daftarKelas as $k)
-                        <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                        <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>
+                            {{ $k }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -43,32 +56,32 @@
             <div>
                 <label class="text-xs font-medium text-slate-600 block mb-1">Kategori</label>
                 <select name="kategori"
-                    class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">Semua Kategori</option>
                     @foreach($kategori as $kat)
-                        <option value="{{ $kat }}" {{ request('kategori') === $kat ? 'selected' : '' }}>{{ ucfirst($kat) }}
+                        <option value="{{ $kat }}" {{ request('kategori') === $kat ? 'selected' : '' }}>
+                            {{ ucfirst($kat) }}
                         </option>
                     @endforeach
                 </select>
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit"
-                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-xl transition">
-                    Cari
-                </button>
+                <a href="{{ route('bk.riwayat.exportPdf', request()->query()) }}"
+                    class="flex-1 inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 rounded-xl transition">
+                    <i data-feather="download" class="w-4 h-4"></i>
+                    PDF
+                </a>
+
                 <a href="{{ route('bk.riwayat.index') }}"
-                    class="flex-1 text-center bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium py-2 rounded-xl transition">
+                    class="flex-1 inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium py-2 rounded-xl transition">
+                    <i data-feather="refresh-cw" class="w-4 h-4"></i>
                     Reset
                 </a>
             </div>
+
         </div>
     </form>
-
-    <div class="bg-blue-700 -mx-6 px-8 py-5 mb-7">
-        <h2 class="text-white font-bold text-xl">Riwayat Permasalahan Siswa</h2>
-        <p class="text-blue-100 text-sm mt-1">{{ $laporan->count() }} kasus ditemukan</p>
-    </div>
 
     <div>
         @forelse($laporanPerKategori as $namaKategori => $dataLaporan)
@@ -76,18 +89,37 @@
                 $cfg = $kategoriConfig[$namaKategori] ?? array_merge($defaultCfg, [
                     'label' => ucfirst($namaKategori ?? 'Tanpa Kategori'),
                 ]);
+
+                $sedangFilterKategori = request('kategori') === $namaKategori;
+
+                $dataPreview = $sedangFilterKategori
+                    ? $dataLaporan
+                    : $dataLaporan->take($limitTampil);
+
+                $perluLihatSemua = !$sedangFilterKategori && $dataLaporan->count() > $limitTampil;
             @endphp
 
             <section class="mb-12">
-                <div class="mb-5">
-                    <h2 class="text-3xl font-bold text-slate-900">{{ $cfg['label'] }}</h2>
-                    <p class="text-slate-500">{{ $dataLaporan->count() }} kasus</p>
+                <div class="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-900">{{ $cfg['label'] }}</h2>
+                        <p class="text-slate-500">{{ $dataLaporan->count() }} kasus</p>
+                    </div>
+
+                    @if($perluLihatSemua)
+                        <a href="{{ route('bk.riwayat.index', array_merge(request()->except('page'), ['kategori' => $namaKategori])) }}"
+                            class="inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700 mt-2">
+                            Lihat Semua
+                            <i data-feather="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    @endif
                 </div>
 
-                <div class="flex overflow-x-auto min-h-[370px] gap-2 pb-4">
-                    @foreach($dataLaporan as $item)
+                <div class="flex overflow-x-auto min-h-[320px] gap-2 pb-4">
+                    @foreach($dataPreview as $item)
                         @php
                             $status = $item->status ?? '-';
+
                             $statusBadge = $status === 'selesai'
                                 ? 'bg-emerald-400/90 text-emerald-950'
                                 : 'bg-rose-400/90 text-rose-950';
@@ -100,7 +132,7 @@
                             $foto = optional($siswa)->foto;
                         @endphp
 
-                        <div class="group relative h-[350px] w-[78px] hover:w-[320px] shrink-0 overflow-hidden rounded-xl transition-all duration-500 shadow-lg bg-gradient-to-br {{ $cfg['gradient'] }} bg-cover bg-center"
+                        <div class="group relative h-[300px] w-[70px] hover:w-[280px] shrink-0 overflow-hidden rounded-xl transition-all duration-500 shadow-lg bg-gradient-to-br {{ $cfg['gradient'] }} bg-cover bg-center"
                             @if($foto) style="background-image:url('{{ asset('storage/' . $foto) }}')" @endif>
 
                             <div
@@ -158,5 +190,25 @@
             </div>
         @endforelse
     </div>
+
+    <script>
+        const formFilter = document.getElementById('filterRiwayat');
+        const filterInputs = document.querySelectorAll('.filter-input');
+        let timer;
+
+        filterInputs.forEach(input => {
+            input.addEventListener('input', function () {
+                clearTimeout(timer);
+
+                timer = setTimeout(() => {
+                    formFilter.submit();
+                }, 500);
+            });
+
+            input.addEventListener('change', function () {
+                formFilter.submit();
+            });
+        });
+    </script>
 
 @endsection

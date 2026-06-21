@@ -162,7 +162,8 @@ class SiswaController extends Controller
     // A6: download data siswa
     public function download(Request $request)
     {
-        $tipe = $request->query('tipe', 'siswa');
+        $tipe = $request->get('tipe', 'siswa');
+
         return (new SiswaExport($tipe))->download();
     }
 

@@ -21,15 +21,15 @@ return new class extends Migration {
             $table->string('nama_siswa');
             $table->string('kelas');
 
-            $table->enum('jenis_kelamin', ['L', 'P']);
+            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
 
             $table->date('tanggal_lahir')->nullable();
 
             $table->text('alamat')->nullable();
 
-            $table->string('nama_ortu');
+            $table->string('nama_ortu')->nullable();
 
-            $table->string('no_whatsapp');
+            $table->string('no_whatsapp')->nullable();
 
             $table->timestamps();
         });

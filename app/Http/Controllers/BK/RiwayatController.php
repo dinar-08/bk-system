@@ -1,31 +1,53 @@
 <?php
+
 namespace App\Http\Controllers\BK;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RiwayatController extends Controller
 {
-    public function index(Request $request)
+    private function queryRiwayat(Request $request)
     {
-        $query = Laporan::with(['siswa', 'guruBk'])
+        $query = Laporan::with(['siswa', 'guruBk', 'evaluasi'])
             ->whereIn('status', ['selesai', 'dirujuk']);
 
-        // B3: search kombinasi nama + kelas + kategori
         if ($request->filled('nama')) {
-            $query->whereHas('siswa', fn($q) => $q->where('nama_siswa', 'like', '%' . $request->nama . '%'));
-        }
-        if ($request->filled('kelas')) {
-            $query->whereHas('siswa', fn($q) => $q->where('kelas', $request->kelas));
-        }
-        if ($request->filled('kategori')) {
-            $query->where('kategori', 'like', $request->kategori . '%');
+            $query->whereHas('siswa', function ($q) use ($request) {
+                $q->where('nama_siswa', 'like', '%' . $request->nama . '%');
+            });
         }
 
-        $laporan = $query->latest()->get();
-        $daftarKelas = Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas');
+        if ($request->filled('kelas')) {
+            $query->whereHas('siswa', function ($q) use ($request) {
+                $q->where('kelas', $request->kelas);
+            });
+        }
+
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
+        $laporan = $this->queryRiwayat($request)
+            ->join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+            ->orderBy('siswa.kelas')
+            ->orderBy('siswa.nis')
+            ->select('laporan.*')
+            ->get();
+
+        $daftarKelas = Siswa::select('kelas')
+            ->distinct()
+            ->orderBy('kelas')
+            ->pluck('kelas');
+
         $kategori = ['akademik', 'sosial', 'perilaku', 'emosional', 'lain-lain'];
 
         return view('bk.riwayat.index', compact('laporan', 'daftarKelas', 'kategori'));
@@ -33,7 +55,6 @@ class RiwayatController extends Controller
 
     public function show(string $id)
     {
-        // B4: rekap lengkap per siswa dalam 1 halaman
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
@@ -43,5 +64,17 @@ class RiwayatController extends Controller
         ])->findOrFail($id);
 
         return view('bk.riwayat.show', compact('laporan'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $laporan = $this->queryRiwayat($request)
+            ->latest()
+            ->get();
+
+        $pdf = Pdf::loadView('bk.download.semua-pdf', compact('laporan'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('riwayat-kasus.pdf');
     }
 }

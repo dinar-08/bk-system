@@ -138,12 +138,7 @@
                     <p class="text-xs text-slate-400 mb-1">Hasil Evaluasi</p>
                     <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->evaluasi->hasil_evaluasi }}</p>
                 </div>
-                @if($laporan->evaluasi->rekomendasi)
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                        <p class="text-xs text-slate-400 mb-1">Rekomendasi</p>
-                        <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->evaluasi->rekomendasi }}</p>
-                    </div>
-                @endif
+
             </div>
         </div>
     @endif

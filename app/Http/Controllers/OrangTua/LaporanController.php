@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\OrangTua;
 
 use App\Http\Controllers\Controller;
@@ -12,25 +13,29 @@ class LaporanController extends Controller
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
-        // S3: pisah laporan aktif dan riwayat
         $laporanAktif = Laporan::with(['siswa', 'guruBk'])
             ->where('siswa_id', $siswa->id)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
-            ->latest()->get();
+            ->latest()
+            ->get();
 
         $laporanRiwayat = Laporan::with(['siswa', 'guruBk'])
             ->where('siswa_id', $siswa->id)
             ->whereIn('status', ['selesai', 'dirujuk'])
-            ->latest()->get();
+            ->latest()
+            ->get();
 
-        return view('orang-tua.laporan.index', compact('laporanAktif', 'laporanRiwayat', 'siswa'));
+        return view('orang-tua.laporan.index', compact(
+            'laporanAktif',
+            'laporanRiwayat',
+            'siswa'
+        ));
     }
 
     public function create()
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
-        // L5: blokir jika ada kasus aktif
         $kasusAktif = Laporan::where('siswa_id', $siswa->id)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
@@ -47,7 +52,6 @@ class LaporanController extends Controller
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
-        // L5: double-check sebelum simpan
         $kasusAktif = Laporan::where('siswa_id', $siswa->id)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
@@ -60,11 +64,11 @@ class LaporanController extends Controller
         $validated = $request->validate([
             'judul_laporan' => ['required', 'string', 'max:150'],
             'deskripsi' => ['required', 'string'],
-            // L3: rekaman audio/video
             'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,mp3,mp4,mov,wav,m4a,ogg', 'max:51200'],
         ]);
 
         $buktiPath = null;
+
         if ($request->hasFile('bukti')) {
             $buktiPath = $request->file('bukti')->store('bukti-laporan', 'public');
         }
@@ -87,7 +91,14 @@ class LaporanController extends Controller
     public function show(string $id)
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
-        $laporan = Laporan::with(['siswa', 'guruBk', 'pemanggilan', 'monitoring', 'evaluasi'])
+
+        $laporan = Laporan::with([
+            'siswa',
+            'guruBk',
+            'pemanggilan',
+            'monitoring',
+            'evaluasi',
+        ])
             ->where('siswa_id', $siswa->id)
             ->findOrFail($id);
 

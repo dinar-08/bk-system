@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+
 @section('title', 'Data Siswa')
 @section('page-title', 'Data Siswa')
 @section('page-subtitle', 'Kelola data siswa dan akun orang tua berdasarkan kelas')
@@ -6,71 +7,110 @@
 @section('content')
 
     @php
-        $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') == 'aktif');
+        $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') === 'aktif');
         $siswaPerKelas = $siswaAktif->groupBy('kelas');
     @endphp
 
-    <div class="mb-7 flex items-center justify-between">
+    <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Data Siswa</h1>
-            <p class="text-slate-500 mt-1 text-sm">Kelola data siswa dan akun orang tua berdasarkan kelas.</p>
+            <p class="text-slate-500 mt-1 text-sm">
+                Kelola data siswa dan akun orang tua berdasarkan kelas.
+            </p>
         </div>
-        <a href="{{ route('admin.siswa.create') }}"
-            class="flex items-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Tambah Siswa
-        </a>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="button" onclick="openDownloadModal()"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
+                <i data-feather="download" class="w-4 h-4"></i>
+                Download Data
+            </button>
+
+            <button type="button" onclick="openPeriodeModal()"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors">
+                <i data-feather="calendar" class="w-4 h-4"></i>
+                Periode Update
+            </button>
+
+            <a href="{{ route('admin.siswa.create') }}"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                <i data-feather="plus" class="w-4 h-4"></i>
+                Tambah Siswa
+            </a>
+        </div>
     </div>
 
+    @if(session('error_nonaktifkan'))
+        @php $errData = session('error_nonaktifkan'); @endphp
+
+        <div class="mb-5 bg-red-50 border border-red-200 rounded-xl p-4">
+            <p class="text-sm font-semibold text-red-700 mb-2">
+                Kelas {{ $errData['kelas'] }} tidak bisa dinonaktifkan
+            </p>
+
+            <p class="text-xs text-red-600 mb-3">
+                Masih ada kasus yang sedang berjalan:
+            </p>
+
+            <ul class="space-y-1">
+                @foreach($errData['kasus'] as $k)
+                    <li class="text-xs text-red-600 bg-red-100 rounded-lg px-3 py-1.5">
+                        <strong>{{ $k['nama'] }}</strong> — {{ $k['judul'] }}
+                        <span class="ml-1 bg-red-200 text-red-700 px-1.5 py-0.5 rounded-full text-[10px] capitalize">
+                            {{ $k['status'] }}
+                        </span>
+                    </li>
+                @endforeach
+            </ul>
+
+            <p class="text-xs text-red-500 mt-2">
+                Selesaikan atau arsipkan kasus tersebut terlebih dahulu.
+            </p>
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="mb-5 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-5 bg-red-50 border border-red-200 rounded-xl p-4">
+            <ul class="list-disc list-inside text-red-600 text-sm space-y-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @forelse($siswaPerKelas as $kelas => $dataSiswa)
-
         <section class="mb-10">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-1 h-7 bg-blue-700 rounded-full"></div>
 
-            {{-- Header kelas --}}
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-1 h-7 bg-blue-700 rounded-full"></div>
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">Kelas {{ $kelas }}</h2>
-                        <p class="text-xs text-slate-500">{{ $dataSiswa->count() }} siswa aktif</p>
-                    </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Kelas {{ $kelas }}</h2>
+                    <p class="text-xs text-slate-500">{{ $dataSiswa->count() }} siswa aktif</p>
                 </div>
-                <form action="{{ route('admin.siswa.nonaktifkan-kelas') }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="kelas" value="{{ $kelas }}">
-                    <button onclick="return confirm('Nonaktifkan semua akun kelas {{ $kelas }}?')"
-                        class="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                        Nonaktifkan Kelas
-                    </button>
-                </form>
             </div>
 
-            {{-- Rak Buku Siswa --}}
             <div class="flex overflow-x-auto gap-1 pb-2" style="min-height: 340px;">
                 @foreach($dataSiswa as $item)
                     <div class="group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-500 shadow-sm cursor-pointer"
                         style="width: 72px; height: 320px;" onmouseenter="this.style.width='300px'"
                         onmouseleave="this.style.width='72px'">
 
-                        {{-- Background --}}
                         <div class="absolute inset-0 bg-gradient-to-b from-blue-700 to-blue-900"></div>
 
                         @if($item->foto)
                             <img src="{{ asset('storage/' . $item->foto) }}"
-                                class="absolute inset-0 w-full h-full object-cover opacity-40">
+                                class="absolute inset-0 w-full h-full object-cover opacity-40" alt="Foto Siswa">
                         @endif
 
-                        {{-- Overlay --}}
                         <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/50 to-transparent"></div>
 
-                        {{-- Nama spine (collapsed) --}}
                         <div class="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300 pointer-events-none"
                             style="writing-mode: vertical-rl; transform: rotate(180deg);">
                             <span
@@ -80,7 +120,6 @@
                             </span>
                         </div>
 
-                        {{-- Konten (expanded) --}}
                         <div
                             class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
                             <div>
@@ -88,26 +127,34 @@
                                     class="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-white text-2xl font-bold mb-3">
                                     {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
                                 </div>
-                                <h3 class="text-white text-base font-bold leading-tight">{{ $item->nama_siswa }}</h3>
+
+                                <h3 class="text-white text-base font-bold leading-tight">
+                                    {{ $item->nama_siswa }}
+                                </h3>
+
                                 <div class="mt-2 space-y-0.5">
                                     <p class="text-blue-100 text-xs">NIS: {{ $item->nis }}</p>
                                     <p class="text-blue-100 text-xs">Kelas: {{ $item->kelas }}</p>
                                     <p class="text-blue-100 text-xs">Orang Tua: {{ $item->nama_ortu }}</p>
                                 </div>
+
                                 <span
                                     class="mt-3 inline-block px-2.5 py-1 rounded-full text-xs font-bold bg-green-400/20 text-green-300 border border-green-400/30">
                                     Akun Aktif
                                 </span>
                             </div>
+
                             <div class="space-y-2">
                                 <a href="{{ route('admin.siswa.edit', $item->id) }}"
                                     class="block w-full bg-white text-blue-900 rounded-xl py-2.5 text-center text-sm font-bold hover:bg-blue-50 transition-colors">
                                     Edit Data
                                 </a>
+
                                 <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button onclick="return confirm('Nonaktifkan akun siswa ini?')"
+
+                                    <button type="submit" onclick="return confirm('Nonaktifkan akun siswa ini?')"
                                         class="w-full bg-red-500/80 hover:bg-red-500 text-white rounded-xl py-2.5 text-sm font-bold transition-colors">
                                         Nonaktifkan
                                     </button>
@@ -118,22 +165,177 @@
                 @endforeach
             </div>
 
-            {{-- Garis rak --}}
             <div class="h-2 rounded-full mt-1"
                 style="background: linear-gradient(to right, #bfdbfe, #3b82f6, #bfdbfe); box-shadow: 0 2px 6px rgba(59,130,246,0.2);">
             </div>
-
         </section>
-
     @empty
         <div class="bg-white rounded-2xl border border-slate-200 p-14 text-center">
-            <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
+            <i data-feather="users" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
             <p class="text-slate-500 font-medium">Belum ada data siswa aktif.</p>
         </div>
     @endforelse
+
+    {{-- Modal Download Data --}}
+    <div id="downloadModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40" onclick="closeDownloadModal()"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg p-6">
+                <div class="mb-5 pb-5 border-b border-slate-100 flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="font-bold text-slate-800">Download Data Siswa</h2>
+                        <p class="text-sm text-slate-500 mt-0.5">
+                            Pilih filter data siswa yang ingin didownload.
+                        </p>
+                    </div>
+
+                    <button type="button" onclick="closeDownloadModal()" class="text-slate-400 hover:text-slate-700">
+                        <i data-feather="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <form method="GET" action="{{ route('admin.siswa.download') }}" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kelas</label>
+                        <select name="kelas"
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Semua Kelas</option>
+                            @foreach($siswaPerKelas as $kelas => $dataSiswa)
+                                <option value="{{ $kelas }}">Kelas {{ $kelas }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Status Akun</label>
+                        <select name="status"
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Semua Status</option>
+                            <option value="aktif">Aktif</option>
+                            <option value="nonaktif">Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Format File</label>
+                        <select name="format"
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeDownloadModal()"
+                            class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-semibold hover:bg-slate-50">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition">
+                            <i data-feather="download" class="w-4 h-4"></i>
+                            Download
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal Periode Update --}}
+    <div id="periodeModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40" onclick="closePeriodeModal()"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-6">
+                <div class="mb-5 pb-5 border-b border-slate-100 flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="font-bold text-slate-800">Periode Update Data</h2>
+                        <p class="text-sm text-slate-500 mt-0.5">
+                            Tentukan rentang waktu wajib update data siswa.
+                        </p>
+                    </div>
+
+                    <button type="button" onclick="closePeriodeModal()" class="text-slate-400 hover:text-slate-700">
+                        <i data-feather="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('admin.periode-update.store') }}" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tahun Ajaran</label>
+                        <input type="text" name="tahun_ajaran" value="{{ old('tahun_ajaran') }}"
+                            placeholder="Contoh: 2026/2027" required
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Mulai</label>
+                        <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}" required
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Selesai</label>
+                        <input type="date" name="tanggal_selesai" value="{{ old('tanggal_selesai') }}" required
+                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closePeriodeModal()"
+                            class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-semibold hover:bg-slate-50">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition">
+                            <i data-feather="save" class="w-4 h-4"></i>
+                            Simpan Periode
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPeriodeModal() {
+            document.getElementById('periodeModal').classList.remove('hidden');
+        }
+
+        function closePeriodeModal() {
+            document.getElementById('periodeModal').classList.add('hidden');
+        }
+
+        function openDownloadModal() {
+            document.getElementById('downloadModal').classList.remove('hidden');
+        }
+
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+
+            @if($errors->any())
+                openPeriodeModal();
+            @endif
+            });
+    </script>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
 
 @endsection

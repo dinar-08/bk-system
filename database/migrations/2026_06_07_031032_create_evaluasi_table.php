@@ -26,8 +26,6 @@ return new class extends Migration {
 
             $table->text('hasil_evaluasi');
 
-            $table->text('rekomendasi');
-
             $table->enum('status_akhir', [
                 'selesai',
                 'monitoring_lanjutan',

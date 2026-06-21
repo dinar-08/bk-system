@@ -132,13 +132,17 @@
                 </div>
             </form>
         @else
-            <div class="bg-green-50 border border-green-200 rounded-xl px-5 py-4 flex items-center justify-between">
+            <div
+                class="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <p class="font-semibold text-green-700 text-sm">Semua monitoring telah selesai.</p>
-                    <p class="text-green-600 text-xs mt-0.5">Silakan lanjut ke tahap evaluasi.</p>
+                    <p class="font-semibold text-blue-700 text-sm">Tidak ada jadwal monitoring aktif.</p>
+                    <p class="text-blue-600 text-xs mt-0.5">
+                        Jika monitoring dirasa sudah cukup, silakan lanjut ke tahap evaluasi.
+                    </p>
                 </div>
+
                 <a href="{{ route('bk.evaluasi.show', $laporan->id) }}"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                    class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
                     <i data-feather="check-square" class="w-4 h-4"></i>
                     Lanjut Evaluasi
                 </a>
@@ -165,9 +169,9 @@
                             </p>
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
-                                @elseif($item->status_perkembangan == 'menurun') bg-red-100 text-red-700
-                                @else bg-blue-100 text-blue-700 @endif">
+                                        @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
+                                        @elseif($item->status_perkembangan == 'menurun') bg-red-100 text-red-700
+                                        @else bg-blue-100 text-blue-700 @endif">
                             {{ ucfirst($item->status_perkembangan) }}
                         </span>
                     </div>

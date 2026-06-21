@@ -38,6 +38,7 @@ class PerkembanganController extends Controller
             'evaluasi',
         ])
             ->where('siswa_id', $siswa->id)
+            ->whereIn('status', ['monitoring', 'selesai', 'dirujuk'])
             ->findOrFail($id);
 
         return view('orang-tua.perkembangan.show', compact('siswa', 'laporan'));
