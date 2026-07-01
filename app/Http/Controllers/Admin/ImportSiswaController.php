@@ -40,7 +40,7 @@ class ImportSiswaController extends Controller
 
         $header = null;
         $barisHeader = null;
-<<<<<<< HEAD
+<<<<<<< HEAD\
 =======
         $kolom = [
             'nis' => null,
