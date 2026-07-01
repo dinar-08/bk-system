@@ -11,17 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-<<<<<<< HEAD
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ImportSiswaController extends Controller
 {
-
-=======
-
-class ImportSiswaController extends Controller
-{
->>>>>>> 4226421 (backup)
     public function store(Request $request)
     {
         $request->validate([
@@ -40,14 +32,11 @@ class ImportSiswaController extends Controller
 
         $header = null;
         $barisHeader = null;
-<<<<<<< HEAD\
-=======
         $kolom = [
             'nis' => null,
             'nama' => null,
             'kelas' => null,
         ];
->>>>>>> 4226421 (backup)
 
         foreach ($rows as $index => $row) {
             $hasilDeteksi = $this->deteksiKolom($row);
@@ -145,10 +134,7 @@ class ImportSiswaController extends Controller
                         'nis' => $nis,
                         'nama' => $nama,
                         'kelas' => $kelas,
-<<<<<<< HEAD
-=======
                         'tahun_ajaran' => $tahunAjaran,
->>>>>>> 4226421 (backup)
                         'password' => $password,
                     ];
                 });

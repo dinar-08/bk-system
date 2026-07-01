@@ -77,8 +77,6 @@ class RiwayatController extends Controller
 
         return $pdf->download('riwayat-kasus.pdf');
     }
-<<<<<<< HEAD
-=======
 
     public function downloadKasus(string $id)
     {
@@ -97,5 +95,5 @@ class RiwayatController extends Controller
 
         return $pdf->download('kasus-' . str_replace(' ', '-', strtolower($namaSiswa)) . '.pdf');
     }
->>>>>>> 4226421 (backup)
+
 }

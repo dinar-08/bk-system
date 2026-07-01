@@ -7,15 +7,15 @@
 @section('content')
 
     @php
-<<<<<<< HEAD
+
         $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') === 'aktif');
         $siswaPerKelas = $siswaAktif->groupBy('kelas');
-=======
+
         $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') == 'aktif');
         $siswaPerKelas = $siswaAktif
             ->sortBy('nama_siswa')
             ->groupBy('kelas');
->>>>>>> 4226421 (backup)
+
     @endphp
 
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

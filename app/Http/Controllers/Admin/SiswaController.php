@@ -218,11 +218,6 @@ class SiswaController extends Controller
 
     public function download(Request $request)
     {
-<<<<<<< HEAD
-        $tipe = $request->get('tipe', 'siswa');
-
-        return (new SiswaExport($tipe))->download();
-=======
         $siswa = Siswa::with('user')
             ->when($request->input('kelas'), fn ($q) => $q->where('kelas', $request->input('kelas')))
             ->when($request->input('status'), function ($q) use ($request) {
@@ -238,7 +233,6 @@ class SiswaController extends Controller
         ])->setPaper('a4', 'portrait');
 
         return $pdf->download('data-siswa-' . now()->format('Ymd-His') . '.pdf');
->>>>>>> 4226421 (backup)
     }
 
     private function generatePassword(): string

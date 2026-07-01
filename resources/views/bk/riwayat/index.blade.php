@@ -7,10 +7,10 @@
 @section('content')
 
     @php
-<<<<<<< HEAD
-        $laporanPerKategori = $laporan->groupBy('kategori');
-=======
->>>>>>> 4226421 (backup)
+        $laporanPerKategori = $laporan
+            ->groupBy(fn($item) => $item->kategori ?: 'lain-lain')
+            ->sortKeys();
+
         $limitTampil = 10;
 
         $kategoriConfig = [
@@ -20,28 +20,13 @@
             'emosional' => ['label' => 'Emosional'],
             'lain-lain' => ['label' => 'Lain-lain'],
         ];
-
-<<<<<<< HEAD
-        $defaultCfg = [
-            'label' => 'Tanpa Kategori',
-            'gradient' => 'from-slate-600 via-slate-700 to-slate-900',
-        ];
-    @endphp
-
-    <div class="bg-blue-700 -mx-6 px-8 py-5 mb-6">
-        <h2 class="text-white font-bold text-xl">Riwayat Permasalahan Siswa</h2>
-        <p class="text-blue-100 text-sm mt-1">{{ $laporan->count() }} kasus ditemukan</p>
-=======
-        $laporanPerKategori = $laporan
-            ->groupBy(fn($item) => $item->kategori ?: 'lain-lain')
-            ->sortKeys();
     @endphp
 
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Riwayat Permasalahan Siswa</h1>
+            <p class="text-sm text-slate-500 mt-1">{{ $laporan->count() }} kasus ditemukan</p>
         </div>
->>>>>>> 4226421 (backup)
     </div>
 
     <form id="filterRiwayat" method="GET" action="{{ route('bk.riwayat.index') }}"
@@ -50,17 +35,6 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
 
             <div>
-<<<<<<< HEAD
-                <label class="text-xs font-medium text-slate-600 block mb-1">Nama Siswa</label>
-                <input type="text" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..." autocomplete="off"
-                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            </div>
-
-            <div>
-                <label class="text-xs font-medium text-slate-600 block mb-1">Kelas</label>
-                <select name="kelas"
-                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-=======
                 <label for="filter-nama" class="text-xs font-medium text-slate-600 block mb-1">Nama Siswa</label>
                 <input type="text" id="filter-nama" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..." autocomplete="off"
                     class="filter-input filter-input-text w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -70,7 +44,6 @@
                 <label for="filter-kelas" class="text-xs font-medium text-slate-600 block mb-1">Kelas</label>
                 <select id="filter-kelas" name="kelas"
                     class="filter-input filter-input-select w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
->>>>>>> 4226421 (backup)
                     <option value="">Semua Kelas</option>
                     @foreach($daftarKelas as $k)
                         <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>
@@ -81,15 +54,6 @@
             </div>
 
             <div>
-<<<<<<< HEAD
-                <label class="text-xs font-medium text-slate-600 block mb-1">Kategori</label>
-                <select name="kategori"
-                    class="filter-input w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <option value="">Semua Kategori</option>
-                    @foreach($kategori as $kat)
-                        <option value="{{ $kat }}" {{ request('kategori') === $kat ? 'selected' : '' }}>
-                            {{ ucfirst($kat) }}
-=======
                 <label for="filter-kategori" class="text-xs font-medium text-slate-600 block mb-1">Kategori</label>
                 <select id="filter-kategori" name="kategori"
                     class="filter-input filter-input-select w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -97,7 +61,6 @@
                     @foreach($kategori as $kat)
                         <option value="{{ $kat }}" {{ request('kategori') === $kat ? 'selected' : '' }}>
                             {{ $kategoriConfig[$kat]['label'] ?? ucfirst($kat) }}
->>>>>>> 4226421 (backup)
                         </option>
                     @endforeach
                 </select>
@@ -120,48 +83,6 @@
         </div>
     </form>
 
-<<<<<<< HEAD
-    <div>
-        @forelse($laporanPerKategori as $namaKategori => $dataLaporan)
-            @php
-                $cfg = $kategoriConfig[$namaKategori] ?? array_merge($defaultCfg, [
-                    'label' => ucfirst($namaKategori ?? 'Tanpa Kategori'),
-                ]);
-
-                $sedangFilterKategori = request('kategori') === $namaKategori;
-
-                $dataPreview = $sedangFilterKategori
-                    ? $dataLaporan
-                    : $dataLaporan->take($limitTampil);
-
-                $perluLihatSemua = !$sedangFilterKategori && $dataLaporan->count() > $limitTampil;
-            @endphp
-
-            <section class="mb-12">
-                <div class="mb-5 flex items-start justify-between gap-4">
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-900">{{ $cfg['label'] }}</h2>
-                        <p class="text-slate-500">{{ $dataLaporan->count() }} kasus</p>
-                    </div>
-
-                    @if($perluLihatSemua)
-                        <a href="{{ route('bk.riwayat.index', array_merge(request()->except('page'), ['kategori' => $namaKategori])) }}"
-                            class="inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700 mt-2">
-                            Lihat Semua
-                            <i data-feather="arrow-right" class="w-4 h-4"></i>
-                        </a>
-                    @endif
-                </div>
-
-                <div class="flex overflow-x-auto min-h-[320px] gap-2 pb-4">
-                    @foreach($dataPreview as $item)
-                        @php
-                            $status = $item->status ?? '-';
-
-                            $statusBadge = $status === 'selesai'
-                                ? 'bg-emerald-400/90 text-emerald-950'
-                                : 'bg-rose-400/90 text-rose-950';
-=======
     @forelse($laporanPerKategori as $namaKategori => $dataLaporan)
         @php
             $cfg = $kategoriConfig[$namaKategori] ?? ['label' => ucfirst($namaKategori)];
@@ -194,7 +115,6 @@
                     </a>
                 @endif
             </div>
->>>>>>> 4226421 (backup)
 
             <div class="flex flex-row flex-nowrap overflow-x-auto pb-3">
                 @foreach($dataPreview as $item)
@@ -205,12 +125,7 @@
                             ? 'bg-green-400/20 text-green-200 border border-green-300/30'
                             : 'bg-red-400/20 text-red-200 border border-red-300/30';
 
-<<<<<<< HEAD
-                        <div class="group relative h-[300px] w-[70px] hover:w-[280px] shrink-0 overflow-hidden rounded-xl transition-all duration-500 shadow-lg bg-gradient-to-br {{ $cfg['gradient'] }} bg-cover bg-center"
-                            @if($foto) style="background-image:url('{{ asset('storage/' . $foto) }}')" @endif>
-=======
                         $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
->>>>>>> 4226421 (backup)
 
                         $siswa = $item->siswa;
                         $nama = optional($siswa)->nama_siswa ?? '-';
@@ -224,8 +139,7 @@
                             <img src="{{ asset('storage/' . $foto) }}" alt="{{ $nama }}"
                                 class="absolute inset-0 w-full h-full object-cover">
                         @else
-                            <div
-                                class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
                                 <span class="text-white/20 text-8xl font-extrabold">
                                     {{ strtoupper(substr($nama, 0, 1)) }}
                                 </span>
@@ -239,11 +153,9 @@
                             {{ $nama }}
                         </p>
 
-                        <div
-                            class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div>
-                                <div
-                                    class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full {{ $statusBadge }} text-xs font-bold">
+                                <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full {{ $statusBadge }} text-xs font-bold">
                                     {{ $statusLabel }}
                                 </div>
 
@@ -308,26 +220,6 @@
             if (typeof feather !== 'undefined') {
                 feather.replace();
             }
-        });
-    </script>
-
-    <script>
-        const formFilter = document.getElementById('filterRiwayat');
-        const filterInputs = document.querySelectorAll('.filter-input');
-        let timer;
-
-        filterInputs.forEach(input => {
-            input.addEventListener('input', function () {
-                clearTimeout(timer);
-
-                timer = setTimeout(() => {
-                    formFilter.submit();
-                }, 500);
-            });
-
-            input.addEventListener('change', function () {
-                formFilter.submit();
-            });
         });
     </script>
 

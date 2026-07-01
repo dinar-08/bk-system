@@ -17,21 +17,30 @@ class ProfileController extends Controller
     public function edit(Request $request)
     {
         $user = $request->user();
-<<<<<<< HEAD
-        $dataProfil = null;
-=======
 
-        $dataProfil  = null;
-        $periode     = null;
+        $dataProfil = null;
+        $periode = null;
         $wajibUpdate = false;
->>>>>>> 4226421 (backup)
 
         if ($user->role === 'bk') {
             $dataProfil = GuruBK::where('user_id', $user->id)->first();
         }
 
-<<<<<<< HEAD
-        return view('profile.edit', compact('user', 'dataProfil'));
+        if ($user->role === 'orang_tua') {
+            $dataProfil = Siswa::where('user_id', $user->id)->first();
+            $periode = PeriodeUpdate::aktifSekarang();
+
+            if ($periode && $dataProfil) {
+                $wajibUpdate = !$dataProfil->sudahUpdateDiPeriode($periode);
+            }
+        }
+
+        return view('profile.edit', compact(
+            'user',
+            'dataProfil',
+            'periode',
+            'wajibUpdate'
+        ));
     }
 
     // Halaman update data siswa (dipanggil saat periode wajib update)
@@ -129,74 +138,25 @@ class ProfileController extends Controller
     }
 
     // Update profil umum (admin, BK, orang tua via halaman /profile)
-=======
-        if ($user->role === 'orang_tua') {
-            $dataProfil  = Siswa::where('user_id', $user->id)->first();
-            $periode     = PeriodeUpdate::aktifSekarang();
-
-            if ($periode && $dataProfil) {
-                $wajibUpdate = !$dataProfil->sudahUpdateDiPeriode($periode);
-            }
-        }
-
-        return view('profile.edit', compact(
-            'user',
-            'dataProfil',
-            'periode',
-            'wajibUpdate'
-        ));
-    }
-
->>>>>>> 4226421 (backup)
     public function update(Request $request)
     {
         $user = $request->user();
 
-<<<<<<< HEAD
-        $request->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'password' => ['nullable', 'confirmed', Password::min(8)],
-            // Orang tua
-            'nama_siswa' => ['nullable', 'string', 'max:150'],
-            'jenis_kelamin' => ['nullable', 'in:L,P'],
-            'tanggal_lahir' => ['nullable', 'date'],
-            'alamat' => ['nullable', 'string'],
-            'kelas' => ['nullable', 'string', 'max:50'],
-            'nama_ortu' => ['nullable', 'string', 'max:150'],
-            'no_whatsapp' => ['nullable', 'string', 'max:20'],
-            // BK
-            'no_hp' => ['nullable', 'string', 'max:20'],
-        ]);
-
-        $updateUser = ['name' => $request->name];
-
-        if ($request->filled('password')) {
-            $updateUser['password'] = Hash::make($request->password);
-        }
-
-        // Handle foto — simpan ke disk, update di users
-        if ($request->hasFile('foto')) {
-            if ($user->foto)
-                Storage::disk('public')->delete($user->foto);
-            $fotoPath = $request->file('foto')->store('foto-profil', 'public');
-            $updateUser['foto'] = $fotoPath;
-=======
         // Kosongkan password jika tidak diisi
         if (trim((string) $request->input('password')) === '') {
             $request->merge([
-                'password'              => null,
+                'password' => null,
                 'password_confirmation' => null,
             ]);
         }
 
         // Tentukan apakah kondisi wajib isi semua field
-        $periode     = null;
+        $periode = null;
         $wajibUpdate = false;
-        $siswa       = null;
+        $siswa = null;
 
         if ($user->role === 'orang_tua') {
-            $siswa   = Siswa::where('user_id', $user->id)->first();
+            $siswa = Siswa::where('user_id', $user->id)->first();
             $periode = PeriodeUpdate::aktifSekarang();
 
             if ($periode && $siswa) {
@@ -208,7 +168,7 @@ class ProfileController extends Controller
         // 1. Login pertama (must_change_password = true)
         // 2. Periode update aktif dan belum update
         $wajibIsiLengkap = $user->role === 'orang_tua' &&
-                           ($user->must_change_password || $wajibUpdate);
+            ($user->must_change_password || $wajibUpdate);
 
         // ── Validasi ──────────────────────────────────────────────────
         $rules = [
@@ -217,27 +177,27 @@ class ProfileController extends Controller
 
         if ($wajibIsiLengkap) {
             // Foto wajib diisi jika belum ada foto
-            $rules['foto']          = [$siswa && $siswa->foto ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
-            $rules['nama_siswa']    = ['required', 'string', 'max:150'];
+            $rules['foto'] = [$siswa && $siswa->foto ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
+            $rules['nama_siswa'] = ['required', 'string', 'max:150'];
             $rules['jenis_kelamin'] = ['required', 'in:L,P'];
             $rules['tanggal_lahir'] = ['required', 'date'];
-            $rules['alamat']        = ['required', 'string'];
-            $rules['kelas']         = ['required', 'string', 'max:50'];
-            $rules['nama_ortu']     = ['required', 'string', 'max:150'];
-            $rules['no_whatsapp']   = ['required', 'string', 'max:20'];
+            $rules['alamat'] = ['required', 'string'];
+            $rules['kelas'] = ['required', 'string', 'max:50'];
+            $rules['nama_ortu'] = ['required', 'string', 'max:150'];
+            $rules['no_whatsapp'] = ['required', 'string', 'max:20'];
         } else {
-            $rules['nama_siswa']    = ['nullable', 'string', 'max:150'];
+            $rules['nama_siswa'] = ['nullable', 'string', 'max:150'];
             $rules['jenis_kelamin'] = ['nullable', 'in:L,P'];
             $rules['tanggal_lahir'] = ['nullable', 'date'];
-            $rules['alamat']        = ['nullable', 'string'];
-            $rules['kelas']         = ['nullable', 'string', 'max:50'];
-            $rules['nama_ortu']     = ['nullable', 'string', 'max:150'];
-            $rules['no_whatsapp']   = ['nullable', 'string', 'max:20'];
+            $rules['alamat'] = ['nullable', 'string'];
+            $rules['kelas'] = ['nullable', 'string', 'max:50'];
+            $rules['nama_ortu'] = ['nullable', 'string', 'max:150'];
+            $rules['no_whatsapp'] = ['nullable', 'string', 'max:20'];
         }
 
         if ($user->role !== 'orang_tua') {
-            $rules['name']   = ['required', 'string', 'max:150'];
-            $rules['no_hp']  = ['nullable', 'string', 'max:20'];
+            $rules['name'] = ['required', 'string', 'max:150'];
+            $rules['no_hp'] = ['nullable', 'string', 'max:20'];
             $rules['alamat'] = ['nullable', 'string'];
         }
 
@@ -248,18 +208,18 @@ class ProfileController extends Controller
         }
 
         $request->validate($rules, [
-            'foto.required'          => 'Foto profil wajib diunggah.',
-            'nama_siswa.required'    => 'Nama siswa wajib diisi.',
+            'foto.required' => 'Foto profil wajib diunggah.',
+            'nama_siswa.required' => 'Nama siswa wajib diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
-            'alamat.required'        => 'Alamat wajib diisi.',
-            'kelas.required'         => 'Kelas wajib diisi.',
-            'nama_ortu.required'     => 'Nama orang tua wajib diisi.',
-            'no_whatsapp.required'   => 'Nomor WhatsApp wajib diisi.',
-            'password.required'      => 'Anda wajib mengganti password sebelum melanjutkan.',
-            'password.mixed_case'    => 'Password harus mengandung huruf besar dan huruf kecil.',
-            'password.numbers'       => 'Password harus mengandung angka.',
-            'password.confirmed'     => 'Konfirmasi password tidak cocok.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'kelas.required' => 'Kelas wajib diisi.',
+            'nama_ortu.required' => 'Nama orang tua wajib diisi.',
+            'no_whatsapp.required' => 'Nomor WhatsApp wajib diisi.',
+            'password.required' => 'Anda wajib mengganti password sebelum melanjutkan.',
+            'password.mixed_case' => 'Password harus mengandung huruf besar dan huruf kecil.',
+            'password.numbers' => 'Password harus mengandung angka.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         // ── Update tabel users ────────────────────────────────────────
@@ -272,8 +232,8 @@ class ProfileController extends Controller
         }
 
         if ($request->filled('password')) {
-            $updateUser['password']             = Hash::make($request->password);
-            $updateUser['default_password']     = null;
+            $updateUser['password'] = Hash::make($request->password);
+            $updateUser['default_password'] = null;
             $updateUser['must_change_password'] = false;
         }
 
@@ -283,72 +243,20 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->foto);
             }
             $updateUser['foto'] = $request->file('foto')->store('foto-profil', 'public');
->>>>>>> 4226421 (backup)
         }
 
         $user->update($updateUser);
 
-<<<<<<< HEAD
-        // Update tabel guru_bk
-        if ($user->role === 'bk') {
-            $profil = GuruBK::where('user_id', $user->id)->first();
-            if ($profil) {
-                $updateProfil = [
-                    'nama' => $request->name,
-                    'no_hp' => $request->no_hp,
-                    'alamat' => $request->alamat,
-                ];
-                // Foto BK disimpan ke guru_bk juga (sama path)
-                if (isset($fotoPath))
-                    $updateProfil['foto'] = $fotoPath;
-                $profil->update($updateProfil);
-            }
-        }
-
-        // Update tabel siswa (orang tua)
-        if ($user->role === 'orang_tua') {
-            $profil = Siswa::where('user_id', $user->id)->first();
-            if ($profil) {
-                $updateProfil = [
-                    'nama_siswa' => $request->nama_siswa ?? $request->name,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'tanggal_lahir' => $request->tanggal_lahir,
-                    'alamat' => $request->alamat,
-                    'kelas' => $request->kelas,
-                    'nama_ortu' => $request->nama_ortu,
-                    'no_whatsapp' => $request->no_whatsapp,
-                ];
-                if (isset($fotoPath))
-                    $updateProfil['foto'] = $fotoPath;
-                $profil->update($updateProfil);
-                // Sinkron nama siswa ke users
-                $user->update(['name' => $request->nama_siswa ?? $request->name]);
-            }
-        }
-
-        return redirect()->route('profile.edit')
-            ->with('status', 'Profil berhasil diperbarui.');
-    }
-
-    private function redirectAfterRole(string $role): string
-    {
-        return match ($role) {
-            'admin' => route('admin.dashboard'),
-            'bk' => route('bk.dashboard'),
-            'orang_tua' => route('orang_tua.dashboard'),
-            default => '/',
-        };
-=======
         // ── Update tabel siswa (khusus orang_tua) ────────────────────
         if ($user->role === 'orang_tua' && $siswa) {
             $updateSiswa = [
-                'nama_siswa'    => $request->nama_siswa    ?? $siswa->nama_siswa,
+                'nama_siswa' => $request->nama_siswa ?? $siswa->nama_siswa,
                 'jenis_kelamin' => $request->jenis_kelamin ?? $siswa->jenis_kelamin,
                 'tanggal_lahir' => $request->tanggal_lahir ?? $siswa->tanggal_lahir,
-                'alamat'        => $request->alamat        ?? $siswa->alamat,
-                'kelas'         => $request->kelas         ?? $siswa->kelas,
-                'nama_ortu'     => $request->nama_ortu     ?? $siswa->nama_ortu,
-                'no_whatsapp'   => $request->no_whatsapp   ?? $siswa->no_whatsapp,
+                'alamat' => $request->alamat ?? $siswa->alamat,
+                'kelas' => $request->kelas ?? $siswa->kelas,
+                'nama_ortu' => $request->nama_ortu ?? $siswa->nama_ortu,
+                'no_whatsapp' => $request->no_whatsapp ?? $siswa->no_whatsapp,
             ];
 
             // Foto untuk orang_tua disimpan di siswa
@@ -371,9 +279,9 @@ class ProfileController extends Controller
             $gurubk = GuruBK::where('user_id', $user->id)->first();
             if ($gurubk) {
                 $updateGurubk = [
-                    'nama'   => $request->name   ?? $gurubk->nama,
-                    'no_hp'  => $request->no_hp  ?? $gurubk->no_hp,
-                    'alamat' => $request->alamat  ?? $gurubk->alamat,
+                    'nama' => $request->name ?? $gurubk->nama,
+                    'no_hp' => $request->no_hp ?? $gurubk->no_hp,
+                    'alamat' => $request->alamat ?? $gurubk->alamat,
                 ];
 
                 // Foto BK disimpan di guru_bk jika ada kolomnya,
@@ -390,7 +298,16 @@ class ProfileController extends Controller
         }
 
         return redirect()->route('profile.edit')->with('status', 'profile-updated');
->>>>>>> 4226421 (backup)
+    }
+
+    private function redirectAfterRole(string $role): string
+    {
+        return match ($role) {
+            'admin' => route('admin.dashboard'),
+            'bk' => route('bk.dashboard'),
+            'orang_tua' => route('orang_tua.dashboard'),
+            default => '/',
+        };
     }
 
     public function destroy(Request $request)
