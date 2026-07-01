@@ -22,10 +22,11 @@ class User extends Authenticatable
         'name',
         'username',
         'role',
-        'password',
         'status_akun',
         'foto',
         'must_change_password',
+        'password',
+        'default_password',
     ];
 
     /**

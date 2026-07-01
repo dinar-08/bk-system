@@ -287,7 +287,10 @@
                         <th>Pihak Dipanggil</th>
                         <th>Tujuan</th>
                         <th>Status Kehadiran</th>
+<<<<<<< HEAD
                         <th>Tindak Lanjut</th>
+=======
+>>>>>>> 4226421 (backup)
                         <th>Tanggal Monitoring</th>
                         <th>Catatan</th>
                     </tr>
@@ -301,7 +304,10 @@
                             <td>{{ str_replace('_', ' ', ucfirst($p->pihak_dipanggil ?? '-')) }}</td>
                             <td>{{ $p->tujuan ?? '-' }}</td>
                             <td>{{ str_replace('_', ' ', ucfirst($p->status_kehadiran ?? '-')) }}</td>
+<<<<<<< HEAD
                             <td>{{ str_replace('_', ' ', ucfirst($p->tindak_lanjut ?? '-')) }}</td>
+=======
+>>>>>>> 4226421 (backup)
                             <td>{{ $p->tanggal_monitoring ? \Carbon\Carbon::parse($p->tanggal_monitoring)->format('d M Y') : '-' }}</td>
                             <td>{{ $p->catatan ?? '-' }}</td>
                         </tr>
@@ -331,7 +337,10 @@
                         <th>Status Monitoring</th>
                         <th>Status Perkembangan</th>
                         <th>Catatan Perkembangan</th>
+<<<<<<< HEAD
                         <th>Tindak Lanjut</th>
+=======
+>>>>>>> 4226421 (backup)
                         <th>Monitoring Berikutnya</th>
                         <th>Guru BK</th>
                     </tr>
@@ -345,7 +354,10 @@
                             <td>{{ ucfirst($m->status_monitoring ?? '-') }}</td>
                             <td>{{ ucfirst($m->status_perkembangan ?? '-') }}</td>
                             <td>{{ $m->catatan_perkembangan ?? '-' }}</td>
+<<<<<<< HEAD
                             <td>{{ $m->tindak_lanjut ?? '-' }}</td>
+=======
+>>>>>>> 4226421 (backup)
                             <td>{{ $m->tanggal_monitoring_berikutnya ? \Carbon\Carbon::parse($m->tanggal_monitoring_berikutnya)->format('d M Y') : '-' }}</td>
                             <td>{{ optional($m->guruBk)->nama ?? '-' }}</td>
                         </tr>

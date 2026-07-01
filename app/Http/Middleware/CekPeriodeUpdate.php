@@ -2,76 +2,61 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\PeriodeUpdate;
+use App\Models\Siswa;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\PeriodeUpdate;
-use App\Models\Siswa;
 
 class CekPeriodeUpdate
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Jika belum login, lanjutkan
         if (!auth()->check()) {
             return $next($request);
         }
 
         $user = auth()->user();
 
-        // Middleware hanya berlaku untuk orang tua
+        // Untuk sementara role kamu masih orang_tua.
+        // Kalau nanti role final sudah siswa, ganti orang_tua menjadi siswa.
         if ($user->role !== 'orang_tua') {
             return $next($request);
         }
 
-        // Cari periode update yang sedang aktif
-        $periode = PeriodeUpdate::where('aktif', true)
-            ->where('tanggal_mulai', '<=', now()->toDateString())
-            ->where('tanggal_selesai', '>=', now()->toDateString())
-            ->first();
+        $periode = PeriodeUpdate::aktifSekarang();
 
-        // Jika tidak ada periode aktif, lanjutkan
         if (!$periode) {
             return $next($request);
         }
 
-        // Cari data siswa berdasarkan user login
         $siswa = Siswa::where('user_id', $user->id)->first();
 
-        // Jika siswa tidak ditemukan, lanjutkan
         if (!$siswa) {
             return $next($request);
         }
 
-        // Cek apakah siswa sudah update data pada periode ini
-        $sudahUpdate =
-            $siswa->last_data_updated_at &&
-            $siswa->last_data_updated_at >= $periode->tanggal_mulai;
+        $sudahUpdate = $siswa->sudahUpdateDiPeriode($periode);
 
-        // Jika belum update
-        if (!$sudahUpdate) {
-
-            // Batasi hanya fitur tertentu
-            if (
-                $request->routeIs('orang_tua.laporan.*') ||
-                $request->routeIs('orang_tua.perkembangan.*')
-            ) {
-                return redirect()
-                    ->route('orang_tua.update-data')
-                    ->with(
-                        'warning',
-                        'Anda wajib memperbarui data diri terlebih dahulu sebelum menggunakan fitur ini. '
-                        . 'Periode update: '
-                        . $periode->tanggal_mulai
-                        . ' s/d '
-                        . $periode->tanggal_selesai
-                    );
-            }
+        if ($sudahUpdate) {
+            return $next($request);
         }
 
-        return $next($request);
+        // Route yang tetap boleh dibuka walaupun belum update data.
+        if (
+            $request->routeIs('profile.edit') ||
+            $request->routeIs('profile.update') ||
+            $request->routeIs('logout') ||
+            $request->routeIs('password.change.*')
+        ) {
+            return $next($request);
+        }
+
+        return redirect()
+            ->route('profile.edit')
+            ->with(
+                'warning',
+                'Silakan lengkapi data profil terlebih dahulu sebelum menggunakan fitur ini.'
+            );
     }
 }

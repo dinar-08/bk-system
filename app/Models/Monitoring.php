@@ -12,11 +12,13 @@ class Monitoring extends Model
         'laporan_id',
         'guru_bk_id',
         'tanggal_monitoring',
+        'waktu_monitoring',
         'monitoring_ke',
         'status_perkembangan',
         'catatan_perkembangan',
         'tindak_lanjut',
         'tanggal_monitoring_berikutnya',
+        'waktu_monitoring_berikutnya',
         'status_monitoring',
     ];
 

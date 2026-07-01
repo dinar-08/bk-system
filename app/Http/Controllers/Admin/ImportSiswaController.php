@@ -3,17 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PeriodeUpdate;
 use App\Models\Siswa;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+<<<<<<< HEAD
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ImportSiswaController extends Controller
 {
 
+=======
+
+class ImportSiswaController extends Controller
+{
+>>>>>>> 4226421 (backup)
     public function store(Request $request)
     {
         $request->validate([
@@ -32,6 +40,14 @@ class ImportSiswaController extends Controller
 
         $header = null;
         $barisHeader = null;
+<<<<<<< HEAD
+=======
+        $kolom = [
+            'nis' => null,
+            'nama' => null,
+            'kelas' => null,
+        ];
+>>>>>>> 4226421 (backup)
 
         foreach ($rows as $index => $row) {
             $hasilDeteksi = $this->deteksiKolom($row);
@@ -66,6 +82,12 @@ class ImportSiswaController extends Controller
         $berhasil = [];
         $gagal = [];
 
+        $periodeAktif = PeriodeUpdate::aktifSekarang();
+
+        $tahunAjaran = $periodeAktif
+            ? $periodeAktif->tahun_ajaran
+            : now()->year . '/' . (now()->year + 1);
+
         foreach ($rows as $no => $row) {
             $rowNum = $no + 2;
 
@@ -98,14 +120,16 @@ class ImportSiswaController extends Controller
             }
 
             try {
-                DB::transaction(function () use ($nis, $nama, $kelas, &$berhasil) {
+                DB::transaction(function () use ($nis, $nama, $kelas, $tahunAjaran, &$berhasil) {
                     $password = $this->generatePassword();
 
                     $user = User::create([
                         'name' => $nama,
                         'username' => $nis,
                         'role' => 'orang_tua',
+                        'status_akun' => 'aktif',
                         'password' => Hash::make($password),
+                        'default_password' => $password,
                         'must_change_password' => true,
                     ]);
 
@@ -114,12 +138,17 @@ class ImportSiswaController extends Controller
                         'nis' => $nis,
                         'nama_siswa' => $nama,
                         'kelas' => $kelas,
+                        'tahun_ajaran' => $tahunAjaran,
                     ]);
 
                     $berhasil[] = [
                         'nis' => $nis,
                         'nama' => $nama,
                         'kelas' => $kelas,
+<<<<<<< HEAD
+=======
+                        'tahun_ajaran' => $tahunAjaran,
+>>>>>>> 4226421 (backup)
                         'password' => $password,
                     ];
                 });

@@ -1,9 +1,30 @@
 @extends('layouts.orang-tua')
+
 @section('title', 'Detail Laporan')
 @section('page-title', 'Detail Laporan')
 @section('page-subtitle', 'Informasi laporan, pemanggilan, monitoring, dan evaluasi anak')
 
 @section('content')
+
+    @php
+        $statusClass = [
+            'baru' => 'bg-blue-50 text-blue-700 border-blue-200',
+            'pemanggilan' => 'bg-amber-50 text-amber-700 border-amber-200',
+            'monitoring' => 'bg-purple-50 text-purple-700 border-purple-200',
+            'selesai' => 'bg-green-50 text-green-700 border-green-200',
+            'dirujuk' => 'bg-red-50 text-red-700 border-red-200',
+        ];
+
+        $statusLabel = [
+            'baru' => 'Baru',
+            'pemanggilan' => 'Pemanggilan',
+            'monitoring' => 'Monitoring',
+            'selesai' => 'Selesai',
+            'dirujuk' => 'Dirujuk',
+        ];
+
+        $status = $laporan->status ?? 'baru';
+    @endphp
 
     <div class="mb-6 flex items-center gap-3">
         <a href="{{ route('orang_tua.laporan.index') }}"
@@ -15,138 +36,36 @@
         <span class="text-sm text-slate-800 font-semibold">Detail Laporan</span>
     </div>
 
-    {{-- DATA ANAK + LAPORAN --}}
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-7">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-            {{-- DATA ANAK --}}
-            <div>
-                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                    <i data-feather="user" class="w-4 h-4 text-blue-600"></i>
-                    <h2 class="text-sm font-bold text-slate-700">Data Anak</h2>
-                </div>
-                <div class="space-y-2.5">
-                    @foreach([['Nama', $laporan->siswa->nama_siswa], ['NIS', $laporan->siswa->nis], ['Kelas', $laporan->siswa->kelas], ['Orang Tua', $laporan->siswa->nama_ortu]] as [$label, $val])
-                        <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                            <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                            <p class="text-sm font-semibold text-slate-700">{{ $val ?? '-' }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+        {{-- HEADER LAPORAN --}}
+        <div class="p-6 border-b border-slate-200">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                        <span
+                            class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold {{ $statusClass[$status] ?? 'bg-slate-50 text-slate-700 border-slate-200' }}">
+                            {{ $statusLabel[$status] ?? ucfirst($status) }}
+                        </span>
 
-            {{-- DATA LAPORAN --}}
-            <div class="lg:col-span-2">
-                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                    <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
-                    <h2 class="text-sm font-bold text-slate-700">Data Laporan</h2>
-                </div>
-                <div class="space-y-2.5">
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                        <p class="text-xs text-slate-400 mb-0.5">Judul</p>
-                        <p class="text-sm font-semibold text-slate-700">{{ $laporan->judul_laporan }}</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                            <p class="text-xs text-slate-400 mb-0.5">Kategori</p>
-                            <p class="text-sm font-semibold text-slate-700">
-                                {{ $laporan->kategori ? ucfirst($laporan->kategori) : 'Menunggu verifikasi BK' }}</p>
-                        </div>
-                        <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                            <p class="text-xs text-slate-400 mb-0.5">Jenis Masalah</p>
-                            <p class="text-sm font-semibold text-slate-700">
-                                {{ $laporan->jenis_masalah ?? 'Menunggu verifikasi BK' }}</p>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                        <p class="text-xs text-slate-400 mb-0.5">Status</p>
-                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                            {{ ucfirst($laporan->status) }}
+                        <span class="text-sm text-slate-400">
+                            {{ $laporan->created_at->format('d M Y') }}
                         </span>
                     </div>
-                    @if($laporan->bukti)
-                        <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                            <p class="text-xs text-slate-400 mb-1">Lampiran</p>
-                            <a href="{{ asset('storage/' . $laporan->bukti) }}" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-700 text-white rounded-lg text-xs font-semibold hover:bg-blue-800 transition-colors">
-                                <i data-feather="paperclip" class="w-3 h-3"></i>
-                                Lihat Bukti
-                            </a>
-                        </div>
-                    @endif
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                        <p class="text-xs text-slate-400 mb-1">Deskripsi</p>
-                        <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->deskripsi }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- RIWAYAT PEMANGGILAN --}}
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
-        <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
-            <i data-feather="phone" class="w-4 h-4 text-blue-600"></i>
-            <h2 class="text-sm font-bold text-slate-700">Riwayat Pemanggilan</h2>
-        </div>
-        <div class="space-y-3">
-            @forelse($laporan->pemanggilan as $item)
-                <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        @foreach([['Tanggal', $item->tanggal_pemanggilan], ['Waktu', $item->waktu_pemanggilan], ['Pihak Dipanggil', str_replace('_', ' ', ucfirst($item->pihak_dipanggil))], ['Status Kehadiran', str_replace('_', ' ', ucfirst($item->status_kehadiran))]] as [$lbl, $val])
-                            <div>
-                                <p class="text-xs text-slate-400 mb-0.5">{{ $lbl }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                    @if($item->tujuan)
-                        <p class="text-sm text-slate-600 mt-3 pt-3 border-t border-slate-200">{{ $item->tujuan }}</p>
-                    @endif
-                </div>
-            @empty
-                <div class="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center">
-                    <i data-feather="calendar" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-                    <p class="text-sm text-slate-400">Belum ada jadwal pemanggilan.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 leading-tight">
+                        {{ $laporan->judul_laporan }}
+                    </h1>
 
-    {{-- RIWAYAT MONITORING --}}
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
-        <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
-            <i data-feather="activity" class="w-4 h-4 text-blue-600"></i>
-            <h2 class="text-sm font-bold text-slate-700">Riwayat Monitoring</h2>
-        </div>
-        <div class="space-y-3">
-            @forelse($laporan->monitoring->where('status_monitoring', 'selesai')->sortBy('monitoring_ke') as $item)
-                <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <div>
-                            <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full">
-                                Monitoring ke-{{ $item->monitoring_ke }}
-                            </span>
-                            <p class="text-xs text-slate-400 mt-1.5">{{ $item->tanggal_monitoring }}</p>
-                        </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
-                                @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
-                                @else bg-red-100 text-red-700 @endif">
-                            {{ ucfirst($item->status_perkembangan) }}
+                    <p class="text-sm text-slate-500 mt-2">
+                        Guru BK:
+                        <span class="font-semibold text-slate-700">
+                            {{ $laporan->guruBk->nama ?? 'Belum ditangani' }}
                         </span>
-                    </div>
-                    <p class="text-sm text-slate-600 leading-relaxed">{{ $item->catatan_perkembangan }}</p>
+                    </p>
                 </div>
-            @empty
-                <div class="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center">
-                    <i data-feather="clock" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-                    <p class="text-sm text-slate-400">Belum ada data monitoring.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
 
+<<<<<<< HEAD
     {{-- EVALUASI AKHIR --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
@@ -163,13 +82,280 @@
                     <p class="text-xs text-slate-400 mb-1">Hasil Evaluasi</p>
                     <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->evaluasi->hasil_evaluasi }}</p>
                 </div>
+=======
+                @if($laporan->bukti)
+                    <a href="{{ asset('storage/' . $laporan->bukti) }}" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-bold hover:bg-blue-800 transition">
+                        <i data-feather="paperclip" class="w-4 h-4"></i>
+                        Lihat Bukti
+                    </a>
+                @endif
+>>>>>>> 4226421 (backup)
             </div>
-        @else
-            <div class="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center">
-                <i data-feather="clipboard" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-                <p class="text-sm text-slate-400">Belum ada evaluasi akhir dari Guru BK.</p>
+        </div>
+
+        {{-- DATA ANAK --}}
+        {{-- DATA ANAK --}}
+        <section class="p-6 border-b border-slate-200">
+
+            <div class="flex items-center gap-2 mb-5">
+                <i data-feather="user" class="w-4 h-4 text-blue-700"></i>
+                <h2 class="text-base font-extrabold text-slate-900">
+                    Data Anak
+                </h2>
             </div>
-        @endif
+
+            <div class="flex flex-col md:flex-row gap-6">
+
+                {{-- FOTO --}}
+                <div class="flex justify-center">
+
+                    <img src="{{ $laporan->siswa->foto
+        ? asset('storage/' . $laporan->siswa->foto)
+        : asset('asset/default-user.png') }}"
+                        class="w-32 h-32 rounded-2xl object-cover border border-slate-200 shadow-sm">
+
+                </div>
+
+                {{-- DATA --}}
+                <div class="flex-1">
+
+                    <div class="grid md:grid-cols-2 gap-x-8 gap-y-5">
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Nama Siswa
+                            </p>
+
+                            <p class="text-base font-bold text-slate-900 mt-1">
+                                {{ $laporan->siswa->nama_siswa }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                NIS
+                            </p>
+
+                            <p class="text-base font-semibold text-slate-700 mt-1">
+                                {{ $laporan->siswa->nis }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Kelas
+                            </p>
+
+                            <p class="text-base font-semibold text-slate-700 mt-1">
+                                {{ $laporan->siswa->kelas }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Jenis Kelamin
+                            </p>
+
+                            <p class="text-base font-semibold text-slate-700 mt-1">
+                                {{ $laporan->siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Nama Orang Tua
+                            </p>
+
+                            <p class="text-base font-semibold text-slate-700 mt-1">
+                                {{ $laporan->siswa->nama_ortu }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                No. WhatsApp
+                            </p>
+
+                            <p class="text-base font-semibold text-slate-700 mt-1">
+                                {{ $laporan->siswa->no_whatsapp }}
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {{-- DATA LAPORAN --}}
+        <section class="p-6 border-b border-slate-200">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-feather="file-text" class="w-4 h-4 text-blue-700"></i>
+                <h2 class="text-base font-extrabold text-slate-900">Data Laporan</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Kategori</p>
+                    <p class="text-sm font-semibold text-slate-800 mt-1">
+                        {{ $laporan->kategori ? ucfirst($laporan->kategori) : 'Menunggu verifikasi BK' }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Jenis Masalah</p>
+                    <p class="text-sm font-semibold text-slate-800 mt-1">
+                        {{ $laporan->jenis_masalah ?? 'Menunggu verifikasi BK' }}
+                    </p>
+                </div>
+
+                <div class="md:col-span-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Deskripsi</p>
+                    <p class="text-sm text-slate-700 mt-1 leading-relaxed">
+                        {{ $laporan->deskripsi }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {{-- RIWAYAT PEMANGGILAN --}}
+        <section class="p-6 border-b border-slate-200">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-feather="phone" class="w-4 h-4 text-blue-700"></i>
+                <h2 class="text-base font-extrabold text-slate-900">Riwayat Pemanggilan</h2>
+            </div>
+
+            <div class="space-y-4">
+                @forelse($laporan->pemanggilan as $item)
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Tanggal</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">
+                                    {{ $item->tanggal_pemanggilan ?? '-' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Waktu</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">
+                                    {{ $item->waktu_pemanggilan ?? '-' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Pihak Dipanggil</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">
+                                    {{ $item->pihak_dipanggil ? str_replace('_', ' ', ucfirst($item->pihak_dipanggil)) : '-' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Status Kehadiran</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">
+                                    {{ $item->status_kehadiran ? str_replace('_', ' ', ucfirst($item->status_kehadiran)) : '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        @if($item->tujuan)
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Tujuan</p>
+                                <p class="text-sm text-slate-700 mt-1 leading-relaxed">
+                                    {{ $item->tujuan }}
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-6 text-center">
+                        <i data-feather="calendar" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-sm text-slate-400">Belum ada jadwal pemanggilan.</p>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+
+        {{-- RIWAYAT MONITORING --}}
+        <section class="p-6 border-b border-slate-200">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-feather="activity" class="w-4 h-4 text-blue-700"></i>
+                <h2 class="text-base font-extrabold text-slate-900">Riwayat Monitoring</h2>
+            </div>
+
+            <div class="space-y-4">
+                @forelse($laporan->monitoring->where('status_monitoring', 'selesai')->sortBy('monitoring_ke') as $item)
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                            <div>
+                                <span
+                                    class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 text-xs font-bold">
+                                    Monitoring ke-{{ $item->monitoring_ke }}
+                                </span>
+
+                                <p class="text-xs text-slate-400 mt-2">
+                                    {{ $item->tanggal_monitoring }}
+                                </p>
+                            </div>
+
+                            <span class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-bold
+                                        @if($item->status_perkembangan == 'membaik')
+                                            bg-green-50 text-green-700 border border-green-200
+                                        @elseif($item->status_perkembangan == 'stabil')
+                                            bg-blue-50 text-blue-700 border border-blue-200
+                                        @else
+                                            bg-red-50 text-red-700 border border-red-200
+                                        @endif">
+                                {{ ucfirst($item->status_perkembangan) }}
+                            </span>
+                        </div>
+
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            {{ $item->catatan_perkembangan }}
+                        </p>
+                    </div>
+                @empty
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-6 text-center">
+                        <i data-feather="clock" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-sm text-slate-400">Belum ada data monitoring.</p>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+
+        {{-- EVALUASI AKHIR --}}
+        <section class="p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-feather="check-square" class="w-4 h-4 text-blue-700"></i>
+                <h2 class="text-base font-extrabold text-slate-900">Evaluasi Akhir</h2>
+            </div>
+
+            @if($laporan->evaluasi)
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                    <div class="mb-4">
+                        <p class="text-xs font-bold text-slate-400 uppercase">Tanggal Evaluasi</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-1">
+                            {{ $laporan->evaluasi->tanggal_evaluasi }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Hasil Evaluasi</p>
+                        <p class="text-sm text-slate-700 mt-1 leading-relaxed">
+                            {{ $laporan->evaluasi->hasil_evaluasi }}
+                        </p>
+                    </div>
+                </div>
+            @else
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-6 text-center">
+                    <i data-feather="clipboard" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                    <p class="text-sm text-slate-400">Belum ada evaluasi akhir dari Guru BK.</p>
+                </div>
+            @endif
+        </section>
     </div>
 
 @endsection

@@ -41,7 +41,7 @@
 
             <div class="mb-7 text-center">
                 <h1 class="text-2xl font-extrabold text-slate-900">
-                    Masuk Akun
+                    Login
                 </h1>
 
             </div>

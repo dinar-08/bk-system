@@ -4,21 +4,54 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
+use App\Models\PeriodeUpdate;
 use App\Models\Siswa;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use App\Exports\SiswaExport;
 
 class SiswaController extends Controller
 {
     public function index()
     {
-        $siswa = Siswa::with('user')->latest()->get();
-        $daftarKelas = Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas');
-        return view('admin.siswa.index', compact('siswa', 'daftarKelas'));
+        $siswa = Siswa::with('user')
+            ->orderBy('kelas')
+            ->orderBy('nama_siswa')
+            ->get();
+
+        $daftarKelas = Siswa::select('kelas')
+            ->distinct()
+            ->orderBy('kelas')
+            ->pluck('kelas');
+
+        $aktifSekarang = PeriodeUpdate::aktifSekarang();
+
+        $siswaAktif = $siswa->filter(function ($item) {
+            return ($item->user->status_akun ?? 'aktif') === 'aktif';
+        });
+
+        $totalSiswaAktif = $siswaAktif->count();
+        $totalSudahUpdate = 0;
+        $totalBelumUpdate = 0;
+
+        if ($aktifSekarang) {
+            $totalSudahUpdate = $siswaAktif
+                ->filter(fn ($item) => $item->sudahUpdateDiPeriode($aktifSekarang))
+                ->count();
+
+            $totalBelumUpdate = $totalSiswaAktif - $totalSudahUpdate;
+        }
+
+        return view('admin.siswa.index', compact(
+            'siswa',
+            'daftarKelas',
+            'aktifSekarang',
+            'totalSiswaAktif',
+            'totalSudahUpdate',
+            'totalBelumUpdate'
+        ));
     }
 
     public function create()
@@ -26,24 +59,25 @@ class SiswaController extends Controller
         return view('admin.siswa.create');
     }
 
-    // A2: form disederhanakan — hanya NIS, nama, kelas
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nis' => ['required', 'string', 'max:50', 'unique:siswa,nis', 'unique:users,username'],
             'nama_siswa' => ['required', 'string', 'max:150'],
             'kelas' => ['required', 'string', 'max:50'],
+            'tahun_ajaran' => ['nullable', 'string', 'max:20'],
         ]);
 
         DB::transaction(function () use ($validated) {
-            // Generate password random huruf+angka 8 karakter
             $password = $this->generatePassword();
 
             $user = User::create([
                 'name' => $validated['nama_siswa'],
                 'username' => $validated['nis'],
                 'role' => 'orang_tua',
+                'status_akun' => 'aktif',
                 'password' => Hash::make($password),
+                'default_password' => $password,
                 'must_change_password' => true,
             ]);
 
@@ -52,9 +86,9 @@ class SiswaController extends Controller
                 'nis' => $validated['nis'],
                 'nama_siswa' => $validated['nama_siswa'],
                 'kelas' => $validated['kelas'],
+                'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
             ]);
 
-            // Simpan password plain ke session untuk ditampilkan sekali
             session()->flash('password_baru', $password);
             session()->flash('nama_siswa_baru', $validated['nama_siswa']);
         });
@@ -66,6 +100,7 @@ class SiswaController extends Controller
     public function edit(string $id)
     {
         $siswa = Siswa::with('user')->findOrFail($id);
+
         return view('admin.siswa.edit', compact('siswa'));
     }
 
@@ -74,9 +109,16 @@ class SiswaController extends Controller
         $siswa = Siswa::with('user')->findOrFail($id);
 
         $validated = $request->validate([
-            'nis' => ['required', 'string', 'max:50', 'unique:siswa,nis,' . $siswa->id, 'unique:users,username,' . $siswa->user_id],
+            'nis' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:siswa,nis,' . $siswa->id,
+                'unique:users,username,' . $siswa->user_id,
+            ],
             'nama_siswa' => ['required', 'string', 'max:150'],
             'kelas' => ['required', 'string', 'max:50'],
+            'tahun_ajaran' => ['nullable', 'string', 'max:20'],
         ]);
 
         DB::transaction(function () use ($siswa, $validated) {
@@ -84,11 +126,15 @@ class SiswaController extends Controller
                 'nis' => $validated['nis'],
                 'nama_siswa' => $validated['nama_siswa'],
                 'kelas' => $validated['kelas'],
+                'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
             ]);
-            $siswa->user->update([
-                'name' => $validated['nama_siswa'],
-                'username' => $validated['nis'],
-            ]);
+
+            if ($siswa->user) {
+                $siswa->user->update([
+                    'name' => $validated['nama_siswa'],
+                    'username' => $validated['nis'],
+                ]);
+            }
         });
 
         return redirect()->route('admin.siswa.index')
@@ -100,23 +146,31 @@ class SiswaController extends Controller
         $siswa = Siswa::with('user')->findOrFail($id);
 
         if ($siswa->user) {
-            $statusBaru = ($siswa->user->status_akun ?? 'aktif') === 'aktif' ? 'nonaktif' : 'aktif';
-            $siswa->user->update(['status_akun' => $statusBaru]);
+            $statusBaru = ($siswa->user->status_akun ?? 'aktif') === 'aktif'
+                ? 'nonaktif'
+                : 'aktif';
+
+            $siswa->user->update([
+                'status_akun' => $statusBaru,
+            ]);
         }
 
         return redirect()->route('admin.siswa.index')
-            ->with('success', 'Status akun siswa berhasil diperbarui.');
+            ->with('success', 'Status siswa berhasil diperbarui.');
     }
 
-    // Fix X2 + bug X11: cek monitoring aktif sebelum nonaktifkan
     public function nonaktifkanKelas(Request $request)
     {
-        $validated = $request->validate(['kelas' => ['required', 'string']]);
+        $validated = $request->validate([
+            'kelas' => ['required', 'string'],
+        ]);
 
-        $siswaDikelas = Siswa::with('user')->where('kelas', $validated['kelas'])->get();
+        $siswaDikelas = Siswa::with('user')
+            ->where('kelas', $validated['kelas'])
+            ->get();
 
-        // Cek kasus monitoring aktif
         $siswaIds = $siswaDikelas->pluck('id');
+
         $kasusAktif = Laporan::whereIn('siswa_id', $siswaIds)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->with('siswa')
@@ -126,17 +180,19 @@ class SiswaController extends Controller
             return redirect()->route('admin.siswa.index')
                 ->with('error_nonaktifkan', [
                     'kelas' => $validated['kelas'],
-                    'kasus' => $kasusAktif->map(fn($l) => [
-                        'nama' => $l->siswa->nama_siswa ?? '-',
-                        'judul' => $l->judul_laporan,
-                        'status' => $l->status,
+                    'kasus' => $kasusAktif->map(fn ($laporan) => [
+                        'nama' => $laporan->siswa->nama_siswa ?? '-',
+                        'judul' => $laporan->judul_laporan,
+                        'status' => $laporan->status,
                     ])->toArray(),
                 ]);
         }
 
         foreach ($siswaDikelas as $item) {
             if ($item->user) {
-                $item->user->update(['status_akun' => 'nonaktif']);
+                $item->user->update([
+                    'status_akun' => 'nonaktif',
+                ]);
             }
         }
 
@@ -144,7 +200,6 @@ class SiswaController extends Controller
             ->with('success', 'Semua akun kelas ' . $validated['kelas'] . ' berhasil dinonaktifkan.');
     }
 
-    // A3: update kelas massal
     public function updateKelasMassal(Request $request)
     {
         $validated = $request->validate([
@@ -153,23 +208,43 @@ class SiswaController extends Controller
         ]);
 
         $jumlah = Siswa::where('kelas', $validated['kelas_lama'])
-            ->update(['kelas' => $validated['kelas_baru']]);
+            ->update([
+                'kelas' => $validated['kelas_baru'],
+            ]);
 
         return redirect()->route('admin.siswa.index')
             ->with('success', $jumlah . ' siswa berhasil dipindahkan dari kelas ' . $validated['kelas_lama'] . ' ke ' . $validated['kelas_baru'] . '.');
     }
 
-    // A6: download data siswa
     public function download(Request $request)
     {
+<<<<<<< HEAD
         $tipe = $request->get('tipe', 'siswa');
 
         return (new SiswaExport($tipe))->download();
+=======
+        $siswa = Siswa::with('user')
+            ->when($request->input('kelas'), fn ($q) => $q->where('kelas', $request->input('kelas')))
+            ->when($request->input('status'), function ($q) use ($request) {
+                $q->whereHas('user', fn ($u) => $u->where('status_akun', $request->input('status')));
+            })
+            ->orderBy('kelas')
+            ->orderBy('nama_siswa')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.siswa.download.download-pdf', [
+            'siswa' => $siswa,
+            'tanggal' => now('Asia/Jakarta')->format('d-m-Y H:i'),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('data-siswa-' . now()->format('Ymd-His') . '.pdf');
+>>>>>>> 4226421 (backup)
     }
 
     private function generatePassword(): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
         return substr(str_shuffle(str_repeat($chars, 4)), 0, 8);
     }
 }

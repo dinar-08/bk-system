@@ -54,6 +54,7 @@ Route::middleware(['auth', 'must.change.password'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+<<<<<<< HEAD
 | Ganti Password Pertama Kali
 |--------------------------------------------------------------------------
 */
@@ -65,6 +66,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/ganti-password-awal', [ProfileController::class, 'processChangePassword'])
         ->name('password.change.process');
 });
+=======
+| Admin
+|--------------------------------------------------------------------------
+*/
+>>>>>>> 4226421 (backup)
 
 /*
 |--------------------------------------------------------------------------
@@ -104,7 +110,7 @@ Route::middleware(['auth', 'role:admin', 'must.change.password'])->group(functio
         ->name('admin.siswa.download');
 
     Route::resource('/admin/periode-update', PeriodeUpdateController::class)
-        ->only(['index', 'store', 'update', 'destroy'])
+        ->only(['store', 'update', 'destroy'])
         ->names('admin.periode-update');
 });
 
@@ -143,8 +149,13 @@ Route::middleware(['auth', 'role:bk', 'must.change.password'])->group(function (
     Route::get('/bk/riwayat/export/pdf', [RiwayatController::class, 'exportPdf'])
         ->name('bk.riwayat.exportPdf');
 
+<<<<<<< HEAD
     Route::get('/admin/import-siswa/download-hasil', [ImportSiswaController::class, 'downloadHasil'])
         ->name('admin.import-siswa.download-hasil');
+=======
+    Route::get('/bk/riwayat/{id}/download', [RiwayatController::class, 'downloadKasus'])
+        ->name('bk.download.kasus');
+>>>>>>> 4226421 (backup)
 
     Route::get('/bk/download/semua-pdf', [DownloadController::class, 'downloadSemuaPdf'])
         ->name('bk.download.semua-pdf');
@@ -176,6 +187,7 @@ Route::middleware(['auth', 'role:orang_tua', 'must.change.password', 'cek.period
 
 /*
 |--------------------------------------------------------------------------
+<<<<<<< HEAD
 | Update Data Orang Tua
 |--------------------------------------------------------------------------
 */
@@ -194,6 +206,12 @@ Route::middleware(['auth', 'role:orang_tua', 'must.change.password'])->group(fun
 |--------------------------------------------------------------------------
 */
 
+=======
+| Panduan
+|--------------------------------------------------------------------------
+*/
+
+>>>>>>> 4226421 (backup)
 Route::get('/panduan', fn() => view('panduan.index'))
     ->middleware(['auth', 'must.change.password'])
     ->name('panduan');

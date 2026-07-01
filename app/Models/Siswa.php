@@ -20,9 +20,11 @@ class Siswa extends Model
         'no_whatsapp',
         'foto',
         'last_data_updated_at',
+        'tahun_ajaran',
     ];
 
     protected $casts = [
+        'tanggal_lahir' => 'date',
         'last_data_updated_at' => 'datetime',
     ];
 
@@ -38,7 +40,20 @@ class Siswa extends Model
 
     public function sudahUpdateDiPeriode(PeriodeUpdate $periode): bool
     {
-        return $this->last_data_updated_at &&
-            $this->last_data_updated_at->gte($periode->tanggal_mulai);
+        if (!$this->last_data_updated_at) {
+            return false;
+        }
+
+        return $this->last_data_updated_at->between(
+            $periode->tanggal_mulai->copy()->startOfDay(),
+            $periode->tanggal_selesai->copy()->endOfDay()
+        );
+    }
+
+    public function tandaiSudahUpdate(PeriodeUpdate $periode): void
+    {
+        $this->update([
+            'last_data_updated_at' => now(),
+        ]);
     }
 }

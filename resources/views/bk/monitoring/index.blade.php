@@ -1,4 +1,5 @@
 @extends('layouts.bk')
+
 @section('title', 'Monitoring')
 @section('page-title', 'Monitoring Permasalahan')
 @section('page-subtitle', 'Pantau perkembangan penanganan setiap laporan')
@@ -6,73 +7,202 @@
 @section('content')
 
     @php
-        $laporanPerKategori = $laporan->groupBy('kategori');
+        use Carbon\Carbon;
+
         $kategoriConfig = [
-            'akademik' => ['label' => 'Akademik', 'bg' => 'bg-blue-50', 'border' => 'border-blue-200', 'text' => 'text-blue-700', 'dot' => 'bg-blue-400'],
-            'sosial' => ['label' => 'Sosial', 'bg' => 'bg-emerald-50', 'border' => 'border-emerald-200', 'text' => 'text-emerald-700', 'dot' => 'bg-emerald-400'],
-            'perilaku' => ['label' => 'Perilaku', 'bg' => 'bg-amber-50', 'border' => 'border-amber-200', 'text' => 'text-amber-700', 'dot' => 'bg-amber-400'],
-            'emosional' => ['label' => 'Emosional', 'bg' => 'bg-rose-50', 'border' => 'border-rose-200', 'text' => 'text-rose-700', 'dot' => 'bg-rose-400'],
+            'akademik' => ['label' => 'Akademik', 'text' => 'text-blue-600', 'border' => 'border-blue-500', 'bg' => 'bg-blue-50'],
+            'sosial' => ['label' => 'Sosial', 'text' => 'text-emerald-600', 'border' => 'border-emerald-500', 'bg' => 'bg-emerald-50'],
+            'perilaku' => ['label' => 'Perilaku', 'text' => 'text-amber-600', 'border' => 'border-amber-500', 'bg' => 'bg-amber-50'],
+            'emosional' => ['label' => 'Emosional', 'text' => 'text-rose-600', 'border' => 'border-rose-500', 'bg' => 'bg-rose-50'],
+            'lain-lain' => ['label' => 'Lainnya', 'text' => 'text-slate-600', 'border' => 'border-slate-400', 'bg' => 'bg-slate-50'],
         ];
-        $defaultCfg = ['label' => 'Lainnya', 'bg' => 'bg-slate-50', 'border' => 'border-slate-200', 'text' => 'text-slate-600', 'dot' => 'bg-slate-400'];
+
+        $kategoriAktif = request('kategori', 'semua');
+
+        $laporanFiltered = $laporan
+            ->filter(function ($item) use ($kategoriAktif) {
+                return $kategoriAktif === 'semua' || $item->kategori === $kategoriAktif;
+            })
+            ->values();
     @endphp
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-slate-900">Monitoring Permasalahan</h1>
-        <p class="text-slate-500 mt-1 text-sm">Pantau perkembangan penanganan setiap laporan aktif.</p>
+    {{-- Filter Kategori --}}
+    <form method="GET" action="{{ route('bk.monitoring.index') }}" class="mb-8">
+        <div class="flex flex-wrap items-center gap-2">
+            <button type="submit" name="kategori" value="semua" class="h-11 px-5 text-sm font-semibold rounded-full transition
+                    {{ $kategoriAktif === 'semua'
+        ? 'bg-blue-600 text-white shadow-sm'
+        : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
+                Semua
+            </button>
+
+            @foreach($kategoriConfig as $key => $cfg)
+                <button type="submit" name="kategori" value="{{ $key }}"
+                    class="h-11 px-5 text-sm font-semibold rounded-full transition
+                            {{ $kategoriAktif === $key
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
+                    {{ $cfg['label'] }}
+                </button>
+            @endforeach
+        </div>
+    </form>
+
+    {{-- Judul section --}}
+    <div class="mb-4">
+        <h2 class="text-base font-bold text-slate-800">Daftar Monitoring</h2>
     </div>
 
-    @forelse($laporanPerKategori as $kategori => $dataLaporan)
-        @php $cfg = $kategoriConfig[$kategori] ?? array_merge($defaultCfg, ['label' => ucfirst($kategori ?? 'Lainnya')]); @endphp
+    {{-- List Monitoring --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-0">
+        @forelse($laporanFiltered as $item)
+            @php
+                $cfg = $kategoriConfig[$item->kategori] ?? $kategoriConfig['lain-lain'];
 
-        <section class="mb-9">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-1 h-6 bg-blue-700 rounded-full"></div>
-                <h2 class="text-base font-bold text-slate-800">{{ $cfg['label'] }}</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">{{ $dataLaporan->count() }}
-                    laporan</span>
-            </div>
+                $monitoringTerjadwal = $item->monitoring
+                    ->where('status_monitoring', 'terjadwal')
+                    ->sortBy('tanggal_monitoring')
+                    ->first();
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                @foreach($dataLaporan as $item)
+                $monitoringTerakhir = $item->monitoring
+                    ->where('status_monitoring', 'selesai')
+                    ->sortByDesc('monitoring_ke')
+                    ->first();
+
+                $jumlahMonitoring = $item->monitoring
+                    ->where('status_monitoring', 'selesai')
+                    ->count();
+
+                $tanggalAcuan = $monitoringTerjadwal?->tanggal_monitoring
+                    ?? $monitoringTerakhir?->tanggal_monitoring
+                    ?? $item->updated_at
+                    ?? $item->created_at;
+
+                $tanggal = Carbon::parse($tanggalAcuan)->locale('id');
+
+                $jamMonitoring = $monitoringTerjadwal?->waktu_monitoring
+                    ? Carbon::parse($monitoringTerjadwal->waktu_monitoring)->format('H:i') . ' WIB'
+                    : 'Jam belum diatur';
+
+                $statusPerkembangan = $monitoringTerakhir->status_perkembangan ?? 'Belum ada monitoring';
+
+                $statusClass = match ($statusPerkembangan) {
+                    'membaik' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                    'stabil' => 'bg-blue-50 text-blue-700 border-blue-300',
+                    'menurun' => 'bg-rose-50 text-rose-700 border-rose-300',
+                    default => 'bg-slate-50 text-slate-600 border-slate-300',
+                };
+            @endphp
+
+            <div
+                class="relative group/list flex items-center justify-between gap-x-4 lg:gap-x-8 py-5 border-b border-blue-100 overflow-hidden">
+
+                {{-- Tanggal + Panah Hover --}}
+                <div class="relative shrink-0">
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
+                        <i data-feather="arrow-right"
+                            class="w-5 h-5 text-blue-600 scale-0 group-hover/list:scale-100 transition-all duration-300"></i>
+                    </div>
+
                     <div
-                        class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                        <div class="flex items-center justify-between mb-4">
+                        class="flex items-center gap-2 min-w-[95px] lg:min-w-[130px] group-hover/list:lg:translate-x-8 transition-all duration-300">
+                        <span class="text-3xl lg:text-4xl font-extrabold text-red-600 leading-none w-[48px]">
+                            {{ $tanggal->format('d') }}
+                        </span>
+
+                        <div class="leading-tight">
+                            <div class="text-xs lg:text-sm font-semibold uppercase text-slate-700">
+                                {{ strtoupper($tanggal->translatedFormat('M')) }}
+                            </div>
+                            <div class="text-xs lg:text-sm text-slate-500">
+                                {{ $tanggal->format('Y') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Isi --}}
+                <div class="flex items-center justify-between gap-x-3 lg:gap-x-5 w-full min-w-0">
+                    <div class="flex-1 min-w-0 group-hover/list:lg:translate-x-4 transition-all duration-300">
+
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                            <h3 class="text-sm lg:text-base font-semibold text-slate-900 truncate">
+                                {{ $item->siswa->nama_siswa ?? '-' }}
+                            </h3>
+
                             <span
-                                class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $cfg['bg'] }} border {{ $cfg['border'] }} {{ $cfg['text'] }} text-xs font-semibold rounded-full">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $cfg['dot'] }} animate-pulse"></span>
+                                class="inline-flex items-center px-2 py-0.5 rounded-full border {{ $cfg['border'] }} {{ $cfg['text'] }} bg-white text-xs font-semibold">
                                 {{ $cfg['label'] }}
                             </span>
-                            <span class="text-xs text-slate-400 font-mono">#{{ $loop->iteration }}</span>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-sm leading-snug mb-3">{{ $item->siswa->nama_siswa ?? '-' }}</h3>
-                        <div class="space-y-1.5 text-sm text-slate-500 mb-5">
-                            <div class="flex items-center gap-2">
-                                <i data-feather="book-open" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
-                                <span>Kelas {{ $item->siswa->kelas ?? '-' }}</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i data-feather="tag" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
-                                <span>{{ $item->jenis_masalah ?? '-' }}</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i data-feather="clock" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
-                                <span>{{ $item->monitoring->count() }}× monitoring</span>
-                            </div>
+
+                        <p class="text-xs lg:text-sm text-slate-500 truncate">
+                            {{ $item->jenis_masalah ?? $item->judul_laporan ?? '-' }}
+                        </p>
+
+                        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                            <span class="inline-flex items-center gap-1 text-cyan-800">
+                                <span class="w-2 h-2 rounded-full bg-cyan-700"></span>
+                                Kelas {{ $item->siswa->kelas ?? '-' }}
+                            </span>
+
+                            <span class="text-slate-300">•</span>
+
+                            <span class="text-cyan-800 font-medium">
+                                Monitoring Berikutnya
+                            </span>
+
+                            <span class="text-slate-300">•</span>
+
+                            <span class="text-cyan-800">
+                                {{ $jamMonitoring }}
+                            </span>
+
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded-full border font-semibold {{ $statusClass }} capitalize">
+                                {{ $statusPerkembangan }}
+                            </span>
+
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold">
+                                {{ $jumlahMonitoring }}x Monitoring
+                            </span>
                         </div>
-                        <a href="{{ route('bk.monitoring.show', $item->id) }}"
-                            class="flex items-center justify-center gap-1.5 w-full py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-sm font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all duration-200">
-                            Lihat Detail
-                            <i data-feather="arrow-right" class="w-4 h-4"></i>
-                        </a>
                     </div>
-                @endforeach
+
+                    {{-- Tombol --}}
+                    <a href="{{ route('bk.monitoring.show', $item->id) }}"
+                        class="relative shrink-0 inline-flex items-center justify-center w-10 h-10 lg:w-[140px] lg:h-10 rounded-full border border-red-500 text-red-600 bg-white hover:bg-red-50 transition-colors duration-500 overflow-hidden group/button uppercase">
+
+                        <span
+                            class="hidden lg:inline-block text-xs font-semibold transition-transform duration-500 group-hover/button:-translate-x-5 group-hover/list:-translate-x-5">
+                            Lihat Detail
+                        </span>
+
+                        <i data-feather="arrow-right" class="lg:hidden w-4 h-4"></i>
+
+                        <span
+                            class="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-red-600 text-white items-center justify-center opacity-0 group-hover/button:opacity-100 group-hover/list:opacity-100 transition-opacity duration-500">
+                            <i data-feather="arrow-right" class="w-3 h-3"></i>
+                        </span>
+                    </a>
+                </div>
             </div>
-        </section>
-    @empty
-        <div class="bg-white rounded-2xl border border-dashed border-slate-200 p-14 text-center">
-            <i data-feather="activity" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
-            <p class="text-slate-400 text-sm font-medium">Belum ada laporan dalam proses monitoring.</p>
-        </div>
-    @endforelse
+        @empty
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-dashed border-slate-200 p-14 text-center">
+                <i data-feather="activity" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+                <p class="text-slate-400 text-sm font-medium">
+                    Belum ada laporan dalam proses monitoring pada filter ini.
+                </p>
+            </div>
+        @endforelse
+    </div>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof feather !== 'undefined') feather.replace();
+        });
+    </script>
 
 @endsection

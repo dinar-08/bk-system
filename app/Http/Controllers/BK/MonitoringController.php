@@ -12,7 +12,7 @@ class MonitoringController extends Controller
 {
     public function index()
     {
-        $laporan = Laporan::with(['siswa', 'guruBk', 'monitoring'])
+        $laporan = Laporan::with(['siswa', 'guruBk', 'monitoring', 'pemanggilan'])
             ->where('status', 'monitoring')
             ->latest()
             ->get();
@@ -43,7 +43,9 @@ class MonitoringController extends Controller
             'laporan_id' => ['required', 'exists:laporan,id'],
             'monitoring_id' => ['nullable', 'exists:monitoring,id'],
             'tanggal_monitoring' => ['required', 'date'],
+            'waktu_monitoring' => ['nullable'],
             'tanggal_monitoring_berikutnya' => ['nullable', 'date'],
+            'waktu_monitoring_berikutnya' => ['nullable'],
             'status_perkembangan' => ['required', 'in:membaik,stabil,menurun'],
             'catatan_perkembangan' => ['required', 'string'],
         ]);
@@ -56,69 +58,80 @@ class MonitoringController extends Controller
             $monitoring->update([
                 'guru_bk_id' => $guruBk->id,
                 'tanggal_monitoring' => $validated['tanggal_monitoring'],
+                'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
                 'status_monitoring' => 'selesai',
                 'status_perkembangan' => $validated['status_perkembangan'],
                 'catatan_perkembangan' => $validated['catatan_perkembangan'],
                 'tindak_lanjut' => '-',
-                'tanggal_monitoring_berikutnya' => $validated['tanggal_monitoring_berikutnya'] ?? null,
+                'tanggal_monitoring_berikutnya' => null,
+                'waktu_monitoring_berikutnya' => null,
             ]);
 
-            if (!empty($validated['tanggal_monitoring_berikutnya'])) {
-                $sudahAdaJadwal = Monitoring::where('laporan_id', $validated['laporan_id'])
-                    ->where('tanggal_monitoring', $validated['tanggal_monitoring_berikutnya'])
-                    ->where('status_monitoring', 'terjadwal')
-                    ->exists();
+            if ($request->filled('tanggal_monitoring_berikutnya')) {
+                Monitoring::create([
+                    'laporan_id' => $validated['laporan_id'],
+                    'guru_bk_id' => $guruBk->id,
+                    'tanggal_monitoring' => $validated['tanggal_monitoring_berikutnya'],
+                    'waktu_monitoring' => $validated['waktu_monitoring_berikutnya'] ?? null,
+                    'monitoring_ke' => $monitoring->monitoring_ke + 1,
+                    'status_monitoring' => 'terjadwal',
+                    'status_perkembangan' => 'stabil',
+                    'catatan_perkembangan' => '-',
+                    'tindak_lanjut' => '-',
+                    'tanggal_monitoring_berikutnya' => null,
+                    'waktu_monitoring_berikutnya' => null,
+                ]);
 
-                if (! $sudahAdaJadwal) {
-                    Monitoring::create([
-                        'laporan_id' => $validated['laporan_id'],
-                        'guru_bk_id' => $guruBk->id,
-                        'tanggal_monitoring' => $validated['tanggal_monitoring_berikutnya'],
-                        'monitoring_ke' => $monitoring->monitoring_ke + 1,
-                        'status_monitoring' => 'terjadwal',
-                        'status_perkembangan' => 'stabil',
-                        'catatan_perkembangan' => '-',
-                        'tindak_lanjut' => '-',
-                        'tanggal_monitoring_berikutnya' => null,
-                    ]);
-                }
+                return back()->with('success', 'Hasil monitoring berhasil disimpan dan jadwal berikutnya sudah dibuat.');
             }
 
-            return back()->with('success', 'Hasil monitoring berhasil disimpan.');
+            return redirect()
+                ->route('bk.evaluasi.show', $validated['laporan_id'])
+                ->with('success', 'Monitoring selesai. Silakan lanjutkan evaluasi.');
         }
 
         $monitoringKe = Monitoring::where('laporan_id', $validated['laporan_id'])->count() + 1;
 
-        Monitoring::create([
+        $monitoring = Monitoring::create([
             'laporan_id' => $validated['laporan_id'],
             'guru_bk_id' => $guruBk->id,
             'tanggal_monitoring' => $validated['tanggal_monitoring'],
+            'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
             'monitoring_ke' => $monitoringKe,
             'status_monitoring' => 'selesai',
             'status_perkembangan' => $validated['status_perkembangan'],
             'catatan_perkembangan' => $validated['catatan_perkembangan'],
             'tindak_lanjut' => '-',
-            'tanggal_monitoring_berikutnya' => $validated['tanggal_monitoring_berikutnya'] ?? null,
+            'tanggal_monitoring_berikutnya' => null,
+            'waktu_monitoring_berikutnya' => null,
         ]);
 
-        if (!empty($validated['tanggal_monitoring_berikutnya'])) {
+        Laporan::where('id', $validated['laporan_id'])
+            ->update([
+                'status' => 'monitoring',
+                'guru_bk_id' => $guruBk->id,
+            ]);
+        if ($request->filled('tanggal_monitoring_berikutnya')) {
             Monitoring::create([
                 'laporan_id' => $validated['laporan_id'],
                 'guru_bk_id' => $guruBk->id,
                 'tanggal_monitoring' => $validated['tanggal_monitoring_berikutnya'],
-                'monitoring_ke' => $monitoringKe + 1,
+                'waktu_monitoring' => $validated['waktu_monitoring_berikutnya'] ?? null,
+                'monitoring_ke' => $monitoring->monitoring_ke + 1,
                 'status_monitoring' => 'terjadwal',
                 'status_perkembangan' => 'stabil',
                 'catatan_perkembangan' => '-',
                 'tindak_lanjut' => '-',
                 'tanggal_monitoring_berikutnya' => null,
+                'waktu_monitoring_berikutnya' => null,
             ]);
+
+            return back()->with('success', 'Catatan monitoring berhasil ditambahkan dan jadwal berikutnya sudah dibuat.');
         }
 
-        Laporan::where('id', $validated['laporan_id'])
-            ->update(['status' => 'monitoring']);
-
-        return back()->with('success', 'Catatan monitoring berhasil ditambahkan.');
+        return redirect()
+            ->route('bk.evaluasi.show', $validated['laporan_id'])
+            ->with('success', 'Monitoring selesai. Silakan lanjutkan evaluasi.');
     }
 
     public function update(Request $request, string $id)
@@ -127,20 +140,44 @@ class MonitoringController extends Controller
 
         $validated = $request->validate([
             'tanggal_monitoring' => ['required', 'date'],
+            'waktu_monitoring' => ['nullable'],
             'tanggal_monitoring_berikutnya' => ['nullable', 'date'],
+            'waktu_monitoring_berikutnya' => ['nullable'],
             'status_perkembangan' => ['required', 'in:membaik,stabil,menurun'],
             'catatan_perkembangan' => ['required', 'string'],
         ]);
 
         $monitoring->update([
             'tanggal_monitoring' => $validated['tanggal_monitoring'],
-            'tanggal_monitoring_berikutnya' => $validated['tanggal_monitoring_berikutnya'] ?? null,
+            'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
+            'tanggal_monitoring_berikutnya' => null,
+            'waktu_monitoring_berikutnya' => null,
             'status_monitoring' => 'selesai',
             'status_perkembangan' => $validated['status_perkembangan'],
             'catatan_perkembangan' => $validated['catatan_perkembangan'],
         ]);
 
-        return back()->with('success', 'Catatan monitoring berhasil diperbarui.');
+        if ($request->filled('tanggal_monitoring_berikutnya')) {
+            Monitoring::create([
+                'laporan_id' => $monitoring->laporan_id,
+                'guru_bk_id' => $monitoring->guru_bk_id,
+                'tanggal_monitoring' => $validated['tanggal_monitoring_berikutnya'],
+                'waktu_monitoring' => $validated['waktu_monitoring_berikutnya'] ?? null,
+                'monitoring_ke' => $monitoring->monitoring_ke + 1,
+                'status_monitoring' => 'terjadwal',
+                'status_perkembangan' => 'stabil',
+                'catatan_perkembangan' => '-',
+                'tindak_lanjut' => '-',
+                'tanggal_monitoring_berikutnya' => null,
+                'waktu_monitoring_berikutnya' => null,
+            ]);
+
+            return back()->with('success', 'Catatan monitoring berhasil diperbarui dan jadwal berikutnya sudah dibuat.');
+        }
+
+        return redirect()
+            ->route('bk.evaluasi.show', $monitoring->laporan_id)
+            ->with('success', 'Monitoring selesai. Silakan lanjutkan evaluasi.');
     }
 
     public function destroy(string $id)

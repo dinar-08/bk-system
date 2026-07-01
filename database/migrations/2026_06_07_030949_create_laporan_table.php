@@ -28,7 +28,8 @@ return new class extends Migration {
                 'akademik',
                 'sosial',
                 'perilaku',
-                'emosional'
+                'emosional',
+                'lain-lain'
             ])->nullable();
 
             $table->string('jenis_masalah')->nullable();

@@ -77,4 +77,25 @@ class RiwayatController extends Controller
 
         return $pdf->download('riwayat-kasus.pdf');
     }
+<<<<<<< HEAD
+=======
+
+    public function downloadKasus(string $id)
+    {
+        $laporan = Laporan::with([
+            'siswa',
+            'guruBk',
+            'pemanggilan',
+            'monitoring.guruBk',
+            'evaluasi',
+        ])->findOrFail($id);
+
+        $namaSiswa = optional($laporan->siswa)->nama_siswa ?? 'siswa';
+
+        $pdf = Pdf::loadView('bk.download.kasus-pdf', compact('laporan'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('kasus-' . str_replace(' ', '-', strtolower($namaSiswa)) . '.pdf');
+    }
+>>>>>>> 4226421 (backup)
 }

@@ -65,6 +65,13 @@ class LaporanController extends Controller
             'judul_laporan' => ['required', 'string', 'max:150'],
             'deskripsi' => ['required', 'string'],
             'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,mp3,mp4,mov,wav,m4a,ogg', 'max:51200'],
+        ], [
+            'judul_laporan.required' => 'Judul laporan wajib diisi.',
+            'judul_laporan.max' => 'Judul laporan maksimal 150 karakter.',
+            'deskripsi.required' => 'Deskripsi laporan wajib diisi.',
+            'bukti.file' => 'File yang diunggah tidak valid.',
+            'bukti.mimes' => 'Format file tidak didukung. Gunakan JPG, PNG, PDF, MP3, MP4, MOV, atau WAV.',
+            'bukti.max' => 'Ukuran file maksimal 50MB.',
         ]);
 
         $buktiPath = null;

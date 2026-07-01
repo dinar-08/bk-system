@@ -15,7 +15,7 @@ class EvaluasiController extends Controller
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
-            'monitoring',
+            'monitoring.guruBk',
             'evaluasi',
         ])
             ->where('status', 'monitoring')
