@@ -25,9 +25,16 @@ class LaporanController extends Controller
             ->latest()
             ->get();
 
+        // INI YANG SEBELUMNYA HILANG — dipakai untuk mengunci tombol
+        // "Buat Laporan" di view, termasuk saat status sudah "monitoring".
+        $adaLaporanBerjalan = Laporan::where('siswa_id', $siswa->id)
+            ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
+            ->exists();
+
         return view('orang-tua.laporan.index', compact(
             'laporanAktif',
             'laporanRiwayat',
+            'adaLaporanBerjalan',
             'siswa'
         ));
     }
@@ -77,7 +84,7 @@ class LaporanController extends Controller
         $buktiPath = null;
 
         if ($request->hasFile('bukti')) {
-            $buktiPath = $request->file('bukti')->store('bukti-laporan', 'public');
+            $buktiPath = $request->file('bukti')->store('bukti-laporan', 'local');
         }
 
         Laporan::create([

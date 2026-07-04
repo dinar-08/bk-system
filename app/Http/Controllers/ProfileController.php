@@ -57,6 +57,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $siswa = Siswa::where('user_id', $user->id)->firstOrFail();
+        $periode = PeriodeUpdate::aktifSekarang();
 
         $validated = $request->validate([
             'nama_siswa' => ['required', 'string', 'max:150'],
@@ -77,6 +78,9 @@ class ProfileController extends Controller
             'alamat' => $validated['alamat'] ?? null,
             'nama_ortu' => $validated['nama_ortu'],
             'no_whatsapp' => $validated['no_whatsapp'],
+            // Catat tahun ajaran dari periode update yang sedang aktif,
+            // supaya kolom ini ikut terisi otomatis saat orang tua update data.
+            'tahun_ajaran' => $periode->tahun_ajaran ?? $siswa->tahun_ajaran,
             'last_data_updated_at' => now(),
         ];
 
@@ -91,6 +95,11 @@ class ProfileController extends Controller
         }
 
         $siswa->update($updateData);
+
+        if ($periode) {
+            $siswa->tandaiSudahUpdate($periode);
+        }
+
         // Sinkron nama ke users
         $user->update(['name' => $validated['nama_siswa']]);
 
@@ -257,6 +266,9 @@ class ProfileController extends Controller
                 'kelas' => $request->kelas ?? $siswa->kelas,
                 'nama_ortu' => $request->nama_ortu ?? $siswa->nama_ortu,
                 'no_whatsapp' => $request->no_whatsapp ?? $siswa->no_whatsapp,
+                // Catat tahun ajaran dari periode update yang sedang aktif,
+                // supaya kolom ini ikut terisi otomatis saat orang tua update data.
+                'tahun_ajaran' => $periode->tahun_ajaran ?? $siswa->tahun_ajaran,
             ];
 
             // Foto untuk orang_tua disimpan di siswa

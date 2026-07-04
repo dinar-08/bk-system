@@ -27,6 +27,7 @@
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">NIP</th>
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">No HP</th>
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">Username</th>
+                    <th class="px-5 py-4 text-left font-semibold text-slate-600">Alamat</th>
                     <th class="px-5 py-4 text-center font-semibold text-slate-600">Aksi</th>
                 </tr>
             </thead>
@@ -45,6 +46,7 @@
                         <td class="px-5 py-4 text-slate-600">{{ $item->nip }}</td>
                         <td class="px-5 py-4 text-slate-600">{{ $item->no_hp }}</td>
                         <td class="px-5 py-4 text-slate-600">{{ $item->user->username ?? '-' }}</td>
+                        <td class="px-5 py-4 text-slate-600">{{ $item->alamat }}</td>
                         <td class="px-5 py-4">
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('admin.guru-bk.edit', $item->id) }}"

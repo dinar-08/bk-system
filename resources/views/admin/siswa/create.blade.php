@@ -279,7 +279,7 @@
                             <p id="file-name" class="text-sm font-semibold text-blue-700 mt-3 hidden"></p>
                         </div>
 
-<<<<<<< HEAD
+
                         <div class="mt-5 bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 text-sm text-blue-700">
                             <div class="flex gap-2">
                                 <i data-feather="info" class="w-4 h-4 mt-0.5 shrink-0"></i>
@@ -290,9 +290,6 @@
                                 </p>
                             </div>
                         </div>
-
-=======
->>>>>>> 4226421 (backup)
                         <div class="flex justify-end gap-3 mt-5">
                             <button type="button" onclick="closeImportModal()"
                                 class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">

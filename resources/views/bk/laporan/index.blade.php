@@ -75,7 +75,7 @@
     <section>
         <div class="flex items-center gap-2 mb-4">
             <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-            <h2 class="text-sm font-bold text-slate-600 uppercase tracking-widest">Dalam Proses</h2>
+            <h2 class="text-sm font-bold text-slate-600 uppercase tracking-widest">Dalam Pemanggilan</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             @forelse($laporan->where('status', '!=', 'baru') as $item)

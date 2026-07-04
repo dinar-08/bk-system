@@ -13,8 +13,11 @@ class PerkembanganController extends Controller
         $siswa = Siswa::where('user_id', auth()->id())
             ->firstOrFail();
 
+        // Mencakup monitoring yang masih aktif, dan yang sudah
+        // selesai/dirujuk sebagai riwayat perkembangan anak.
         $laporan = Laporan::with([
             'siswa',
+            'guruBk',
             'monitoring',
             'evaluasi',
         ])
@@ -33,8 +36,11 @@ class PerkembanganController extends Controller
 
         $laporan = Laporan::with([
             'siswa',
+            'guruBk',
             'pemanggilan',
-            'monitoring',
+            'monitoring' => function ($query) {
+                $query->orderByDesc('tanggal_monitoring');
+            },
             'evaluasi',
         ])
             ->where('siswa_id', $siswa->id)

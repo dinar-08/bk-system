@@ -23,19 +23,13 @@
 
     @forelse($arsipPerTahun as $tahunAjaran => $dataSiswa)
         <section class="mb-8 bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 lg:p-6 shadow-sm overflow-hidden">
-            <div class="flex items-center justify-between gap-4 mb-5">
-                <div>
-                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">
-                        {{ $tahunAjaran }}
-                    </h2>
-                    <p class="text-sm text-slate-500 mt-1">
-                        {{ $dataSiswa->count() }} siswa diarsipkan
-                    </p>
-                </div>
-
-                <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center">
-                    <i data-feather="archive" class="w-5 h-5 text-slate-500"></i>
-                </div>
+            <div class="mb-5">
+                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">
+                    {{ $tahunAjaran }}
+                </h2>
+                <p class="text-sm text-slate-500 mt-1">
+                    {{ $dataSiswa->count() }} siswa diarsipkan
+                </p>
             </div>
 
             {{-- Mobile --}}

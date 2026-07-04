@@ -96,18 +96,101 @@
             </div>
         </div>
     @else
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-5">
-            <div class="relative">
-                <video autoplay muted loop playsinline class="w-full">
-                    <source src="{{ asset('asset/ayo_bercerita.mp4') }}" type="video/mp4">
-                </video>
+        <div class="mb-5">
+            <div class="text-center mb-6">
+                <p class="text-xs font-semibold text-blue-600 tracking-wider uppercase mb-1.5">
+                    Berikut tata cara pembuatan laporan
+                </p>
+                <h2 class="text-2xl font-extrabold text-slate-800">
+                    Buat Laporan <span class="text-blue-600">Konsultasi</span>
+                </h2>
+            </div>
 
-                <div class="absolute inset-0 bg-blue-900/40"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {{-- Langkah 1 --}}
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="relative bg-blue-50 mx-4 mt-4 rounded-xl overflow-hidden" style="aspect-ratio: 4/3;">
+                        <svg viewBox="0 0 200 150" class="w-full h-full">
+                            <rect x="0" y="0" width="200" height="150" fill="#EFF6FF" />
+                            <text x="14" y="24" font-size="20" fill="#BFDBFE" font-family="Arial, sans-serif"
+                                font-weight="bold">+</text>
+                            <text x="170" y="140" font-size="20" fill="#BFDBFE" font-family="Arial, sans-serif"
+                                font-weight="bold">+</text>
+                            <circle cx="100" cy="75" r="42" fill="#2563EB" />
+                            <rect x="94" y="55" width="12" height="40" rx="6" fill="white" />
+                            <rect x="80" y="69" width="40" height="12" rx="6" fill="white" />
+                        </svg>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Mulai</p>
+                        </div>
+                        <p class="font-bold text-slate-800 text-base mb-1.5">Klik Tombol Buat Laporan</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Tekan tombol bulat di pojok kanan bawah untuk memulai laporan konsultasi baru.
+                        </p>
+                    </div>
+                </div>
 
+                {{-- Langkah 2 --}}
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="relative bg-blue-50 mx-4 mt-4 rounded-xl overflow-hidden" style="aspect-ratio: 4/3;">
+                        <svg viewBox="0 0 200 150" class="w-full h-full">
+                            <rect x="0" y="0" width="200" height="150" fill="#EFF6FF" />
+                            <rect x="60" y="24" width="80" height="102" rx="10" fill="white" stroke="#BFDBFE"
+                                stroke-width="2" />
+                            <rect x="74" y="42" width="52" height="6" rx="3" fill="#93C5FD" />
+                            <rect x="74" y="56" width="40" height="6" rx="3" fill="#DBEAFE" />
+                            <rect x="74" y="76" width="52" height="6" rx="3" fill="#93C5FD" />
+                            <rect x="74" y="90" width="30" height="6" rx="3" fill="#DBEAFE" />
+                            <rect x="74" y="104" width="52" height="14" rx="7" fill="#2563EB" />
+                        </svg>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">2</span>
+                            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Isi Data</p>
+                        </div>
+                        <p class="font-bold text-slate-800 text-base mb-1.5">Lengkapi Detail Masalah</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Pilih data anak dan jelaskan permasalahan yang ingin dikonsultasikan secara singkat.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Langkah 3 --}}
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="relative bg-blue-50 mx-4 mt-4 rounded-xl overflow-hidden" style="aspect-ratio: 4/3;">
+                        <svg viewBox="0 0 200 150" class="w-full h-full">
+                            <rect x="0" y="0" width="200" height="150" fill="#EFF6FF" />
+                            <circle cx="100" cy="70" r="38" fill="white" stroke="#BFDBFE" stroke-width="2" />
+                            <path d="M82 70 L94 82 L120 56" stroke="#2563EB" stroke-width="7" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <rect x="70" y="122" width="60" height="10" rx="5" fill="#93C5FD" />
+                        </svg>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">3</span>
+                            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Selesai</p>
+                        </div>
+                        <p class="font-bold text-slate-800 text-base mb-1.5">Kirim & Pantau Prosesnya</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Kirim laporan Anda, lalu pantau status dan perkembangannya langsung dari dashboard ini.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-5">
                 <a href="{{ route('orang_tua.laporan.create') }}"
-                    class="absolute bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-                    title="Buat Laporan Baru">
-                    <i data-feather="plus" class="w-6 h-6"></i>
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all">
+                    <i data-feather="plus" class="w-4 h-4"></i>
+                    Buat Laporan Sekarang
                 </a>
             </div>
         </div>

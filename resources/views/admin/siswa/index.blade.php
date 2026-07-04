@@ -7,58 +7,33 @@
 @section('content')
 
     @php
-
         $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') === 'aktif');
-        $siswaPerKelas = $siswaAktif->groupBy('kelas');
-
-        $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') == 'aktif');
-        $siswaPerKelas = $siswaAktif
-            ->sortBy('nama_siswa')
-            ->groupBy('kelas');
-
+        $siswaPerKelas = $siswaAktif->sortBy('nama_siswa')->groupBy('kelas');
     @endphp
 
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Data Siswa</h1>
             <p class="text-slate-500 mt-1 text-sm">
-<<<<<<< HEAD
                 Kelola data siswa dan akun orang tua berdasarkan kelas.
-            </p>
-        </div>
-
-        <div class="flex flex-wrap gap-3">
-            <button type="button" onclick="openDownloadModal()"
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
-=======
-                Kelola data siswa.
             </p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
             <button type="button" onclick="openDownloadModal()"
                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition">
->>>>>>> 4226421 (backup)
                 <i data-feather="download" class="w-4 h-4"></i>
                 Download Data
             </button>
 
             <button type="button" onclick="openPeriodeModal()"
-<<<<<<< HEAD
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors">
-=======
                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-semibold hover:bg-amber-600 transition">
->>>>>>> 4226421 (backup)
                 <i data-feather="calendar" class="w-4 h-4"></i>
                 Periode Update
             </button>
 
             <a href="{{ route('admin.siswa.create') }}"
-<<<<<<< HEAD
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
-=======
                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition">
->>>>>>> 4226421 (backup)
                 <i data-feather="plus" class="w-4 h-4"></i>
                 Tambah Siswa
             </a>
@@ -72,8 +47,6 @@
             <p class="text-sm font-semibold text-red-700 mb-2">
                 Kelas {{ $errData['kelas'] }} tidak bisa dinonaktifkan
             </p>
-<<<<<<< HEAD
-
             <p class="text-xs text-red-600 mb-3">
                 Masih ada kasus yang sedang berjalan:
             </p>
@@ -92,12 +65,6 @@
             <p class="text-xs text-red-500 mt-2">
                 Selesaikan atau arsipkan kasus tersebut terlebih dahulu.
             </p>
-        </div>
-    @endif
-
-    @if(session('success'))
-        <div class="mb-5 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
-            {{ session('success') }}
         </div>
     @endif
 
@@ -108,47 +75,6 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-        </div>
-    @endif
-
-    @forelse($siswaPerKelas as $kelas => $dataSiswa)
-        <section class="mb-10">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-1 h-7 bg-blue-700 rounded-full"></div>
-
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Kelas {{ $kelas }}</h2>
-                    <p class="text-xs text-slate-500">{{ $dataSiswa->count() }} siswa aktif</p>
-                </div>
-            </div>
-
-            <div class="flex overflow-x-auto gap-1 pb-2" style="min-height: 340px;">
-                @foreach($dataSiswa as $item)
-                    <div class="group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-500 shadow-sm cursor-pointer"
-                        style="width: 72px; height: 320px;" onmouseenter="this.style.width='300px'"
-                        onmouseleave="this.style.width='72px'">
-
-                        <div class="absolute inset-0 bg-gradient-to-b from-blue-700 to-blue-900"></div>
-=======
-
-            <p class="text-xs text-red-600 mb-3">
-                Masih ada kasus yang sedang berjalan:
-            </p>
-
-            <ul class="space-y-1">
-                @foreach($errData['kasus'] as $k)
-                    <li class="text-xs text-red-600 bg-red-100 rounded-lg px-3 py-1.5">
-                        <strong>{{ $k['nama'] }}</strong> — {{ $k['judul'] }}
-                        <span class="ml-1 bg-red-200 text-red-700 px-1.5 py-0.5 rounded-full text-[10px] capitalize">
-                            {{ $k['status'] }}
-                        </span>
-                    </li>
-                @endforeach
-            </ul>
-
-            <p class="text-xs text-red-500 mt-2">
-                Selesaikan atau arsipkan kasus tersebut terlebih dahulu.
-            </p>
         </div>
     @endif
 
@@ -248,55 +174,9 @@
                 @foreach($dataSiswa as $item)
                     <div class="group relative shrink-0 h-[330px] border-r-4 border-white bg-center overflow-hidden transition-all duration-500 ease-out cursor-pointer"
                         style="width: 58px;" onmouseenter="this.style.width='284px'" onmouseleave="this.style.width='58px'">
->>>>>>> 4226421 (backup)
 
                         {{-- Background foto / fallback --}}
                         @if($item->foto)
-<<<<<<< HEAD
-                            <img src="{{ asset('storage/' . $item->foto) }}"
-                                class="absolute inset-0 w-full h-full object-cover opacity-40" alt="Foto Siswa">
-                        @endif
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/50 to-transparent"></div>
-
-                        <div class="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300 pointer-events-none"
-                            style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                            <span
-                                class="text-white text-[11px] font-bold tracking-[3px] uppercase whitespace-nowrap overflow-hidden"
-                                style="max-height: 260px;">
-                                {{ $item->nama_siswa }}
-                            </span>
-                        </div>
-
-                        <div
-                            class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div>
-                                <div
-                                    class="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-white text-2xl font-bold mb-3">
-                                    {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
-                                </div>
-
-                                <h3 class="text-white text-base font-bold leading-tight">
-                                    {{ $item->nama_siswa }}
-                                </h3>
-
-                                <div class="mt-2 space-y-0.5">
-                                    <p class="text-blue-100 text-xs">NIS: {{ $item->nis }}</p>
-                                    <p class="text-blue-100 text-xs">Kelas: {{ $item->kelas }}</p>
-                                    <p class="text-blue-100 text-xs">Orang Tua: {{ $item->nama_ortu }}</p>
-                                </div>
-
-                                <span
-                                    class="mt-3 inline-block px-2.5 py-1 rounded-full text-xs font-bold bg-green-400/20 text-green-300 border border-green-400/30">
-                                    Akun Aktif
-                                </span>
-                            </div>
-
-                            <div class="space-y-2">
-                                <a href="{{ route('admin.siswa.edit', $item->id) }}"
-                                    class="block w-full bg-white text-blue-900 rounded-xl py-2.5 text-center text-sm font-bold hover:bg-blue-50 transition-colors">
-                                    Edit Data
-=======
                             <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_siswa }}"
                                 class="absolute inset-0 w-full h-full object-cover">
                         @else
@@ -324,23 +204,15 @@
                                 <a href="{{ route('admin.siswa.edit', $item->id) }}" title="Edit Data"
                                     class="w-10 h-10 rounded-full bg-white/90 text-blue-700 flex items-center justify-center hover:bg-blue-700 hover:text-white transition">
                                     <i data-feather="edit-2" class="w-4 h-4"></i>
->>>>>>> 4226421 (backup)
                                 </a>
 
                                 <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-
-<<<<<<< HEAD
-                                    <button type="submit" onclick="return confirm('Nonaktifkan akun siswa ini?')"
-                                        class="w-full bg-red-500/80 hover:bg-red-500 text-white rounded-xl py-2.5 text-sm font-bold transition-colors">
-                                        Nonaktifkan
-=======
                                     <button type="submit" title="Nonaktifkan"
                                         onclick="return confirm('Nonaktifkan akun siswa ini?')"
                                         class="w-10 h-10 rounded-full bg-white/90 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition">
                                         <i data-feather="archive" class="w-4 h-4"></i>
->>>>>>> 4226421 (backup)
                                     </button>
                                 </form>
                             </div>
@@ -368,13 +240,6 @@
                     </div>
                 @endforeach
             </div>
-<<<<<<< HEAD
-
-            <div class="h-2 rounded-full mt-1"
-                style="background: linear-gradient(to right, #bfdbfe, #3b82f6, #bfdbfe); box-shadow: 0 2px 6px rgba(59,130,246,0.2);">
-            </div>
-=======
->>>>>>> 4226421 (backup)
         </section>
     @empty
         <div class="bg-white rounded-2xl border border-slate-200 p-14 text-center">
@@ -424,18 +289,8 @@
                         </select>
                     </div>
 
-<<<<<<< HEAD
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Format File</label>
-                        <select name="format"
-                            class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="pdf">PDF</option>
-                            <option value="excel">Excel</option>
-                        </select>
-                    </div>
+                    <input type="hidden" name="format" value="pdf">
 
-=======
->>>>>>> 4226421 (backup)
                     <div class="flex justify-end gap-3 pt-2">
                         <button type="button" onclick="closeDownloadModal()"
                             class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-semibold hover:bg-slate-50">
@@ -511,10 +366,7 @@
         </div>
     </div>
 
-<<<<<<< HEAD
-=======
     <script src="https://unpkg.com/feather-icons"></script>
->>>>>>> 4226421 (backup)
     <script>
         function openPeriodeModal() {
             document.getElementById('periodeModal').classList.remove('hidden');
@@ -540,20 +392,7 @@
             @if($errors->any())
                 openPeriodeModal();
             @endif
-<<<<<<< HEAD
-            });
-    </script>
-
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (typeof feather !== 'undefined') {
-                feather.replace();
-            }
-        });
-=======
-                    });
->>>>>>> 4226421 (backup)
+                });
     </script>
 
 @endsection

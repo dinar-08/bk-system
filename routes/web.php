@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FotoController;
 
 // Admin
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -37,6 +38,19 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Foto & Bukti (private, wajib login)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/foto/siswa/{siswa}', [FotoController::class, 'siswa'])->name('foto.siswa');
+    Route::get('/foto/guru-bk/{guruBk}', [FotoController::class, 'guruBk'])->name('foto.guru-bk');
+    Route::get('/foto/user/{user}', [FotoController::class, 'user'])->name('foto.user');
+    Route::get('/bukti/{laporan}', [FotoController::class, 'bukti'])->name('bukti.show');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Profile
 |--------------------------------------------------------------------------
 */
@@ -54,7 +68,6 @@ Route::middleware(['auth', 'must.change.password'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-<<<<<<< HEAD
 | Ganti Password Pertama Kali
 |--------------------------------------------------------------------------
 */
@@ -183,7 +196,6 @@ Route::middleware(['auth', 'role:orang_tua', 'must.change.password', 'cek.period
 
 /*
 |--------------------------------------------------------------------------
-<<<<<<< HEAD
 | Update Data Orang Tua
 |--------------------------------------------------------------------------
 */

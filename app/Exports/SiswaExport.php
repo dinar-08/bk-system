@@ -81,7 +81,7 @@ class SiswaExport
     private function exportRiwayatKasus($spreadsheet): void
     {
         $sheet = $spreadsheet->createSheet();
-        $sheet->setTitle('Riwayat Kasus');
+        $sheet->setTitle('Riwayat Permasalahan');
 
         $sheet->fromArray([
             ['No', 'NIS', 'Nama Siswa', 'Kelas', 'Judul Laporan', 'Kategori', 'Status', 'Guru BK', 'Tanggal']

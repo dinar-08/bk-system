@@ -213,8 +213,8 @@
                 <td>Tanggal Lahir</td>
                 <td>
                     {{ optional($laporan->siswa)->tanggal_lahir
-                        ? \Carbon\Carbon::parse($laporan->siswa->tanggal_lahir)->format('d M Y')
-                        : '-' }}
+    ? \Carbon\Carbon::parse($laporan->siswa->tanggal_lahir)->format('d M Y')
+    : '-' }}
                 </td>
             </tr>
             <tr>
@@ -287,10 +287,6 @@
                         <th>Pihak Dipanggil</th>
                         <th>Tujuan</th>
                         <th>Status Kehadiran</th>
-<<<<<<< HEAD
-                        <th>Tindak Lanjut</th>
-=======
->>>>>>> 4226421 (backup)
                         <th>Tanggal Monitoring</th>
                         <th>Catatan</th>
                     </tr>
@@ -299,16 +295,14 @@
                     @foreach($laporan->pemanggilan as $p)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $p->tanggal_pemanggilan ? \Carbon\Carbon::parse($p->tanggal_pemanggilan)->format('d M Y') : '-' }}</td>
+                            <td>{{ $p->tanggal_pemanggilan ? \Carbon\Carbon::parse($p->tanggal_pemanggilan)->format('d M Y') : '-' }}
+                            </td>
                             <td>{{ $p->waktu_pemanggilan ?? '-' }}</td>
                             <td>{{ str_replace('_', ' ', ucfirst($p->pihak_dipanggil ?? '-')) }}</td>
                             <td>{{ $p->tujuan ?? '-' }}</td>
                             <td>{{ str_replace('_', ' ', ucfirst($p->status_kehadiran ?? '-')) }}</td>
-<<<<<<< HEAD
-                            <td>{{ str_replace('_', ' ', ucfirst($p->tindak_lanjut ?? '-')) }}</td>
-=======
->>>>>>> 4226421 (backup)
-                            <td>{{ $p->tanggal_monitoring ? \Carbon\Carbon::parse($p->tanggal_monitoring)->format('d M Y') : '-' }}</td>
+                            <td>{{ $p->tanggal_monitoring ? \Carbon\Carbon::parse($p->tanggal_monitoring)->format('d M Y') : '-' }}
+                            </td>
                             <td>{{ $p->catatan ?? '-' }}</td>
                         </tr>
                     @endforeach
@@ -337,10 +331,6 @@
                         <th>Status Monitoring</th>
                         <th>Status Perkembangan</th>
                         <th>Catatan Perkembangan</th>
-<<<<<<< HEAD
-                        <th>Tindak Lanjut</th>
-=======
->>>>>>> 4226421 (backup)
                         <th>Monitoring Berikutnya</th>
                         <th>Guru BK</th>
                     </tr>
@@ -350,15 +340,13 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $m->monitoring_ke ?? '-' }}</td>
-                            <td>{{ $m->tanggal_monitoring ? \Carbon\Carbon::parse($m->tanggal_monitoring)->format('d M Y') : '-' }}</td>
+                            <td>{{ $m->tanggal_monitoring ? \Carbon\Carbon::parse($m->tanggal_monitoring)->format('d M Y') : '-' }}
+                            </td>
                             <td>{{ ucfirst($m->status_monitoring ?? '-') }}</td>
                             <td>{{ ucfirst($m->status_perkembangan ?? '-') }}</td>
                             <td>{{ $m->catatan_perkembangan ?? '-' }}</td>
-<<<<<<< HEAD
-                            <td>{{ $m->tindak_lanjut ?? '-' }}</td>
-=======
->>>>>>> 4226421 (backup)
-                            <td>{{ $m->tanggal_monitoring_berikutnya ? \Carbon\Carbon::parse($m->tanggal_monitoring_berikutnya)->format('d M Y') : '-' }}</td>
+                            <td>{{ $m->tanggal_monitoring_berikutnya ? \Carbon\Carbon::parse($m->tanggal_monitoring_berikutnya)->format('d M Y') : '-' }}
+                            </td>
                             <td>{{ optional($m->guruBk)->nama ?? '-' }}</td>
                         </tr>
                     @endforeach
@@ -383,8 +371,8 @@
                     <td>Tanggal Evaluasi</td>
                     <td>
                         {{ $laporan->evaluasi->tanggal_evaluasi
-                            ? \Carbon\Carbon::parse($laporan->evaluasi->tanggal_evaluasi)->format('d M Y')
-                            : '-' }}
+            ? \Carbon\Carbon::parse($laporan->evaluasi->tanggal_evaluasi)->format('d M Y')
+            : '-' }}
                     </td>
                 </tr>
                 <tr>

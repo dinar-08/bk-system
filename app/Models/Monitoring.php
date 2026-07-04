@@ -16,7 +16,6 @@ class Monitoring extends Model
         'monitoring_ke',
         'status_perkembangan',
         'catatan_perkembangan',
-        'tindak_lanjut',
         'tanggal_monitoring_berikutnya',
         'waktu_monitoring_berikutnya',
         'status_monitoring',

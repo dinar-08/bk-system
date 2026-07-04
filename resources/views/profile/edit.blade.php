@@ -77,8 +77,8 @@
             <div>
                 <h4 class="font-semibold text-amber-800">Periode Update Aktif</h4>
                 <p class="text-sm text-amber-700 mt-1">
-                    Sedang berlangsung periode pembaruan data
-                    <strong>{{ $periode->nama ?? '' }}</strong>.
+                    Sedang berlangsung periode pembaruan data.
+                    <strong>{{ $periode->nama ?? '' }}</strong>
                     Semua data wajib diperbarui dan disimpan sebelum menggunakan fitur lainnya.
                 </p>
             </div>

@@ -24,17 +24,21 @@
         ];
     @endphp
 
+    {{-- Breadcrumb --}}
+    <div class="flex items-center gap-2 text-sm mb-4">
+        <a href="{{ route('admin.arsip.index') }}"
+            class="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600 font-medium">
+            <i data-feather="chevron-left" class="w-4 h-4"></i>
+            Kembali
+        </a>
+        <span class="text-slate-300">/</span>
+        <span class="text-slate-800 font-bold">Detail Arsip</span>
+    </div>
+
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
         {{-- Header --}}
-        <div
-            class="px-5 sm:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <a href="{{ route('admin.arsip.index') }}"
-                class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 font-medium">
-                <i data-feather="arrow-left" class="w-4 h-4"></i>
-                Kembali ke Arsip
-            </a>
-
+        <div class="px-5 sm:px-6 py-4 border-b border-slate-100 flex justify-end">
             <form action="{{ route('admin.siswa.destroy', $siswa->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
@@ -47,89 +51,6 @@
             </form>
         </div>
 
-<<<<<<< HEAD
-    {{-- Riwayat Laporan --}}
-    <div class="mb-5 flex items-center gap-3">
-        <div class="w-1 h-6 bg-blue-700 rounded-full"></div>
-        <h2 class="text-lg font-bold text-slate-900">Riwayat Penanganan BK</h2>
-        <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">{{ $siswa->laporan->count() }}
-            laporan</span>
-    </div>
-
-    @forelse($siswa->laporan as $laporan)
-
-        <div class="bg-white rounded-2xl border border-slate-200 mb-4 overflow-hidden">
-
-            {{-- Header laporan --}}
-            <div class="px-6 py-4 border-b border-slate-100 flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="font-bold text-slate-800">{{ $laporan->judul_laporan }}</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">{{ $laporan->created_at->format('d M Y') }}</p>
-                </div>
-                <span class="flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                    {{ ucfirst($laporan->status) }}
-                </span>
-            </div>
-
-            <div class="p-6 space-y-6">
-
-                {{-- Deskripsi --}}
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Deskripsi Permasalahan</p>
-                    <p class="text-sm text-slate-700 bg-slate-50 rounded-xl p-3 leading-relaxed">{{ $laporan->deskripsi }}</p>
-                </div>
-
-                {{-- Pemanggilan --}}
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Riwayat Pemanggilan</p>
-                    @forelse($laporan->pemanggilan as $item)
-                        <div class="flex items-center gap-4 border border-slate-100 rounded-xl p-3 mb-2 bg-slate-50">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-slate-700">
-                                    {{ \Carbon\Carbon::parse($item->tanggal_panggilan)->format('d M Y') }}</p>
-                                <p class="text-xs text-slate-500">Kehadiran: <span
-                                        class="font-semibold">{{ ucfirst($item->status_kehadiran) }}</span></p>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-sm text-slate-400 bg-slate-50 rounded-xl p-3">Tidak ada data pemanggilan.</p>
-                    @endforelse
-                </div>
-
-                {{-- Monitoring --}}
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Riwayat Monitoring</p>
-                    @forelse($laporan->monitoring as $item)
-                        <div class="border border-slate-100 rounded-xl p-3 mb-2 bg-slate-50">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
-                                    Monitoring ke-{{ $item->monitoring_ke }}
-                                </span>
-                                <span class="text-xs text-slate-500">{{ ucfirst($item->status_perkembangan) }}</span>
-                            </div>
-                            <p class="text-sm text-slate-700">{{ $item->catatan_perkembangan }}</p>
-                        </div>
-                    @empty
-                        <p class="text-sm text-slate-400 bg-slate-50 rounded-xl p-3">Tidak ada data monitoring.</p>
-                    @endforelse
-                </div>
-
-                {{-- Evaluasi --}}
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Evaluasi Akhir</p>
-                    @if($laporan->evaluasi)
-                        <div class="border border-green-200 rounded-xl p-4 bg-green-50">
-                            <p class="text-xs font-semibold text-green-700 mb-1">Hasil Evaluasi</p>
-                            <p class="text-sm text-slate-700 mb-3">{{ $laporan->evaluasi->hasil_evaluasi }}</p>
-                        </div>
-=======
         {{-- Profil --}}
         <div class="p-5 sm:p-6">
             <div class="flex flex-col lg:flex-row gap-5 lg:items-center">
@@ -137,7 +58,6 @@
                     @if($siswa->foto)
                         <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_siswa }}"
                             class="w-full h-full object-cover">
->>>>>>> 4226421 (backup)
                     @else
                         <div class="w-full h-full flex items-center justify-center text-5xl font-extrabold text-slate-300">
                             {{ strtoupper(substr($siswa->nama_siswa, 0, 1)) }}

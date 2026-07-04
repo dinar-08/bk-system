@@ -151,6 +151,7 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
     <script>
         const genderLabels = @json($genderLabels);
@@ -162,6 +163,36 @@
         const kategoriLabels = @json($kategoriLabels);
         const kategoriData = @json($kategoriData);
 
+        // Menghitung step sumbu Y yang "rapi" (1, 2, 5, 10, 20, 50, 100, dst)
+        // menyesuaikan otomatis dengan nilai data terbesar, supaya tidak muncul 0.2 / 0.4.
+        function hitungStepRapi(nilaiMax) {
+            if (!nilaiMax || nilaiMax <= 0) return 1;
+
+            const kasar = nilaiMax / 5;
+            const magnitude = Math.pow(10, Math.floor(Math.log10(kasar)));
+            const sisa = kasar / magnitude;
+
+            let stepRapi;
+            if (sisa > 5) stepRapi = 10;
+            else if (sisa > 2) stepRapi = 5;
+            else if (sisa > 1) stepRapi = 2;
+            else stepRapi = 1;
+
+            return stepRapi * magnitude;
+        }
+
+        // Opsi bawaan untuk semua chart: legend & tooltip dimatikan.
+        // datalabels dimatikan di sini (default), lalu diaktifkan khusus untuk pie chart saja.
+        const opsiUmum = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+                datalabels: { display: false }
+            }
+        };
+
         new Chart(document.getElementById('genderChartCanvas'), {
             type: 'pie',
             data: {
@@ -170,12 +201,26 @@
                     data: genderData
                 }]
             },
+            plugins: [ChartDataLabels],
             options: {
-                responsive: true,
-                maintainAspectRatio: false
+                ...opsiUmum,
+                plugins: {
+                    ...opsiUmum.plugins,
+                    datalabels: {
+                        color: '#000',
+                        font: { weight: 'bold', size: 13 },
+                        formatter: function (value, context) {
+                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            if (!total) return '0%';
+                            const persen = (value / total) * 100;
+                            return persen.toFixed(1) + '%';
+                        }
+                    }
+                }
             }
         });
 
+        const kelasStep = hitungStepRapi(Math.max(...kelasData, 0));
         new Chart(document.getElementById('kelasChartCanvas'), {
             type: 'bar',
             data: {
@@ -186,11 +231,20 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false
+                ...opsiUmum,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: kelasStep,
+                            precision: 0
+                        }
+                    }
+                }
             }
         });
 
+        const kategoriStep = hitungStepRapi(Math.max(...kategoriData, 0));
         new Chart(document.getElementById('kategoriChartCanvas'), {
             type: 'bar',
             data: {
@@ -201,8 +255,16 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false
+                ...opsiUmum,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: kategoriStep,
+                            precision: 0
+                        }
+                    }
+                }
             }
         });
     </script>

@@ -104,7 +104,7 @@
                     Laporan
                 </a>
                 <a href="{{ route('bk.monitoring.index') }}"
-                    class="nav-link {{ request()->routeIs('bk.monitoring.*') ? 'active' : '' }}">
+                    class="nav-link {{ request()->routeIs('bk.monitoring.*') || request()->routeIs('bk.evaluasi.*') ? 'active' : '' }}">
                     <i data-feather="activity" class="w-4 h-4 flex-shrink-0"></i>
                     Monitoring
                 </a>

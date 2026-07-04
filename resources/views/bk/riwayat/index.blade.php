@@ -1,8 +1,8 @@
 @extends('layouts.bk')
 
-@section('title', 'Riwayat Kasus')
-@section('page-title', 'Riwayat Kasus')
-@section('page-subtitle', 'Semua kasus yang telah selesai atau dirujuk')
+@section('title', 'Riwayat Permasalahan')
+@section('page-title', 'Riwayat Permasalahan')
+@section('page-subtitle', 'Semua permasalahan yang telah selesai atau dirujuk')
 
 @section('content')
 
@@ -25,7 +25,6 @@
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Riwayat Permasalahan Siswa</h1>
-            <p class="text-sm text-slate-500 mt-1">{{ $laporan->count() }} kasus ditemukan</p>
         </div>
     </div>
 
@@ -103,7 +102,7 @@
                         {{ $cfg['label'] }}
                     </h2>
                     <p class="text-sm text-slate-500 mt-1">
-                        {{ $dataLaporan->count() }} kasus
+                        {{ $dataLaporan->count() }} Permasalahan
                     </p>
                 </div>
 
@@ -179,7 +178,7 @@
 
                             <a href="{{ route('bk.riwayat.show', $item->id) }}"
                                 class="block w-full bg-white text-slate-900 rounded-xl py-3 text-center font-semibold hover:bg-slate-50 transition-colors">
-                                Lihat Detail Kasus
+                                Lihat Detail Permasalahan
                             </a>
                         </div>
                     </div>

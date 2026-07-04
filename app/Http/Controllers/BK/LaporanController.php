@@ -50,7 +50,7 @@ class LaporanController extends Controller
         $buktiPath = null;
 
         if ($request->hasFile('bukti')) {
-            $buktiPath = $request->file('bukti')->store('bukti-laporan', 'public');
+            $buktiPath = $request->file('bukti')->store('bukti-laporan', 'local');
         }
 
         Laporan::create([
