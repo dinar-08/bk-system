@@ -10,11 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('monitoring', function (Blueprint $table) {
-            $table->text('tindak_lanjut')
-                ->nullable()
-                ->after('catatan_perkembangan');
-        });
+        if (!Schema::hasColumn('monitoring', 'tindak_lanjut')) {
+            Schema::table('monitoring', function (Blueprint $table) {
+                $table->text('tindak_lanjut')
+                    ->nullable()
+                    ->after('catatan_perkembangan');
+            });
+        }
     }
 
     /**
@@ -22,8 +24,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('monitoring', function (Blueprint $table) {
-            $table->dropColumn('tindak_lanjut');
-        });
+        if (Schema::hasColumn('monitoring', 'tindak_lanjut')) {
+            Schema::table('monitoring', function (Blueprint $table) {
+                $table->dropColumn('tindak_lanjut');
+            });
+        }
     }
 };
