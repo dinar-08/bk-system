@@ -135,15 +135,15 @@
                         class="block rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 active:scale-[0.98] transition-transform">
 
                         <div class="relative h-32 w-full bg-center bg-cover">
-                            @if($foto)
-                                <img src="{{ asset('storage/' . $foto) }}" alt="{{ $nama }}"
-                                    class="absolute inset-0 w-full h-full object-cover">
+                            @if(optional($siswa)->foto)
+                                <img src="{{ route('foto.siswa', $siswa->id) }}"alt="{{ $nama }}"
+                                class="absolute inset-0 w-full h-full object-cover">
                             @else
                                 <div
-                                    class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
-                                    <span class="text-white/30 text-4xl font-extrabold">
-                                        {{ strtoupper(substr($nama, 0, 1)) }}
-                                    </span>
+                                class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                <span class="text-white/30 text-4xl font-extrabold">
+                                {{ strtoupper(substr($nama, 0, 1)) }}
+                                </span>
                                 </div>
                             @endif
                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
@@ -171,25 +171,22 @@
             {{-- DESKTOP: strip kartu dengan efek hover melebar --}}
             <div class="hidden md:flex flex-row flex-nowrap overflow-x-auto pb-3">
                 @foreach($dataPreview as $item)
-                    @php
-                        $status = $item->status ?? '-';
+                        @php
+                            $status = $item->status ?? '-';
 
-                        $statusBadge = $status === 'selesai'
-                            ? 'bg-green-400/20 text-green-200 border border-green-300/30'
-                            : 'bg-red-400/20 text-red-200 border border-red-300/30';
+                            $statusBadge = $status === 'selesai'
+                                ? 'bg-green-400/20 text-green-200 border border-green-300/30'
+                                : 'bg-red-400/20 text-red-200 border border-red-300/30';
 
-                        $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
+                            $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
 
-                        $siswa = $item->siswa;
-                        $nama = optional($siswa)->nama_siswa ?? '-';
-                        $foto = optional($siswa)->foto;
-                    @endphp
+                            $siswa = $item->siswa;
+                            $nama = optional($siswa)->nama_siswa ?? '-';
+                            $foto = optional($siswa)->foto;
+                        @endphp
 
-                    <div class="group relative shrink-0 h-[330px] border-r-4 border-white bg-center overflow-hidden transition-all duration-500 ease-out cursor-pointer"
-                        style="width: 58px;" onmouseenter="this.style.width='284px'" onmouseleave="this.style.width='58px'">
-
-                        @if($foto)
-                            <img src="{{ asset('storage/' . $foto) }}" alt="{{ $nama }}"
+                        @if(optional($siswa)->foto)
+                            <img src="{{ route('foto.siswa', $siswa->id) }}" alt="{{ $nama }}"
                                 class="absolute inset-0 w-full h-full object-cover">
                         @else
                             <div
