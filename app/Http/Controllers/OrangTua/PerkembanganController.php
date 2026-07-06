@@ -5,6 +5,7 @@ namespace App\Http\Controllers\OrangTua;
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
 use App\Models\Siswa;
+use App\Notifications\MonitoringBaruNotification;
 
 class PerkembanganController extends Controller
 {
@@ -13,8 +14,7 @@ class PerkembanganController extends Controller
         $siswa = Siswa::where('user_id', auth()->id())
             ->firstOrFail();
 
-        // Mencakup monitoring yang masih aktif, dan yang sudah
-        // selesai/dirujuk sebagai riwayat perkembangan anak.
+        // Laporan yang sudah 'selesai' atau 'dirujuk' otomatis pindah ke riwayat.
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
@@ -22,9 +22,11 @@ class PerkembanganController extends Controller
             'evaluasi',
         ])
             ->where('siswa_id', $siswa->id)
-            ->whereIn('status', ['monitoring', 'selesai', 'dirujuk'])
+            ->where('status', 'monitoring')
             ->latest()
             ->get();
+
+        $this->tandaiNotifikasiMonitoringDibaca();
 
         return view('orang-tua.perkembangan.index', compact('siswa', 'laporan'));
     }
@@ -44,9 +46,19 @@ class PerkembanganController extends Controller
             'evaluasi',
         ])
             ->where('siswa_id', $siswa->id)
-            ->whereIn('status', ['monitoring', 'selesai', 'dirujuk'])
+            ->where('status', 'monitoring')
             ->findOrFail($id);
 
+        // Tandai juga saat user langsung buka detail
+        $this->tandaiNotifikasiMonitoringDibaca();
+
         return view('orang-tua.perkembangan.show', compact('siswa', 'laporan'));
+    }
+
+    protected function tandaiNotifikasiMonitoringDibaca(): void
+    {
+        auth()->user()->unreadNotifications()
+            ->where('type', MonitoringBaruNotification::class)
+            ->update(['read_at' => now()]);
     }
 }

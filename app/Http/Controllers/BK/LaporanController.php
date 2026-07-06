@@ -7,6 +7,7 @@ use App\Models\GuruBK;
 use App\Models\Laporan;
 use App\Models\Pemanggilan;
 use App\Models\Siswa;
+use App\Notifications\LaporanBaruNotification;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -53,7 +54,7 @@ class LaporanController extends Controller
             $buktiPath = $request->file('bukti')->store('bukti-laporan', 'local');
         }
 
-        Laporan::create([
+        $laporan = Laporan::create([
             'siswa_id' => $validated['siswa_id'],
             'guru_bk_id' => $guruBk->id,
             'judul_laporan' => $validated['judul_laporan'],
@@ -63,6 +64,11 @@ class LaporanController extends Controller
             'bukti' => $buktiPath,
             'status' => 'baru',
         ]);
+
+        $laporan->load('siswa.user');
+        if ($laporan->siswa && $laporan->siswa->user) {
+            $laporan->siswa->user->notify(new LaporanBaruNotification($laporan));
+        }
 
         return redirect()
             ->route('bk.laporan.index')

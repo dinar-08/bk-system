@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
     <title>@yield('title', 'Lapor Bu!!')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,15 +103,48 @@
                     <i data-feather="grid" class="w-4 h-4 flex-shrink-0"></i>
                     Dashboard
                 </a>
+
+                @php
+                    $notifLaporan = auth()->user()->unreadNotifications()
+                        ->whereIn('type', [
+                            \App\Notifications\LaporanBaruNotification::class,
+                            \App\Notifications\EvaluasiBaruNotification::class,
+                            \App\Notifications\JadwalPemanggilanNotification::class,
+                        ])->count();
+
+                    $notifPerkembangan = auth()->user()->unreadNotifications()
+                        ->where('type', \App\Notifications\MonitoringBaruNotification::class)
+                        ->count();
+                @endphp
+
                 <a href="{{ route('orang_tua.laporan.index') }}"
-                    class="nav-link {{ request()->routeIs('orang_tua.laporan.*') ? 'active' : '' }}">
-                    <i data-feather="file-text" class="w-4 h-4 flex-shrink-0"></i>
-                    Laporan Saya
+                    class="nav-link {{ request()->routeIs('orang_tua.laporan.*') ? 'active' : '' }}"
+                    style="justify-content: space-between;">
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <i data-feather="file-text" class="w-4 h-4 flex-shrink-0"></i>
+                        Laporan Saya
+                    </span>
+                    @if($notifLaporan > 0)
+                        <span
+                            style="background:#ef4444;color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9999px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
+                            {{ $notifLaporan > 9 ? '9+' : $notifLaporan }}
+                        </span>
+                    @endif
                 </a>
+
                 <a href="{{ route('orang_tua.perkembangan') }}"
-                    class="nav-link {{ request()->routeIs('orang_tua.perkembangan*') ? 'active' : '' }}">
-                    <i data-feather="trending-up" class="w-4 h-4 flex-shrink-0"></i>
-                    Perkembangan Anak
+                    class="nav-link {{ request()->routeIs('orang_tua.perkembangan*') ? 'active' : '' }}"
+                    style="justify-content: space-between;">
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <i data-feather="trending-up" class="w-4 h-4 flex-shrink-0"></i>
+                        Perkembangan Anak
+                    </span>
+                    @if($notifPerkembangan > 0)
+                        <span
+                            style="background:#ef4444;color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9999px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
+                            {{ $notifPerkembangan > 9 ? '9+' : $notifPerkembangan }}
+                        </span>
+                    @endif
                 </a>
 
                 <p class="nav-section">Akun</p>
@@ -150,7 +185,7 @@
                     </svg>
                 </button>
 
-                <div>
+                <div class="flex-1">
                     @php
                         $hour = now('Asia/Jakarta')->hour;
 
@@ -175,7 +210,8 @@
             </header>
 
             {{-- Topbar desktop --}}
-            <header class="hidden lg:flex sticky top-0 z-10 px-8 py-4 items-center" style="background:#1d4ed8;">
+            <header class="hidden lg:flex sticky top-0 z-10 px-8 py-4 items-center justify-between"
+                style="background:#1d4ed8;">
 
                 <div>
                     @php
@@ -238,6 +274,62 @@
             o.classList.add('opacity-0');
             setTimeout(() => o.classList.add('hidden'), 300);
         }
+    </script>
+
+    <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    </script>
+
+    {{-- ================= Push Notification Browser (kayak WhatsApp) ================= --}}
+    <script>
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+        }
+
+        async function daftarPushNotification() {
+            const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
+
+            if (!('serviceWorker' in navigator) || !('PushManager' in window) || !vapidPublicKey) {
+                return; // browser tidak didukung, atau VAPID key belum di-generate di server
+            }
+
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+
+                let permission = Notification.permission;
+                if (permission === 'default') {
+                    permission = await Notification.requestPermission();
+                }
+                if (permission !== 'granted') {
+                    return;
+                }
+
+                let subscription = await registration.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                    });
+                }
+
+                await fetch('{{ route('push-subscription.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(subscription.toJSON()),
+                });
+            } catch (err) {
+                console.error('Gagal mendaftarkan push notification:', err);
+            }
+        }
+
+        daftarPushNotification();
     </script>
 
 </body>

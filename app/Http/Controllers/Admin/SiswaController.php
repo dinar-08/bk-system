@@ -38,7 +38,7 @@ class SiswaController extends Controller
 
         if ($aktifSekarang) {
             $totalSudahUpdate = $siswaAktif
-                ->filter(fn ($item) => $item->sudahUpdateDiPeriode($aktifSekarang))
+                ->filter(fn($item) => $item->sudahUpdateDiPeriode($aktifSekarang))
                 ->count();
 
             $totalBelumUpdate = $totalSiswaAktif - $totalSudahUpdate;
@@ -119,6 +119,12 @@ class SiswaController extends Controller
             'nama_siswa' => ['required', 'string', 'max:150'],
             'kelas' => ['required', 'string', 'max:50'],
             'tahun_ajaran' => ['nullable', 'string', 'max:20'],
+            'jenis_kelamin' => ['nullable', 'in:L,P'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'no_whatsapp' => ['nullable', 'string', 'max:20'],
+            'nama_ortu' => ['nullable', 'string', 'max:150'],
+            'alamat' => ['nullable', 'string', 'max:500'],
+            'password' => ['nullable', 'string', 'min:8'],
         ]);
 
         DB::transaction(function () use ($siswa, $validated) {
@@ -127,13 +133,31 @@ class SiswaController extends Controller
                 'nama_siswa' => $validated['nama_siswa'],
                 'kelas' => $validated['kelas'],
                 'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
+                'jenis_kelamin' => $validated['jenis_kelamin'] ?? null,
+                'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
+                'no_whatsapp' => $validated['no_whatsapp'] ?? null,
+                'nama_ortu' => $validated['nama_ortu'] ?? null,
+                'alamat' => $validated['alamat'] ?? null,
             ]);
 
             if ($siswa->user) {
-                $siswa->user->update([
+                $dataUser = [
                     'name' => $validated['nama_siswa'],
                     'username' => $validated['nis'],
-                ]);
+                ];
+
+                // Password hanya diganti kalau admin benar-benar mengisinya.
+                // Dibiarkan kosong = password lama tetap dipakai.
+                if (!empty($validated['password'])) {
+                    $dataUser['password'] = Hash::make($validated['password']);
+                    $dataUser['default_password'] = $validated['password'];
+                    // Sama seperti pembuatan akun baru: paksa ganti password
+                    // saat login berikutnya, supaya password titipan admin
+                    // tidak dipakai terus-menerus oleh orang tua.
+                    $dataUser['must_change_password'] = true;
+                }
+
+                $siswa->user->update($dataUser);
             }
         });
 
@@ -180,7 +204,7 @@ class SiswaController extends Controller
             return redirect()->route('admin.siswa.index')
                 ->with('error_nonaktifkan', [
                     'kelas' => $validated['kelas'],
-                    'kasus' => $kasusAktif->map(fn ($laporan) => [
+                    'kasus' => $kasusAktif->map(fn($laporan) => [
                         'nama' => $laporan->siswa->nama_siswa ?? '-',
                         'judul' => $laporan->judul_laporan,
                         'status' => $laporan->status,
@@ -219,9 +243,9 @@ class SiswaController extends Controller
     public function download(Request $request)
     {
         $siswa = Siswa::with('user')
-            ->when($request->input('kelas'), fn ($q) => $q->where('kelas', $request->input('kelas')))
+            ->when($request->input('kelas'), fn($q) => $q->where('kelas', $request->input('kelas')))
             ->when($request->input('status'), function ($q) use ($request) {
-                $q->whereHas('user', fn ($u) => $u->where('status_akun', $request->input('status')));
+                $q->whereHas('user', fn($u) => $u->where('status_akun', $request->input('status')));
             })
             ->orderBy('kelas')
             ->orderBy('nama_siswa')

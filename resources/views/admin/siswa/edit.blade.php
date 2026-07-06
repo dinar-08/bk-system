@@ -39,12 +39,17 @@
             <div class="grid grid-cols-2 gap-5">
                 <div class="col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto Siswa</label>
-                    @if($siswa->foto)
-                        <div class="mb-3">
-                            <img src="{{ asset('storage/' . $siswa->foto) }}"
-                                class="w-24 h-24 object-cover rounded-2xl border border-slate-200 shadow-sm">
-                        </div>
-                    @endif
+
+                    <div
+                        class="w-24 h-24 rounded-2xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3 shadow-sm">
+                        @if($siswa->foto)
+                            <img src="{{ asset('storage/' . $siswa->foto) }}" class="w-full h-full object-cover"
+                                alt="Foto Siswa">
+                        @else
+                            <i data-feather="user" class="w-8 h-8 text-blue-200"></i>
+                        @endif
+                    </div>
+
                     <input type="file" name="foto" accept="image/*"
                         class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     <p class="text-xs text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah foto.</p>

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
     <title>@yield('title', 'Lapor Bu!!') | BK</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
@@ -73,6 +75,17 @@
 
 <body class="bg-slate-50 text-slate-800">
 
+    @php
+        // ==== Data notifikasi BK ====
+        $laporanBaruCount = \App\Models\Laporan::where('status', 'baru')->count();
+
+        $batasMonitoring = now('Asia/Jakarta')->addDay()->toDateString(); // H (hari ini) & H+1 (besok)
+
+        $monitoringDekatCount = \App\Models\Monitoring::where('status_monitoring', 'terjadwal')
+            ->whereDate('tanggal_monitoring', '<=', $batasMonitoring)
+            ->count();
+    @endphp
+
     <div class="flex min-h-screen">
 
         {{-- Overlay mobile --}}
@@ -98,16 +111,37 @@
                     <i data-feather="grid" class="w-4 h-4 flex-shrink-0"></i>
                     Dashboard
                 </a>
+
                 <a href="{{ route('bk.laporan.index') }}"
-                    class="nav-link {{ request()->routeIs('bk.laporan.*') ? 'active' : '' }}">
-                    <i data-feather="file-text" class="w-4 h-4 flex-shrink-0"></i>
-                    Laporan
+                    class="nav-link {{ request()->routeIs('bk.laporan.*') ? 'active' : '' }}"
+                    style="justify-content: space-between;">
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <i data-feather="file-text" class="w-4 h-4 flex-shrink-0"></i>
+                        Laporan
+                    </span>
+                    @if($laporanBaruCount > 0)
+                        <span
+                            style="background:#ef4444;color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9999px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
+                            {{ $laporanBaruCount > 9 ? '9+' : $laporanBaruCount }}
+                        </span>
+                    @endif
                 </a>
+
                 <a href="{{ route('bk.monitoring.index') }}"
-                    class="nav-link {{ request()->routeIs('bk.monitoring.*') || request()->routeIs('bk.evaluasi.*') ? 'active' : '' }}">
-                    <i data-feather="activity" class="w-4 h-4 flex-shrink-0"></i>
-                    Monitoring
+                    class="nav-link {{ request()->routeIs('bk.monitoring.*') || request()->routeIs('bk.evaluasi.*') ? 'active' : '' }}"
+                    style="justify-content: space-between;">
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <i data-feather="activity" class="w-4 h-4 flex-shrink-0"></i>
+                        Monitoring
+                    </span>
+                    @if($monitoringDekatCount > 0)
+                        <span
+                            style="background:#ef4444;color:#fff;font-size:10.5px;font-weight:700;min-width:18px;height:18px;border-radius:9999px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
+                            {{ $monitoringDekatCount > 9 ? '9+' : $monitoringDekatCount }}
+                        </span>
+                    @endif
                 </a>
+
                 <a href="{{ route('bk.riwayat.index') }}"
                     class="nav-link {{ request()->routeIs('bk.riwayat.*') ? 'active' : '' }}">
                     <i data-feather="clock" class="w-4 h-4 flex-shrink-0"></i>
@@ -152,7 +186,7 @@
                     </svg>
                 </button>
 
-                <div>
+                <div class="flex-1">
                     @php
                         $hour = now('Asia/Jakarta')->hour;
 
@@ -177,7 +211,8 @@
             </header>
 
             {{-- Topbar desktop --}}
-            <header class="hidden lg:flex sticky top-0 z-10 px-8 py-4 items-center" style="background:#1d4ed8;">
+            <header class="hidden lg:flex sticky top-0 z-10 px-8 py-4 items-center justify-between"
+                style="background:#1d4ed8;">
 
                 <div>
                     @php
@@ -240,6 +275,54 @@
             o.classList.add('opacity-0');
             setTimeout(() => o.classList.add('hidden'), 300);
         }
+    </script>
+
+    <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    </script>
+    {{-- ================= Push Notification Browser (kayak WhatsApp) ================= --}}
+    <script>
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+        }
+        async function daftarPushNotification() {
+            const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
+            if (!('serviceWorker' in navigator) || !('PushManager' in window) || !vapidPublicKey) {
+                return;
+            }
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                let permission = Notification.permission;
+                if (permission === 'default') {
+                    permission = await Notification.requestPermission();
+                }
+                if (permission !== 'granted') {
+                    return;
+                }
+                let subscription = await registration.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                    });
+                }
+                await fetch('{{ route('push-subscription.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(subscription.toJSON()),
+                });
+            } catch (err) {
+                console.error('Gagal mendaftarkan push notification:', err);
+            }
+        }
+        daftarPushNotification();
     </script>
 
 </body>

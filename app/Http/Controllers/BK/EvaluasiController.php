@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Evaluasi;
 use App\Models\GuruBK;
 use App\Models\Laporan;
+use App\Notifications\EvaluasiBaruNotification;
 use Illuminate\Http\Request;
 
 class EvaluasiController extends Controller
@@ -48,6 +49,11 @@ class EvaluasiController extends Controller
                 'status' => $validated['status_akhir'],
             ]);
 
+        $laporan = Laporan::with('siswa.user')->find($validated['laporan_id']);
+        if ($laporan->siswa && $laporan->siswa->user) {
+            $laporan->siswa->user->notify(new EvaluasiBaruNotification($laporan));
+        }
+
         return redirect()
             ->route('bk.riwayat.index')
             ->with('success', 'Evaluasi berhasil disimpan dan kasus telah dipindahkan ke riwayat.');
@@ -72,6 +78,11 @@ class EvaluasiController extends Controller
         $evaluasi->laporan->update([
             'status' => $validated['status_akhir'],
         ]);
+
+        $laporan = $evaluasi->laporan()->with('siswa.user')->first();
+        if ($laporan->siswa && $laporan->siswa->user) {
+            $laporan->siswa->user->notify(new EvaluasiBaruNotification($laporan));
+        }
 
         return redirect()
             ->route('bk.riwayat.index')

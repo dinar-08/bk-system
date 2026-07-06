@@ -74,6 +74,14 @@
                             <p class="text-xs text-slate-400 mb-1">Deskripsi</p>
                             <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->deskripsi }}</p>
                         </div>
+
+                        @if($laporan->bukti)
+                            <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-bold hover:bg-blue-800 transition">
+                                <i data-feather="paperclip" class="w-4 h-4"></i>
+                                Lihat Bukti
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -160,9 +168,9 @@
                                 <p class="text-xs text-slate-400 mt-1.5">{{ $item->tanggal_monitoring }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                            @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
-                                            @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
-                                            @else bg-red-100 text-red-700 @endif">
+                                                    @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
+                                                    @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
+                                                    @else bg-red-100 text-red-700 @endif">
                                 {{ ucfirst($item->status_perkembangan) }}
                             </span>
                         </div>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FotoController;
+use App\Http\Controllers\PushSubscriptionController;
 
 // Admin
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -47,6 +48,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/foto/guru-bk/{guruBk}', [FotoController::class, 'guruBk'])->name('foto.guru-bk');
     Route::get('/foto/user/{user}', [FotoController::class, 'user'])->name('foto.user');
     Route::get('/bukti/{laporan}', [FotoController::class, 'bukti'])->name('bukti.show');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/push-subscription', [PushSubscriptionController::class, 'store'])
+        ->name('push-subscription.store');
+    Route::delete('/push-subscription', [PushSubscriptionController::class, 'destroy'])
+        ->name('push-subscription.destroy');
 });
 
 /*
@@ -158,7 +166,6 @@ Route::middleware(['auth', 'role:bk', 'must.change.password'])->group(function (
     Route::get('/bk/riwayat/export/pdf', [RiwayatController::class, 'exportPdf'])
         ->name('bk.riwayat.exportPdf');
 
-
     Route::get('/admin/import-siswa/download-hasil', [ImportSiswaController::class, 'downloadHasil'])
         ->name('admin.import-siswa.download-hasil');
 
@@ -194,12 +201,6 @@ Route::middleware(['auth', 'role:orang_tua', 'must.change.password', 'cek.period
         ->name('orang_tua.perkembangan.show');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Update Data Orang Tua
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware(['auth', 'role:orang_tua', 'must.change.password'])->group(function () {
     Route::get('/orang-tua/update-data', [ProfileController::class, 'editSiswa'])
         ->name('orang_tua.update-data');
@@ -208,11 +209,6 @@ Route::middleware(['auth', 'role:orang_tua', 'must.change.password'])->group(fun
         ->name('orang_tua.update-data.save');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Panduan
-|--------------------------------------------------------------------------
-*/
 
 /*
 |--------------------------------------------------------------------------

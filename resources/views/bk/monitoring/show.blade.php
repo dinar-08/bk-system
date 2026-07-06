@@ -49,7 +49,7 @@
                     <div
                         class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
-                            <img src="{{ asset('storage/' . $laporan->siswa->foto) }}"
+                            <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
                         @else
                             <div class="text-center">
@@ -148,8 +148,8 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jam Monitoring</label>
-                            <input type="time" name="waktu_monitoring"
-                                value="{{ old('waktu_monitoring', $monitoringTerjadwal->waktu_monitoring ?? '') }}"
+                            <input type="time" name="waktu_monitoring" step="60"
+                                value="{{ old('waktu_monitoring', $monitoringTerjadwal->waktu_monitoring ? \Carbon\Carbon::parse($monitoringTerjadwal->waktu_monitoring)->format('H:i') : '') }}"
                                 class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
                         </div>
 
@@ -172,7 +172,7 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jam Monitoring Berikutnya</label>
-                            <input type="time" name="waktu_monitoring_berikutnya"
+                            <input type="time" name="waktu_monitoring_berikutnya" step="60"
                                 value="{{ old('waktu_monitoring_berikutnya') }}"
                                 class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
                         </div>

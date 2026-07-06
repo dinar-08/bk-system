@@ -87,8 +87,8 @@ class ProfileController extends Controller
         if ($request->hasFile('foto')) {
             // Hapus foto lama jika ada
             if ($siswa->foto)
-                Storage::disk('public')->delete($siswa->foto);
-            $fotoPath = $request->file('foto')->store('foto-profil', 'public');
+                Storage::disk('local')->delete($siswa->foto);
+            $fotoPath = $request->file('foto')->store('foto-profil', 'local');
             $updateData['foto'] = $fotoPath;
             // Sinkron ke tabel users juga
             $user->update(['foto' => $fotoPath]);
@@ -249,9 +249,9 @@ class ProfileController extends Controller
         // Foto untuk admin/bk disimpan di users
         if ($user->role !== 'orang_tua' && $request->hasFile('foto')) {
             if ($user->foto) {
-                Storage::disk('public')->delete($user->foto);
+                Storage::disk('local')->delete($user->foto);
             }
-            $updateUser['foto'] = $request->file('foto')->store('foto-profil', 'public');
+            $updateUser['foto'] = $request->file('foto')->store('foto-profil', 'local');
         }
 
         $user->update($updateUser);
@@ -274,9 +274,9 @@ class ProfileController extends Controller
             // Foto untuk orang_tua disimpan di siswa
             if ($request->hasFile('foto')) {
                 if ($siswa->foto) {
-                    Storage::disk('public')->delete($siswa->foto);
+                    Storage::disk('local')->delete($siswa->foto);
                 }
-                $updateSiswa['foto'] = $request->file('foto')->store('foto-profil', 'public');
+                $updateSiswa['foto'] = $request->file('foto')->store('foto-profil', 'local');
             }
 
             $siswa->update($updateSiswa);
@@ -300,9 +300,9 @@ class ProfileController extends Controller
                 // kalau tidak ada hapus baris ini
                 if ($request->hasFile('foto')) {
                     if ($gurubk->foto) {
-                        Storage::disk('public')->delete($gurubk->foto);
+                        Storage::disk('local')->delete($gurubk->foto);
                     }
-                    $updateGurubk['foto'] = $request->file('foto')->store('foto-profil', 'public');
+                    $updateGurubk['foto'] = $request->file('foto')->store('foto-profil', 'local');
                 }
 
                 $gurubk->update($updateGurubk);

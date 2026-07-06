@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\OrangTua;
 
 use App\Http\Controllers\Controller;
+use App\Models\GuruBK;
 use App\Models\Laporan;
 use App\Models\Siswa;
+use App\Notifications\EvaluasiBaruNotification;
+use App\Notifications\JadwalPemanggilanNotification;
+use App\Notifications\LaporanBaruBkNotification;
+use App\Notifications\LaporanBaruNotification;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -25,11 +30,11 @@ class LaporanController extends Controller
             ->latest()
             ->get();
 
-        // INI YANG SEBELUMNYA HILANG — dipakai untuk mengunci tombol
-        // "Buat Laporan" di view, termasuk saat status sudah "monitoring".
         $adaLaporanBerjalan = Laporan::where('siswa_id', $siswa->id)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
+
+        $this->tandaiNotifikasiLaporanDibaca();
 
         return view('orang-tua.laporan.index', compact(
             'laporanAktif',
@@ -87,7 +92,7 @@ class LaporanController extends Controller
             $buktiPath = $request->file('bukti')->store('bukti-laporan', 'local');
         }
 
-        Laporan::create([
+        $laporan = Laporan::create([
             'siswa_id' => $siswa->id,
             'guru_bk_id' => null,
             'judul_laporan' => $validated['judul_laporan'],
@@ -97,6 +102,14 @@ class LaporanController extends Controller
             'bukti' => $buktiPath,
             'status' => 'baru',
         ]);
+
+        $laporan->load('siswa');
+
+        GuruBK::with('user')->get()->each(function ($guruBk) use ($laporan) {
+            if ($guruBk->user) {
+                $guruBk->user->notify(new LaporanBaruBkNotification($laporan));
+            }
+        });
 
         return redirect()->route('orang_tua.laporan.index')
             ->with('success', 'Laporan berhasil dikirim.');
@@ -116,6 +129,19 @@ class LaporanController extends Controller
             ->where('siswa_id', $siswa->id)
             ->findOrFail($id);
 
+        $this->tandaiNotifikasiLaporanDibaca();
+
         return view('orang-tua.laporan.show', compact('laporan', 'siswa'));
+    }
+
+    protected function tandaiNotifikasiLaporanDibaca(): void
+    {
+        auth()->user()->unreadNotifications()
+            ->whereIn('type', [
+                LaporanBaruNotification::class,
+                EvaluasiBaruNotification::class,
+                JadwalPemanggilanNotification::class,
+            ])
+            ->update(['read_at' => now()]);
     }
 }

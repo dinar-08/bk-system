@@ -8,6 +8,7 @@
 
     <div>
         <div class="mb-5">
+            <h1 class="text-2xl font-extrabold text-slate-900">Perkembangan Permasalahan<h1>
             <p class="text-sm text-slate-500">
                 Data perkembangan hanya muncul jika laporan sudah masuk tahap monitoring.
             </p>

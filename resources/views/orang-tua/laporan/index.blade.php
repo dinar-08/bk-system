@@ -77,75 +77,62 @@
             </button>
         </div>
 
-        {{-- ===== TAB CONTENT: LAPORAN AKTIF ===== --}}
+        {{-- ===== TAB CONTENT: LAPORAN AKTIF (gaya list, sama seperti Riwayat) ===== --}}
         <section id="tabAktifContent">
 
-            <div class="space-y-3">
-                @forelse($laporanAktif as $l)
-                    @continue(($l->status ?? 'baru') === 'monitoring')
-                    @php $status = $l->status ?? 'baru'; @endphp
+            @forelse($laporanAktif as $l)
+                @continue(($l->status ?? 'baru') === 'monitoring')
+                @php $status = $l->status ?? 'baru'; @endphp
+
+                <div class="border-t border-slate-200 py-6 first:border-t-0 first:pt-0">
+                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                        <span
+                            class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold {{ $statusClass[$status] ?? 'bg-slate-50 text-slate-700 border-slate-200' }}">
+                            {{ $statusLabel[$status] ?? ucfirst($status) }}
+                        </span>
+                        <span class="text-sm text-slate-400">
+                            {{ $l->created_at->format('d M Y') }}
+                        </span>
+                    </div>
+
+                    <a href="{{ route('orang_tua.laporan.show', $l->id) }}" class="group block">
+                        <h3 class="text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
+                            {{ $l->judul_laporan }}
+                        </h3>
+                    </a>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Guru BK:
+                        <span class="font-semibold text-slate-700">
+                            {{ $l->guruBk->nama ?? 'Belum ditangani' }}
+                        </span>
+                    </p>
+
+                    <p class="text-sm text-slate-600 mt-2 leading-relaxed line-clamp-2 max-w-2xl">
+                        {{ $l->deskripsi }}
+                    </p>
 
                     <a href="{{ route('orang_tua.laporan.show', $l->id) }}"
-                        class="group block rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm hover:border-blue-200 hover:shadow-md transition">
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                            <div class="min-w-0">
-                                <div class="flex flex-wrap items-center gap-3 mb-3">
-                                    <span
-                                        class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold {{ $statusClass[$status] ?? 'bg-slate-50 text-slate-700 border-slate-200' }}">
-                                        {{ $statusLabel[$status] ?? ucfirst($status) }}
-                                    </span>
-                                    <span class="text-sm text-slate-400">
-                                        {{ $l->created_at->format('d M Y') }}
-                                    </span>
-                                </div>
-
-                                <h3
-                                    class="text-lg font-extrabold text-slate-900 leading-tight group-hover:text-blue-700 transition">
-                                    {{ $l->judul_laporan }}
-                                </h3>
-
-                                <p class="text-sm text-slate-500 mt-2">
-                                    Guru BK:
-                                    <span class="font-semibold text-slate-700">
-                                        {{ $l->guruBk->nama ?? 'Belum ditangani' }}
-                                    </span>
-                                </p>
-
-                                <p class="text-sm text-slate-600 mt-2 leading-relaxed line-clamp-2">
-                                    {{ $l->deskripsi }}
-                                </p>
-                            </div>
-
-                            <div class="shrink-0 sm:pt-9">
-                                <span
-                                    class="inline-flex items-center gap-1 text-sm font-bold text-blue-700 group-hover:text-blue-900">
-                                    Detail
-                                    <i data-feather="arrow-right" class="w-4 h-4"></i>
-                                </span>
-                            </div>
-                        </div>
+                        class="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-900 mt-3 transition">
+                        Lihat Selengkapnya
+                        <i data-feather="arrow-right" class="w-4 h-4"></i>
                     </a>
-                @empty
-                    <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-10 text-center">
-                        <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-50">
-                            <i data-feather="inbox" class="w-5 h-5 text-slate-400"></i>
-                        </div>
-                        <p class="text-base font-bold text-slate-800">Tidak ada laporan aktif</p>
-                        <p class="text-sm text-slate-500 mt-1">
-                            Silakan buat laporan jika ada permasalahan yang perlu ditangani Guru BK.
-                        </p>
+                </div>
+            @empty
+                <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-10 text-center">
+                    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-50">
+                        <i data-feather="inbox" class="w-5 h-5 text-slate-400"></i>
                     </div>
-                @endforelse
-            </div>
+                    <p class="text-base font-bold text-slate-800">Tidak ada laporan aktif</p>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Silakan buat laporan jika ada permasalahan yang perlu ditangani Guru BK.
+                    </p>
+                </div>
+            @endforelse
         </section>
 
         {{-- ===== TAB CONTENT: RIWAYAT (gaya list JKT48 News) ===== --}}
         <section id="tabRiwayatContent" class="hidden">
-            <div class="mb-4">
-                <p class="text-sm text-slate-500">
-                    Laporan yang sudah selesai atau dirujuk.
-                </p>
-            </div>
 
             @forelse($laporanRiwayat as $l)
                 @php $status = $l->status ?? 'selesai'; @endphp

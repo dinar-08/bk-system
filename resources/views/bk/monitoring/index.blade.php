@@ -30,16 +30,15 @@
     <form method="GET" action="{{ route('bk.monitoring.index') }}" class="mb-8">
         <div class="flex flex-wrap items-center gap-2">
             <button type="submit" name="kategori" value="semua" class="h-11 px-5 text-sm font-semibold rounded-full transition
-                    {{ $kategoriAktif === 'semua'
+                        {{ $kategoriAktif === 'semua'
         ? 'bg-blue-600 text-white shadow-sm'
         : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                 Semua
             </button>
 
             @foreach($kategoriConfig as $key => $cfg)
-                <button type="submit" name="kategori" value="{{ $key }}"
-                    class="h-11 px-5 text-sm font-semibold rounded-full transition
-                            {{ $kategoriAktif === $key
+                <button type="submit" name="kategori" value="{{ $key }}" class="h-11 px-5 text-sm font-semibold rounded-full transition
+                                    {{ $kategoriAktif === $key
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                     {{ $cfg['label'] }}
@@ -95,7 +94,7 @@
             @endphp
 
             <div
-                class="relative group/list flex items-center justify-between gap-x-4 lg:gap-x-8 py-5 border-b border-blue-100 overflow-hidden">
+                class="relative group/list flex items-center justify-between gap-x-4 lg:gap-x-8 py-5 border-b border-blue-300 overflow-hidden">
 
                 {{-- Tanggal + Panah Hover --}}
                 <div class="relative shrink-0">
@@ -106,7 +105,7 @@
 
                     <div
                         class="flex items-center gap-2 min-w-[95px] lg:min-w-[130px] group-hover/list:lg:translate-x-8 transition-all duration-300">
-                        <span class="text-3xl lg:text-4xl font-extrabold text-red-600 leading-none w-[48px]">
+                        <span class="text-3xl lg:text-4xl font-extrabold text-blue-600 leading-none w-[48px]">
                             {{ $tanggal->format('d') }}
                         </span>
 
@@ -172,7 +171,7 @@
 
                     {{-- Tombol --}}
                     <a href="{{ route('bk.monitoring.show', $item->id) }}"
-                        class="relative shrink-0 inline-flex items-center justify-center w-10 h-10 lg:w-[140px] lg:h-10 rounded-full border border-red-500 text-red-600 bg-white hover:bg-red-50 transition-colors duration-500 overflow-hidden group/button uppercase">
+                        class="relative shrink-0 inline-flex items-center justify-center w-10 h-10 lg:w-[140px] lg:h-10 rounded-full border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-500 overflow-hidden group/button uppercase">
 
                         <span
                             class="hidden lg:inline-block text-xs font-semibold transition-transform duration-500 group-hover/button:-translate-x-5 group-hover/list:-translate-x-5">
@@ -182,7 +181,7 @@
                         <i data-feather="arrow-right" class="lg:hidden w-4 h-4"></i>
 
                         <span
-                            class="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-red-600 text-white items-center justify-center opacity-0 group-hover/button:opacity-100 group-hover/list:opacity-100 transition-opacity duration-500">
+                            class="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-blue-600 text-white items-center justify-center opacity-0 group-hover/button:opacity-100 group-hover/list:opacity-100 transition-opacity duration-500">
                             <i data-feather="arrow-right" class="w-3 h-3"></i>
                         </span>
                     </a>

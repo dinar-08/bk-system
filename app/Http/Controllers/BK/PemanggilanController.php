@@ -6,6 +6,7 @@ use App\Models\GuruBK;
 use App\Models\Laporan;
 use App\Models\Monitoring;
 use App\Models\Pemanggilan;
+use App\Notifications\JadwalPemanggilanNotification;
 use Illuminate\Http\Request;
 
 class PemanggilanController extends Controller
@@ -22,7 +23,7 @@ class PemanggilanController extends Controller
 
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
-        Pemanggilan::create([
+        $pemanggilan = Pemanggilan::create([
             'laporan_id' => $validated['laporan_id'],
             'guru_bk_id' => $guruBk->id, // Fix B6: simpan guru BK
             'tanggal_pemanggilan' => $validated['tanggal_pemanggilan'],
@@ -35,6 +36,11 @@ class PemanggilanController extends Controller
         ]);
 
         Laporan::where('id', $validated['laporan_id'])->update(['status' => 'pemanggilan']);
+
+        $pemanggilan->load('laporan.siswa.user');
+        if ($pemanggilan->laporan?->siswa?->user) {
+            $pemanggilan->laporan->siswa->user->notify(new JadwalPemanggilanNotification($pemanggilan));
+        }
 
         return back()->with('success', 'Jadwal pemanggilan berhasil dibuat.');
     }

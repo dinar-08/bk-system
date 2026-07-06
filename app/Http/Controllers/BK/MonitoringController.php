@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GuruBK;
 use App\Models\Laporan;
 use App\Models\Monitoring;
+use App\Notifications\MonitoringBaruNotification;
 use Illuminate\Http\Request;
 
 class MonitoringController extends Controller
@@ -97,6 +98,11 @@ class MonitoringController extends Controller
                 'status' => 'monitoring',
                 'guru_bk_id' => $guruBk->id,
             ]);
+
+        $laporanUntukNotif = Laporan::with('siswa.user')->find($validated['laporan_id']);
+        if ($laporanUntukNotif->siswa && $laporanUntukNotif->siswa->user) {
+            $laporanUntukNotif->siswa->user->notify(new MonitoringBaruNotification($laporanUntukNotif));
+        }
 
         if ($request->filled('tanggal_monitoring_berikutnya')) {
             $this->buatJadwalMonitoringBerikutnya($validated, $guruBk->id, $monitoring->monitoring_ke);

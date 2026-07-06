@@ -24,6 +24,17 @@
         ? ($dataProfil->foto ?? null)
         : ($role === 'admin' ? ($user->foto ?? null) : ($dataProfil->foto ?? null));
 
+    // URL foto: semua foto bersifat privat, jadi diambil lewat route foto.*
+    // (bukan asset('storage/...')) supaya tetap melalui pengecekan akses di FotoController.
+    $photoUrl = null;
+    if ($photo) {
+        $photoUrl = match (true) {
+            $role === 'orang_tua' && $dataProfil => route('foto.siswa', $dataProfil->id),
+            $role === 'bk' && $dataProfil        => route('foto.guru-bk', $dataProfil->id),
+            default                              => route('foto.user', $user->id),
+        };
+    }
+
     $mustChangePassword = auth()->user()->must_change_password;
 
     $wajibIsiLengkap = $role === 'orang_tua' && ($mustChangePassword || (!empty($wajibUpdate) && $wajibUpdate));
@@ -128,9 +139,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-8 pb-8 border-b border-slate-200">
                 <div class="shrink-0">
                     <label for="foto-input" class="cursor-pointer block">
-                        @if($photo)
+                        @if($photoUrl)
                             <img id="avatar-preview"
-                                src="{{ asset('storage/' . $photo) }}"
+                                src="{{ $photoUrl }}"
                                 class="w-24 h-24 object-cover border-4 {{ $fotoWajib ? 'border-red-300' : 'border-blue-100' }}">
                         @else
                             <div id="avatar-initials"

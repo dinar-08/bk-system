@@ -53,7 +53,7 @@
 
                     <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
-                            <img src="{{ asset('storage/' . $laporan->siswa->foto) }}"
+                            <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
                         @else
                             <div class="text-center">

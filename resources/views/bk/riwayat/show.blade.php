@@ -53,7 +53,7 @@
 
                 <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                     @if(optional($laporan->siswa)->foto)
-                        <img src="{{ asset('storage/' . $laporan->siswa->foto) }}"
+                        <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                             class="w-full h-full object-cover" alt="Foto Siswa">
                     @else
                         <div class="text-center">
@@ -111,7 +111,7 @@
                         <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->deskripsi ?? '-' }}</p>
 
                         @if($laporan->bukti)
-                            <a href="{{ asset('storage/' . $laporan->bukti) }}" target="_blank"
+                            <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
                                 class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800">
                                 <i data-feather="paperclip" class="w-4 h-4"></i>
                                 Lihat Bukti
