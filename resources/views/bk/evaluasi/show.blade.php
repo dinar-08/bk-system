@@ -28,30 +28,30 @@
         };
     @endphp
 
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-5 lg:mb-6 flex items-center gap-2 lg:gap-3">
         <a href="{{ route('bk.monitoring.show', $laporan->id) }}"
-            class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
+            class="flex items-center gap-1.5 text-xs lg:text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
             <i data-feather="arrow-left" class="w-4 h-4"></i>
             Kembali
         </a>
         <span class="text-slate-300">/</span>
-        <span class="text-sm text-slate-800 font-semibold">Evaluasi</span>
+        <span class="text-xs lg:text-sm text-slate-800 font-semibold">Evaluasi</span>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
         {{-- DATA SISWA + DETAIL LAPORAN --}}
-        <section class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
+        <section class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-7">
 
                 {{-- DATA SISWA --}}
                 <div>
-                    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2 mb-3 lg:mb-4 pb-3 border-b border-slate-100">
                         <i data-feather="user" class="w-4 h-4 text-blue-600"></i>
                         <h2 class="text-sm font-bold text-slate-700">Data Siswa</h2>
                     </div>
 
-                    <div class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
+                    <div class="w-full h-32 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
                             <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
@@ -70,9 +70,9 @@
                             ['NIS', optional($laporan->siswa)->nis],
                             ['Orang Tua', optional($laporan->siswa)->nama_ortu],
                         ] as [$label, $val])
-                            <div class="px-4 py-3 @if(!$loop->last) border-b border-slate-200 @endif">
+                            <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 @if(!$loop->last) border-b border-slate-200 @endif">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val ?: '-' }}</p>
+                                <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?: '-' }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -80,7 +80,7 @@
 
                 {{-- DETAIL LAPORAN --}}
                 <div>
-                    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2 mb-3 lg:mb-4 pb-3 border-b border-slate-100">
                         <i data-feather="file-text" class="w-4 h-4 text-blue-600"></i>
                         <h2 class="text-sm font-bold text-slate-700">Detail Laporan</h2>
                     </div>
@@ -93,15 +93,15 @@
                             ['Guru BK', optional($laporan->guruBk)->nama ?? 'Belum ditentukan'],
                             ['Status', ucfirst($laporan->status ?? '-')],
                         ] as [$label, $val])
-                            <div class="px-4 py-3 border-b border-slate-200">
+                            <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 border-b border-slate-200">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val ?: '-' }}</p>
+                                <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?: '-' }}</p>
                             </div>
                         @endforeach
 
-                        <div class="px-4 py-3 min-h-[120px]">
+                        <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 min-h-[100px] sm:min-h-[120px]">
                             <p class="text-xs text-slate-400 mb-1">Deskripsi</p>
-                            <p class="text-sm text-slate-700 leading-relaxed">
+                            <p class="text-sm text-slate-700 leading-relaxed break-words">
                                 {{ $laporan->deskripsi ?: '-' }}
                             </p>
                         </div>
@@ -111,21 +111,21 @@
         </section>
 
         {{-- RINGKASAN MONITORING --}}
-        <section class="p-6 border-t border-slate-200">
-            <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
+        <section class="p-4 sm:p-6 border-t border-slate-200">
+            <div class="flex items-center gap-2 mb-4 lg:mb-5 pb-3 lg:pb-4 border-b border-slate-100">
                 <i data-feather="activity" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">Ringkasan Monitoring</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3">
                     <p class="text-xs text-slate-400 mb-1">Jumlah Monitoring</p>
                     <p class="text-sm font-bold text-slate-800">
                         {{ $riwayatMonitoring->count() }} kali
                     </p>
                 </div>
 
-                <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+                <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3">
                     <p class="text-xs text-slate-400 mb-1">Monitoring Terakhir</p>
                     <p class="text-sm font-bold text-slate-800">
                         @if($monitoringTerakhir)
@@ -136,7 +136,7 @@
                     </p>
                 </div>
 
-                <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+                <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3">
                     <p class="text-xs text-slate-400 mb-1">Status Terakhir</p>
                     @if($monitoringTerakhir)
                         <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">
@@ -147,9 +147,9 @@
                     @endif
                 </div>
 
-                <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+                <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3">
                     <p class="text-xs text-slate-400 mb-1">Guru BK</p>
-                    <p class="text-sm font-bold text-slate-800">
+                    <p class="text-sm font-bold text-slate-800 break-words">
                     {{ optional($monitoringTerakhir?->guruBk)->nama ?? optional($laporan->guruBk)->nama ?? '-' }}
                     </p>
                 </div>
@@ -157,8 +157,8 @@
         </section>
 
         {{-- RIWAYAT MONITORING --}}
-        <section class="p-6 border-t border-slate-200">
-            <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
+        <section class="p-4 sm:p-6 border-t border-slate-200">
+            <div class="flex items-center gap-2 mb-4 lg:mb-5 pb-3 lg:pb-4 border-b border-slate-100">
                 <i data-feather="list" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">Riwayat Monitoring</h2>
             </div>
@@ -173,7 +173,7 @@
                         };
                     @endphp
 
-                    <div class="flex gap-4">
+                    <div class="flex gap-2.5 sm:gap-4">
                         {{-- Kolom marker: titik + garis, terpisah dari konten --}}
                         <div class="flex flex-col items-center w-3 shrink-0">
                             <span class="w-3 h-3 rounded-full bg-blue-600 shrink-0"></span>
@@ -183,7 +183,7 @@
                         </div>
 
                         {{-- Kolom konten --}}
-                        <div class="flex-1 pb-6">
+                        <div class="flex-1 min-w-0 pb-5 sm:pb-6">
                             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
                                 <div>
                                     <p class="text-sm font-bold text-slate-800">
@@ -203,15 +203,15 @@
                                 </span>
                             </div>
 
-                            <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                                <p class="text-sm text-slate-600 leading-relaxed">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3">
+                                <p class="text-sm text-slate-600 leading-relaxed break-words">
                                     {{ $item->catatan_perkembangan ?: '-' }}
                                 </p>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center">
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-6 sm:p-8 text-center">
                         <i data-feather="clock" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
                         <p class="text-sm text-slate-400">Belum ada riwayat monitoring.</p>
                     </div>
@@ -220,8 +220,8 @@
         </section>
 
         {{-- FORM EVALUASI --}}
-        <section class="p-6 border-t border-slate-200">
-            <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
+        <section class="p-4 sm:p-6 border-t border-slate-200">
+            <div class="flex items-center gap-2 mb-4 lg:mb-5 pb-3 lg:pb-4 border-b border-slate-100">
                 <i data-feather="check-square" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">Form Evaluasi</h2>
             </div>
@@ -278,9 +278,9 @@
                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400">{{ old('hasil_evaluasi') }}</textarea>
                     </div>
 
-                    <div class="md:col-span-2 flex justify-end">
+                    <div class="md:col-span-2 flex justify-stretch sm:justify-end">
                         <button type="submit"
-                            class="px-6 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                            class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
                             Simpan Evaluasi
                         </button>
                     </div>

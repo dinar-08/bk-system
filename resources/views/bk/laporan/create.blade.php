@@ -4,7 +4,7 @@
 @section('page-subtitle', 'Tambahkan laporan permasalahan siswa baru')
 @section('content')
 
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-6 flex items-center gap-2 sm:gap-3 flex-wrap">
         <a href="{{ route('bk.laporan.index') }}"
             class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
             <i data-feather="arrow-left" class="w-4 h-4"></i> Kembali
@@ -13,7 +13,7 @@
         <span class="text-sm text-slate-800 font-semibold">Buat Laporan</span>
     </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
         <div class="mb-5 pb-5 border-b border-slate-100">
             <h2 class="font-bold text-slate-800">Formulir Laporan</h2>
             <p class="text-sm text-slate-500 mt-0.5">Isi semua data dengan lengkap dan benar.</p>
@@ -21,7 +21,7 @@
 
         <form action="{{ route('bk.laporan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
 
                 {{-- Cari Siswa --}}
                 <div>
@@ -85,7 +85,7 @@
                 </div>
 
                 {{-- Judul --}}
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Laporan</label>
                     <input type="text" name="judul_laporan" value="{{ old('judul_laporan') }}"
                         placeholder="Contoh: Laporan Perilaku Siswa"
@@ -107,7 +107,7 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti / Lampiran</label>
                     <label
                         class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                        <i data-feather="paperclip" class="w-4 h-4 text-slate-400"></i>
+                        <i data-feather="paperclip" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
                         <span id="fileName" class="text-sm text-slate-400 truncate">Foto, PDF, atau rekaman
                             audio/video</span>
                         <input type="file" name="bukti" id="buktiInput" class="hidden"
@@ -122,11 +122,11 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-5 border-t border-slate-100 flex justify-end gap-3">
+            <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                 <a href="{{ route('bk.laporan.index') }}"
-                    class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Batal</a>
+                    class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors text-center w-full sm:w-auto">Batal</a>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">Simpan
+                    class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors w-full sm:w-auto">Simpan
                     Laporan</button>
             </div>
         </form>
@@ -174,8 +174,8 @@
                 item.className = 'w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-blue-50 text-sm';
 
                 item.innerHTML = `
-            <p class="font-semibold text-slate-700">${siswa.nama_siswa}</p>
-        `;
+                <p class="font-semibold text-slate-700">${siswa.nama_siswa}</p>
+            `;
 
                 item.onclick = function () {
                     namaInput.value = siswa.nama_siswa;

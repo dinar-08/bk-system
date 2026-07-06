@@ -6,7 +6,7 @@
 
 @section('content')
 
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-6 flex items-center gap-2 sm:gap-3 flex-wrap">
         <a href="{{ route('bk.laporan.index') }}"
             class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 font-medium">
             <i data-feather="arrow-left" class="w-4 h-4"></i>
@@ -32,8 +32,8 @@
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
 
         {{-- DATA SISWA + DETAIL LAPORAN (sejajar 2 kolom) --}}
-        <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
+        <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-7">
 
                 {{-- Data Siswa --}}
                 <div>
@@ -42,7 +42,7 @@
                         <h2 class="text-sm font-bold text-slate-700">Data Siswa</h2>
                     </div>
 
-                    <div class="w-32 h-32 mx-auto md:mx-0 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 mx-auto lg:mx-0 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
                             <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
@@ -65,7 +65,7 @@
                         ] as [$label, $val])
                             <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val ?? '-' }}</p>
+                                <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?? '-' }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -90,7 +90,7 @@
                             <p class="text-sm font-semibold text-slate-700">{{ $laporan->judul_laporan ?? '-' }}</p>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
                                 <label for="kategori" class="block text-xs text-slate-400 mb-1.5">Kategori</label>
                                 <select id="kategori" name="kategori" required
@@ -133,7 +133,7 @@
 
                         <div class="flex justify-end pt-1">
                             <button type="submit"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800">
+                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900">
                                 <i data-feather="save" class="w-4 h-4"></i>
                                 Simpan Verifikasi
                             </button>
@@ -147,7 +147,7 @@
                             <p class="text-sm font-semibold text-slate-700">{{ $laporan->judul_laporan ?? '-' }}</p>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
                                 <p class="text-xs text-slate-400 mb-0.5">Kategori</p>
                                 <p class="text-sm font-semibold text-slate-700">
@@ -202,7 +202,7 @@
         @endphp
 
         @if($laporan->status === 'pemanggilan' && $tampilkanFormJadwal)
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
                     <i data-feather="phone" class="w-4 h-4 text-blue-600"></i>
                     <h2 class="text-sm font-bold text-slate-700">
@@ -212,7 +212,7 @@
 
                 @if($perluJadwalUlang)
                     <div class="mb-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2">
-                        <i data-feather="alert-triangle" class="w-4 h-4 text-amber-500 mt-0.5"></i>
+                        <i data-feather="alert-triangle" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
                         <p class="text-sm text-amber-700">
                             Pemanggilan sebelumnya tidak dihadiri. Silakan jadwalkan pemanggilan ulang.
                         </p>
@@ -223,7 +223,7 @@
                     @csrf
                     <input type="hidden" name="laporan_id" value="{{ $laporan->id }}">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="tanggal_pemanggilan" class="block text-xs font-semibold text-slate-600 mb-1.5">Tanggal Pemanggilan</label>
                             <input type="date" id="tanggal_pemanggilan" name="tanggal_pemanggilan" required
@@ -259,7 +259,7 @@
 
                     <div class="flex justify-end mt-5">
                         <button type="submit"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800">
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900">
                             <i data-feather="calendar" class="w-4 h-4"></i>
                             {{ $laporan->pemanggilan->isEmpty() ? 'Simpan Jadwal Pemanggilan' : 'Simpan Jadwal Pemanggilan Ulang' }}
                         </button>
@@ -269,7 +269,7 @@
         @endif
 
         {{-- RIWAYAT PEMANGGILAN --}}
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
                 <i data-feather="list" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">Riwayat Pemanggilan</h2>
@@ -278,29 +278,29 @@
             <div class="space-y-4">
                 @forelse($laporan->pemanggilan->sortByDesc('created_at') as $index => $item)
                     <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
                             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                                 Pemanggilan ke-{{ $laporan->pemanggilan->count() - $index }}
                             </span>
                             @if($item->status_kehadiran === 'tidak_hadir')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold whitespace-nowrap">
                                     <i data-feather="x-circle" class="w-3 h-3"></i>
                                     Tidak Hadir
                                 </span>
                             @elseif($item->status_kehadiran === 'hadir')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-xs font-semibold">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-xs font-semibold whitespace-nowrap">
                                     <i data-feather="check-circle" class="w-3 h-3"></i>
                                     Hadir
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold whitespace-nowrap">
                                     <i data-feather="clock" class="w-3 h-3"></i>
                                     Belum
                                 </span>
                             @endif
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                             @foreach([
                                 ['Tanggal', $item->tanggal_pemanggilan],
                                 ['Waktu', $item->waktu_pemanggilan],
@@ -320,7 +320,7 @@
 
                         @if($item->status_kehadiran === 'belum')
                             <form action="{{ route('bk.pemanggilan.update', $item->id) }}" method="POST"
-                                class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                 @csrf
                                 @method('PUT')
 
@@ -384,18 +384,18 @@
                                         . "Mohon hadir tepat waktu. Terima kasih.";
                                 @endphp
 
-                                <div class="md:col-span-4 flex flex-wrap justify-end gap-3">
+                                <div class="sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row flex-wrap justify-end gap-3">
                                     @if($nomorWa)
                                         <a href="https://wa.me/{{ $nomorWa }}?text={{ urlencode($pesan) }}"
                                             target="_blank"
-                                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold transition-colors">
+                                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-xl text-sm font-semibold transition-colors w-full sm:w-auto">
                                             <i data-feather="message-circle" class="w-4 h-4"></i>
                                             Kirim WA
                                         </a>
                                     @endif
 
                                     <button type="submit"
-                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-sm font-semibold">
+                                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white rounded-xl text-sm font-semibold w-full sm:w-auto">
                                         <i data-feather="save" class="w-4 h-4"></i>
                                         Simpan Hasil Pemanggilan
                                     </button>

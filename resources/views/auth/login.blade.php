@@ -21,26 +21,28 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-blue-700 overflow-hidden">
+<body class="min-h-screen bg-blue-700 overflow-x-hidden">
 
-    <div class="relative min-h-screen flex items-center justify-center px-5 py-8">
+    <div class="relative min-h-screen flex items-center justify-center px-4 sm:px-5 py-6 sm:py-8">
 
         <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-white/10"></div>
         <div class="absolute top-24 -right-24 h-80 w-80 rounded-full bg-white/10"></div>
         <div class="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-blue-400/20"></div>
 
-        <div class="relative w-full max-w-lg rounded-[2rem] bg-white border border-slate-100 p-8 shadow-2xl">
+        <div
+            class="relative w-full max-w-lg rounded-3xl sm:rounded-[2rem] bg-white border border-slate-100 p-6 sm:p-8 shadow-2xl">
 
-            <div class="mb-8 text-center">
-                <img src="{{ asset('asset/logo.png') }}" alt="Logo SDIT Al-Kautsar" class="h-28 mx-auto object-contain">
+            <div class="mb-6 sm:mb-8 text-center">
+                <img src="{{ asset('asset/logo.png') }}" alt="Logo SDIT Al-Kautsar"
+                    class="h-20 sm:h-28 mx-auto object-contain">
 
                 <p class="text-xs text-slate-500 mt-2">
                     SDIT Muhammadiyah Al-Kautsar Kartasura
                 </p>
             </div>
 
-            <div class="mb-7 text-center">
-                <h1 class="text-2xl font-extrabold text-slate-900">
+            <div class="mb-6 sm:mb-7 text-center">
+                <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">
                     Login
                 </h1>
 
@@ -105,7 +107,7 @@
                 </div>
 
                 <button type="submit" id="loginBtn"
-                    class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800">
+                    class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 active:bg-blue-900">
                     <i data-feather="log-in" class="h-5 w-5"></i>
                     Masuk
                 </button>

@@ -6,18 +6,18 @@
 
 @section('content')
 
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-5 lg:mb-6 flex items-center gap-2 lg:gap-3">
         <a href="{{ route('orang_tua.laporan.index') }}"
-            class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
+            class="flex items-center gap-1.5 text-xs lg:text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
             <i data-feather="arrow-left" class="w-4 h-4"></i> Kembali
         </a>
         <span class="text-slate-300">/</span>
-        <span class="text-sm text-slate-800 font-semibold">Buat Laporan</span>
+        <span class="text-xs lg:text-sm text-slate-800 font-semibold">Buat Laporan</span>
     </div>
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
 
-        <div class="mb-5 pb-5 border-b border-slate-100">
+        <div class="mb-4 sm:mb-5 pb-4 sm:pb-5 border-b border-slate-100">
             <h2 class="font-bold text-slate-800">Formulir Laporan Orang Tua</h2>
             <p class="text-sm text-slate-500 mt-0.5">
                 Laporkan Permasalahan Anak Anda.
@@ -25,18 +25,18 @@
         </div>
 
         {{-- Data Siswa --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5 sm:mb-6">
+            <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 sm:p-4">
                 <p class="text-xs text-slate-500 mb-1">Nama Siswa</p>
-                <p class="text-sm font-bold text-slate-800">{{ $siswa->nama_siswa }}</p>
+                <p class="text-sm font-bold text-slate-800 break-words">{{ $siswa->nama_siswa }}</p>
             </div>
 
-            <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+            <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 sm:p-4">
                 <p class="text-xs text-slate-500 mb-1">NIS</p>
                 <p class="text-sm font-bold text-slate-800">{{ $siswa->nis }}</p>
             </div>
 
-            <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+            <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 sm:p-4">
                 <p class="text-xs text-slate-500 mb-1">Kelas</p>
                 <p class="text-sm font-bold text-slate-800">{{ $siswa->kelas }}</p>
             </div>
@@ -77,10 +77,10 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti / Lampiran</label>
 
                     <label
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                        <i data-feather="paperclip" class="w-4 h-4 text-slate-400"></i>
+                        class="flex items-center gap-2.5 sm:gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors">
+                        <i data-feather="paperclip" class="w-4 h-4 text-slate-400 shrink-0"></i>
 
-                        <span id="fileName" class="text-sm text-slate-400 truncate">
+                        <span id="fileName" class="text-sm text-slate-400 truncate min-w-0">
                             Foto, PDF, atau rekaman audio/video
                         </span>
 
@@ -103,14 +103,15 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-5 border-t border-slate-100 flex justify-end gap-3">
+            <div
+                class="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 sm:gap-3">
                 <a href="{{ route('orang_tua.laporan.index') }}"
-                    class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                    class="w-full sm:w-auto text-center px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
                     Batal
                 </a>
 
                 <button type="submit"
-                    class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                    class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
                     Kirim Laporan
                 </button>
             </div>

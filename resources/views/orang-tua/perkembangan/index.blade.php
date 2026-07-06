@@ -7,9 +7,9 @@
 @section('content')
 
     <div>
-        <div class="mb-5">
-            <h1 class="text-2xl font-extrabold text-slate-900">Perkembangan Permasalahan<h1>
-            <p class="text-sm text-slate-500">
+        <div class="mb-4 sm:mb-5">
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">Perkembangan Permasalahan</h1>
+            <p class="text-sm text-slate-500 mt-1">
                 Data perkembangan hanya muncul jika laporan sudah masuk tahap monitoring.
             </p>
         </div>
@@ -58,20 +58,21 @@
                     : null;
             @endphp
 
-            <div class="border-t border-slate-200 py-6 first:border-t-0 first:pt-0">
+            <div class="border-t border-slate-200 py-5 sm:py-6 first:border-t-0 first:pt-0">
 
-                <div class="flex flex-wrap items-center gap-3 mb-3">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2.5 sm:mb-3">
                     <span
                         class="inline-flex items-center rounded-full {{ $statusLaporanColor }} text-white px-3 py-1 text-xs font-bold">
                         {{ $statusLaporanLabel }}
                     </span>
-                    <span class="text-sm text-slate-400">
+                    <span class="text-xs sm:text-sm text-slate-400">
                         {{ $tanggalLaporan }}
                     </span>
                 </div>
 
                 <a href="{{ route('orang_tua.perkembangan.show', $item->id) }}" class="group block">
-                    <h3 class="text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
+                    <h3
+                        class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                         {{ $item->judul_laporan }}
                     </h3>
                 </a>
@@ -83,8 +84,8 @@
                     @endif
                 </p>
 
-                <div class="flex items-center gap-1.5 text-sm text-slate-600 mt-2">
-                    <i data-feather="calendar" class="w-4 h-4 text-slate-400"></i>
+                <div class="flex items-start gap-1.5 text-sm text-slate-600 mt-2">
+                    <i data-feather="calendar" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i>
                     <span>
                         Jadwal monitoring:
                         <span class="font-semibold">
@@ -104,7 +105,7 @@
                 </a>
             </div>
         @empty
-            <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-14 text-center">
+            <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-10 sm:px-5 sm:py-14 text-center">
                 <i data-feather="trending-up" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
                 <p class="font-semibold text-slate-700">
                     Belum ada data perkembangan anak.

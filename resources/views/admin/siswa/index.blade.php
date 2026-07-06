@@ -177,12 +177,20 @@
 
                         {{-- Background foto / fallback --}}
                         @if($item->foto)
-                            <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_siswa }}"
-                                class="absolute inset-0 w-full h-full object-cover">
+                            <img src="{{ route('foto.siswa', $item->id) }}" alt="{{ $item->nama_siswa }}"
+                                class="absolute inset-0 w-full h-full object-cover"
+                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+
+                            <div
+                                class="hidden absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                <span class="text-white/60 text-8xl font-extrabold">
+                                    {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
+                                </span>
+                            </div>
                         @else
                             <div
                                 class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
-                                <span class="text-white/20 text-8xl font-extrabold">
+                                <span class="text-white/60 text-8xl font-extrabold">
                                     {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
                                 </span>
                             </div>
@@ -392,7 +400,7 @@
             @if($errors->any())
                 openPeriodeModal();
             @endif
-                });
+                    });
     </script>
 
 @endsection

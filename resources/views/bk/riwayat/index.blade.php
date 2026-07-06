@@ -24,7 +24,7 @@
 
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Riwayat Permasalahan Siswa</h1>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Riwayat Permasalahan Siswa</h1>
         </div>
     </div>
 
@@ -35,7 +35,8 @@
 
             <div>
                 <label for="filter-nama" class="text-xs font-medium text-slate-600 block mb-1">Nama Siswa</label>
-                <input type="text" id="filter-nama" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..." autocomplete="off"
+                <input type="text" id="filter-nama" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..."
+                    autocomplete="off"
                     class="filter-input filter-input-text w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
 
@@ -95,10 +96,10 @@
             $perluLihatSemua = !$sedangFilterKategori && $dataLaporan->count() > $limitTampil;
         @endphp
 
-        <section class="mb-8 bg-white border border-slate-200 rounded-3xl p-5 lg:p-6 shadow-sm overflow-hidden">
-            <div class="flex items-center justify-between gap-4 mb-5">
+        <section class="mb-8 bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 lg:p-6 shadow-sm overflow-hidden">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">
+                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">
                         {{ $cfg['label'] }}
                     </h2>
                     <p class="text-sm text-slate-500 mt-1">
@@ -115,7 +116,60 @@
                 @endif
             </div>
 
-            <div class="flex flex-row flex-nowrap overflow-x-auto pb-3">
+            {{-- MOBILE & TABLET: kartu statis (hover tidak bisa dipakai di layar sentuh) --}}
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:hidden gap-3">
+                @foreach($dataPreview as $item)
+                    @php
+                        $status = $item->status ?? '-';
+                        $statusBadgeMobile = $status === 'selesai'
+                            ? 'bg-green-100 text-green-700 border border-green-200'
+                            : 'bg-red-100 text-red-700 border border-red-200';
+                        $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
+
+                        $siswa = $item->siswa;
+                        $nama = optional($siswa)->nama_siswa ?? '-';
+                        $foto = optional($siswa)->foto;
+                    @endphp
+
+                    <a href="{{ route('bk.riwayat.show', $item->id) }}"
+                        class="block rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 active:scale-[0.98] transition-transform">
+
+                        <div class="relative h-32 w-full bg-center bg-cover">
+                            @if($foto)
+                                <img src="{{ asset('storage/' . $foto) }}" alt="{{ $nama }}"
+                                    class="absolute inset-0 w-full h-full object-cover">
+                            @else
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                    <span class="text-white/30 text-4xl font-extrabold">
+                                        {{ strtoupper(substr($nama, 0, 1)) }}
+                                    </span>
+                                </div>
+                            @endif
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                            <span
+                                class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $statusBadgeMobile }} bg-white/90">
+                                {{ $statusLabel }}
+                            </span>
+                            <p class="absolute left-2 bottom-2 right-2 text-white text-xs font-bold leading-tight line-clamp-2">
+                                {{ $nama }}
+                            </p>
+                        </div>
+
+                        <div class="p-2.5">
+                            <p class="text-[11px] text-slate-500">
+                                Kelas {{ optional($siswa)->kelas ?? '-' }}
+                            </p>
+                            <p class="text-xs text-slate-700 font-medium line-clamp-2 mt-0.5">
+                                {{ $item->judul_laporan ?? $item->jenis_masalah ?? '-' }}
+                            </p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            {{-- DESKTOP: strip kartu dengan efek hover melebar --}}
+            <div class="hidden md:flex flex-row flex-nowrap overflow-x-auto pb-3">
                 @foreach($dataPreview as $item)
                     @php
                         $status = $item->status ?? '-';
@@ -138,7 +192,8 @@
                             <img src="{{ asset('storage/' . $foto) }}" alt="{{ $nama }}"
                                 class="absolute inset-0 w-full h-full object-cover">
                         @else
-                            <div class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
                                 <span class="text-white/20 text-8xl font-extrabold">
                                     {{ strtoupper(substr($nama, 0, 1)) }}
                                 </span>
@@ -152,9 +207,11 @@
                             {{ $nama }}
                         </p>
 
-                        <div class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div
+                            class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div>
-                                <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full {{ $statusBadge }} text-xs font-bold">
+                                <div
+                                    class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full {{ $statusBadge }} text-xs font-bold">
                                     {{ $statusLabel }}
                                 </div>
 
@@ -186,7 +243,7 @@
             </div>
         </section>
     @empty
-        <div class="bg-white rounded-2xl border border-slate-200 p-14 text-center">
+        <div class="bg-white rounded-2xl border border-slate-200 p-10 sm:p-14 text-center">
             <i data-feather="archive" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
             <p class="text-slate-500 font-medium">Tidak ada riwayat yang cocok dengan filter.</p>
         </div>

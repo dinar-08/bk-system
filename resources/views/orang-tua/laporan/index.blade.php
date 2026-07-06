@@ -23,28 +23,28 @@
         ];
     @endphp
 
-    <div class="space-y-6">
+    <div class="space-y-5 sm:space-y-6">
 
         @if(session('warning'))
             <div
-                class="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 px-5 py-4 rounded-2xl text-sm">
-                <i data-feather="alert-triangle" class="w-5 h-5"></i>
+                class="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3.5 sm:px-5 sm:py-4 rounded-2xl text-sm">
+                <i data-feather="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
                 <span>{{ session('warning') }}</span>
             </div>
         @endif
 
         {{-- Header --}}
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
             <div>
-                <h1 class="text-2xl font-extrabold text-slate-900">Laporan Saya</h1>
-                <p class="text-sm text-slate-500 mt-1.5">
+                <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">Laporan Saya</h1>
+                <p class="text-sm text-slate-500 mt-1 sm:mt-1.5">
                     Pantau laporan aktif dan riwayat penanganan oleh Guru BK.
                 </p>
             </div>
 
             @if(!$adaLaporanBerjalan)
                 <a href="{{ route('orang_tua.laporan.create') }}"
-                    class="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition">
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition">
                     <i data-feather="plus" class="w-4 h-4"></i>
                     Buat Laporan
                 </a>
@@ -52,9 +52,9 @@
         </div>
 
         @if($adaLaporanBerjalan)
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3.5 text-sm text-amber-700">
-                <div class="flex items-center gap-2">
-                    <i data-feather="info" class="w-4 h-4"></i>
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 sm:px-5 sm:py-3.5 text-sm text-amber-700">
+                <div class="flex items-start gap-2">
+                    <i data-feather="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
                     <span class="font-semibold">
                         Tidak bisa membuat laporan baru selama masih ada permasalahan aktif.
                     </span>
@@ -63,15 +63,15 @@
         @endif
 
         {{-- ===== TAB NAV (mirip Home / News JKT48) ===== --}}
-        <div class="flex items-center gap-6 border-b border-slate-200">
+        <div class="flex items-center gap-4 sm:gap-6 border-b border-slate-200 overflow-x-auto no-scrollbar">
             <button type="button" onclick="showLaporanTab('aktif')" id="tabAktifBtn"
-                class="relative pb-3 text-sm font-extrabold text-blue-700 transition">
+                class="relative pb-3 text-sm font-extrabold text-blue-700 transition whitespace-nowrap shrink-0">
                 Laporan Aktif
                 <span id="tabAktifUnderline" class="absolute left-0 -bottom-px h-0.5 w-full bg-blue-700"></span>
             </button>
 
             <button type="button" onclick="showLaporanTab('riwayat')" id="tabRiwayatBtn"
-                class="relative pb-3 text-sm font-extrabold text-slate-400 hover:text-slate-600 transition">
+                class="relative pb-3 text-sm font-extrabold text-slate-400 hover:text-slate-600 transition whitespace-nowrap shrink-0">
                 Riwayat Laporan
                 <span id="tabRiwayatUnderline" class="absolute left-0 -bottom-px h-0.5 w-full bg-blue-700 hidden"></span>
             </button>
@@ -84,19 +84,20 @@
                 @continue(($l->status ?? 'baru') === 'monitoring')
                 @php $status = $l->status ?? 'baru'; @endphp
 
-                <div class="border-t border-slate-200 py-6 first:border-t-0 first:pt-0">
-                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                <div class="border-t border-slate-200 py-5 sm:py-6 first:border-t-0 first:pt-0">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2.5 sm:mb-3">
                         <span
                             class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold {{ $statusClass[$status] ?? 'bg-slate-50 text-slate-700 border-slate-200' }}">
                             {{ $statusLabel[$status] ?? ucfirst($status) }}
                         </span>
-                        <span class="text-sm text-slate-400">
+                        <span class="text-xs sm:text-sm text-slate-400">
                             {{ $l->created_at->format('d M Y') }}
                         </span>
                     </div>
 
                     <a href="{{ route('orang_tua.laporan.show', $l->id) }}" class="group block">
-                        <h3 class="text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
+                        <h3
+                            class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                             {{ $l->judul_laporan }}
                         </h3>
                     </a>
@@ -119,7 +120,7 @@
                     </a>
                 </div>
             @empty
-                <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-10 text-center">
+                <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 sm:px-5 sm:py-10 text-center">
                     <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-50">
                         <i data-feather="inbox" class="w-5 h-5 text-slate-400"></i>
                     </div>
@@ -137,19 +138,20 @@
             @forelse($laporanRiwayat as $l)
                 @php $status = $l->status ?? 'selesai'; @endphp
 
-                <div class="border-t border-slate-200 py-6 first:border-t-0 first:pt-0">
-                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                <div class="border-t border-slate-200 py-5 sm:py-6 first:border-t-0 first:pt-0">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2.5 sm:mb-3">
                         <span
                             class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold {{ $statusClass[$status] ?? 'bg-slate-50 text-slate-700 border-slate-200' }}">
                             {{ $statusLabel[$status] ?? ucfirst($status) }}
                         </span>
-                        <span class="text-sm text-slate-400">
+                        <span class="text-xs sm:text-sm text-slate-400">
                             {{ $l->created_at->format('d M Y') }}
                         </span>
                     </div>
 
                     <a href="{{ route('orang_tua.laporan.show', $l->id) }}" class="group block">
-                        <h3 class="text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
+                        <h3
+                            class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                             {{ $l->judul_laporan }}
                         </h3>
                     </a>
@@ -165,7 +167,7 @@
                     </a>
                 </div>
             @empty
-                <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-10 text-center">
+                <div class="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-8 sm:px-5 sm:py-10 text-center">
                     <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-50">
                         <i data-feather="archive" class="w-5 h-5 text-slate-400"></i>
                     </div>
@@ -178,6 +180,17 @@
         </section>
 
     </div>
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 
     <script>
         function showLaporanTab(tab) {

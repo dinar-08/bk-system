@@ -27,18 +27,19 @@
     @endphp
 
     {{-- Filter Kategori --}}
-    <form method="GET" action="{{ route('bk.monitoring.index') }}" class="mb-8">
-        <div class="flex flex-wrap items-center gap-2">
-            <button type="submit" name="kategori" value="semua" class="h-11 px-5 text-sm font-semibold rounded-full transition
-                        {{ $kategoriAktif === 'semua'
+    <form method="GET" action="{{ route('bk.monitoring.index') }}" class="mb-6 lg:mb-8">
+        <div
+            class="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0 lg:overflow-visible scrollbar-hide">
+            <button type="submit" name="kategori" value="semua" class="shrink-0 h-9 lg:h-11 px-4 lg:px-5 text-xs lg:text-sm font-semibold rounded-full transition whitespace-nowrap
+                            {{ $kategoriAktif === 'semua'
         ? 'bg-blue-600 text-white shadow-sm'
         : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                 Semua
             </button>
 
             @foreach($kategoriConfig as $key => $cfg)
-                <button type="submit" name="kategori" value="{{ $key }}" class="h-11 px-5 text-sm font-semibold rounded-full transition
-                                    {{ $kategoriAktif === $key
+                <button type="submit" name="kategori" value="{{ $key }}" class="shrink-0 h-9 lg:h-11 px-4 lg:px-5 text-xs lg:text-sm font-semibold rounded-full transition whitespace-nowrap
+                                            {{ $kategoriAktif === $key
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                     {{ $cfg['label'] }}
@@ -48,8 +49,8 @@
     </form>
 
     {{-- Judul section --}}
-    <div class="mb-4">
-        <h2 class="text-base font-bold text-slate-800">Daftar Monitoring</h2>
+    <div class="mb-3 lg:mb-4">
+        <h2 class="text-sm lg:text-base font-bold text-slate-800">Daftar Monitoring</h2>
     </div>
 
     {{-- List Monitoring --}}
@@ -94,7 +95,7 @@
             @endphp
 
             <div
-                class="relative group/list flex items-center justify-between gap-x-4 lg:gap-x-8 py-5 border-b border-blue-300 overflow-hidden">
+                class="relative group/list flex items-start lg:items-center justify-between gap-x-3 lg:gap-x-8 py-4 lg:py-5 border-b border-blue-300 overflow-hidden">
 
                 {{-- Tanggal + Panah Hover --}}
                 <div class="relative shrink-0">
@@ -104,16 +105,16 @@
                     </div>
 
                     <div
-                        class="flex items-center gap-2 min-w-[95px] lg:min-w-[130px] group-hover/list:lg:translate-x-8 transition-all duration-300">
-                        <span class="text-3xl lg:text-4xl font-extrabold text-blue-600 leading-none w-[48px]">
+                        class="flex items-center gap-1.5 lg:gap-2 min-w-[70px] lg:min-w-[130px] group-hover/list:lg:translate-x-8 transition-all duration-300">
+                        <span class="text-2xl lg:text-4xl font-extrabold text-blue-600 leading-none w-[36px] lg:w-[48px]">
                             {{ $tanggal->format('d') }}
                         </span>
 
                         <div class="leading-tight">
-                            <div class="text-xs lg:text-sm font-semibold uppercase text-slate-700">
+                            <div class="text-[10px] lg:text-sm font-semibold uppercase text-slate-700">
                                 {{ strtoupper($tanggal->translatedFormat('M')) }}
                             </div>
-                            <div class="text-xs lg:text-sm text-slate-500">
+                            <div class="text-[10px] lg:text-sm text-slate-500">
                                 {{ $tanggal->format('Y') }}
                             </div>
                         </div>
@@ -121,16 +122,16 @@
                 </div>
 
                 {{-- Isi --}}
-                <div class="flex items-center justify-between gap-x-3 lg:gap-x-5 w-full min-w-0">
+                <div class="flex items-start lg:items-center justify-between gap-x-2 lg:gap-x-5 w-full min-w-0">
                     <div class="flex-1 min-w-0 group-hover/list:lg:translate-x-4 transition-all duration-300">
 
                         <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                            <h3 class="text-sm lg:text-base font-semibold text-slate-900 truncate">
+                            <h3 class="text-sm lg:text-base font-semibold text-slate-900 truncate max-w-[160px] sm:max-w-none">
                                 {{ $item->siswa->nama_siswa ?? '-' }}
                             </h3>
 
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full border {{ $cfg['border'] }} {{ $cfg['text'] }} bg-white text-xs font-semibold">
+                                class="inline-flex items-center px-2 py-0.5 rounded-full border {{ $cfg['border'] }} {{ $cfg['text'] }} bg-white text-[10px] lg:text-xs font-semibold">
                                 {{ $cfg['label'] }}
                             </span>
                         </div>
@@ -139,31 +140,31 @@
                             {{ $item->jenis_masalah ?? $item->judul_laporan ?? '-' }}
                         </p>
 
-                        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                        <div class="mt-1.5 flex flex-wrap items-center gap-1 lg:gap-1.5 text-[10px] lg:text-xs">
                             <span class="inline-flex items-center gap-1 text-cyan-800">
-                                <span class="w-2 h-2 rounded-full bg-cyan-700"></span>
+                                <span class="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-cyan-700"></span>
                                 Kelas {{ $item->siswa->kelas ?? '-' }}
                             </span>
 
-                            <span class="text-slate-300">•</span>
+                            <span class="hidden sm:inline text-slate-300">•</span>
 
-                            <span class="text-cyan-800 font-medium">
+                            <span class="hidden sm:inline text-cyan-800 font-medium">
                                 Monitoring Berikutnya
                             </span>
 
-                            <span class="text-slate-300">•</span>
+                            <span class="hidden sm:inline text-slate-300">•</span>
 
                             <span class="text-cyan-800">
                                 {{ $jamMonitoring }}
                             </span>
 
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full border font-semibold {{ $statusClass }} capitalize">
+                                class="inline-flex items-center px-1.5 lg:px-2 py-0.5 rounded-full border font-semibold {{ $statusClass }} capitalize">
                                 {{ $statusPerkembangan }}
                             </span>
 
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold">
+                                class="inline-flex items-center px-1.5 lg:px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold whitespace-nowrap">
                                 {{ $jumlahMonitoring }}x Monitoring
                             </span>
                         </div>
@@ -171,7 +172,7 @@
 
                     {{-- Tombol --}}
                     <a href="{{ route('bk.monitoring.show', $item->id) }}"
-                        class="relative shrink-0 inline-flex items-center justify-center w-10 h-10 lg:w-[140px] lg:h-10 rounded-full border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-500 overflow-hidden group/button uppercase">
+                        class="relative shrink-0 inline-flex items-center justify-center w-9 h-9 lg:w-[140px] lg:h-10 rounded-full border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-500 overflow-hidden group/button uppercase mt-0.5 lg:mt-0">
 
                         <span
                             class="hidden lg:inline-block text-xs font-semibold transition-transform duration-500 group-hover/button:-translate-x-5 group-hover/list:-translate-x-5">
@@ -188,7 +189,7 @@
                 </div>
             </div>
         @empty
-            <div class="lg:col-span-2 bg-white rounded-2xl border border-dashed border-slate-200 p-14 text-center">
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-dashed border-slate-200 p-10 lg:p-14 text-center">
                 <i data-feather="activity" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
                 <p class="text-slate-400 text-sm font-medium">
                     Belum ada laporan dalam proses monitoring pada filter ini.

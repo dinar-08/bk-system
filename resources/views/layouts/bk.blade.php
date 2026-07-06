@@ -94,13 +94,20 @@
 
         {{-- SIDEBAR --}}
         <aside id="sidebar"
-            class="fixed left-0 top-0 h-screen w-60 flex flex-col z-30 -translate-x-full lg:translate-x-0 shadow-lg"
+            class="fixed left-0 top-0 h-screen w-[80%] max-w-[260px] lg:w-60 flex flex-col z-30 -translate-x-full lg:translate-x-0 shadow-lg"
             style="background:#1d4ed8;">
 
-            {{-- Logo full width --}}
-            <div class="flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.15);">
+            {{-- Logo + tombol close (mobile) --}}
+            <div class="flex-shrink-0 relative" style="border-bottom:1px solid rgba(255,255,255,0.15);">
                 <img src="{{ asset('asset/logo.png') }}" alt="Logo" class="w-full object-contain p-4"
                     style="max-height:100px;">
+
+                <button onclick="closeSidebar()"
+                    class="lg:hidden absolute top-2 right-2 text-white/80 p-1.5 rounded-full hover:bg-white/10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             {{-- Nav --}}
@@ -180,13 +187,13 @@
             <header class="lg:hidden sticky top-0 z-10 px-4 py-3 flex items-center gap-3 shadow-sm"
                 style="background:#1d4ed8;">
 
-                <button onclick="openSidebar()" class="text-white p-1 -ml-1">
+                <button onclick="openSidebar()" class="text-white p-1 -ml-1 flex-shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
 
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     @php
                         $hour = now('Asia/Jakarta')->hour;
 
@@ -198,11 +205,11 @@
                         };
                     @endphp
 
-                    <h1 class="font-semibold text-white text-sm">
+                    <h1 class="font-semibold text-white text-sm truncate">
                         {{ $greeting }}, {{ auth()->user()->name ?? 'Admin' }}
                     </h1>
 
-                    <p class="text-xs text-blue-100 mt-0.5">
+                    <p class="text-[11px] text-blue-100 mt-0.5 truncate">
                         {{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}
                         •
                         {{ now('Asia/Jakarta')->format('H:i') }} WIB
@@ -238,19 +245,19 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 @if (session('success'))
                     <div
-                        class="mb-5 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
-                        <i data-feather="check-circle" class="w-4 h-4 flex-shrink-0"></i>
-                        {{ session('success') }}
+                        class="mb-5 flex items-start gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm break-words">
+                        <i data-feather="check-circle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                        <span>{{ session('success') }}</span>
                     </div>
                 @endif
                 @if (session('error'))
                     <div
-                        class="mb-5 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                        <i data-feather="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
-                        {{ session('error') }}
+                        class="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm break-words">
+                        <i data-feather="alert-circle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                        <span>{{ session('error') }}</span>
                     </div>
                 @endif
                 @yield('content')

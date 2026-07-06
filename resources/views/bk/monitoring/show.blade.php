@@ -24,21 +24,21 @@
         ];
     @endphp
 
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-6 flex flex-wrap items-center gap-3">
         <a href="{{ route('bk.monitoring.index') }}"
             class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-700 transition-colors font-medium">
             <i data-feather="arrow-left" class="w-4 h-4"></i>
             Kembali
         </a>
-        <span class="text-slate-300">/</span>
-        <span class="text-sm text-slate-800 font-semibold">Detail Monitoring</span>
+        <span class="text-slate-300 hidden sm:inline">/</span>
+        <span class="text-sm text-slate-800 font-semibold hidden sm:inline">Detail Monitoring</span>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
         {{-- DATA SISWA + DETAIL LAPORAN --}}
-        <section class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
+        <section class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-7">
 
                 {{-- DATA SISWA --}}
                 <div>
@@ -47,7 +47,7 @@
                         <h2 class="text-sm font-bold text-slate-700">Data Siswa</h2>
                     </div>
                     <div
-                        class="w-full h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
+                        class="w-full h-28 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
                             <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
@@ -66,9 +66,9 @@
                             ['NIS', optional($laporan->siswa)->nis],
                             ['Orang Tua', optional($laporan->siswa)->nama_ortu],
                         ] as [$label, $val])
-                            <div class="px-4 py-3 @if(!$loop->last) border-b border-slate-200 @endif">
+                            <div class="px-3 sm:px-4 py-2.5 sm:py-3 @if(!$loop->last) border-b border-slate-200 @endif">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val ?: '-' }}</p>
+                                <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?: '-' }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -87,15 +87,15 @@
                             ['Kategori', $kategoriLabel[$laporan->kategori] ?? ($laporan->kategori ? ucfirst($laporan->kategori) : '-')],
                             ['Jenis Masalah', $laporan->jenis_masalah ?: '-'],
                         ] as [$label, $val])
-                            <div class="px-4 py-3 border-b border-slate-200">
+                            <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-200">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
-                                <p class="text-sm font-semibold text-slate-700">{{ $val ?: '-' }}</p>
+                                <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?: '-' }}</p>
                             </div>
                         @endforeach
 
-                        <div class="px-4 py-3 min-h-[120px]">
+                        <div class="px-3 sm:px-4 py-2.5 sm:py-3 min-h-[100px] sm:min-h-[120px]">
                             <p class="text-xs text-slate-400 mb-1">Deskripsi</p>
-                            <p class="text-sm text-slate-700 leading-relaxed">
+                            <p class="text-sm text-slate-700 leading-relaxed break-words">
                                 {{ $laporan->deskripsi ?: '-' }}
                             </p>
                         </div>
@@ -105,7 +105,7 @@
         </section>
 
         {{-- FORM MONITORING --}}
-        <section class="p-6 border-t border-slate-200">
+        <section class="p-4 sm:p-6 border-t border-slate-200">
             <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
                 <i data-feather="edit-3" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">
@@ -184,9 +184,9 @@
                                 class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400">{{ old('catatan_perkembangan') }}</textarea>
                         </div>
 
-                        <div class="md:col-span-2 flex justify-end">
+                        <div class="md:col-span-2 flex justify-stretch sm:justify-end">
                             <button type="submit"
-                                class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                                class="w-full sm:w-auto px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
                                 Simpan Hasil Monitoring
                             </button>
                         </div>
@@ -194,7 +194,7 @@
                 </form>
             @else
                 <div
-                    class="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    class="bg-blue-50 border border-blue-200 rounded-xl px-4 sm:px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <p class="font-semibold text-blue-700 text-sm">Tidak ada jadwal monitoring aktif.</p>
                         <p class="text-blue-600 text-xs mt-0.5">
@@ -203,7 +203,7 @@
                     </div>
 
                     <a href="{{ route('bk.evaluasi.show', $laporan->id) }}"
-                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors w-full md:w-auto">
                         <i data-feather="check-square" class="w-4 h-4"></i>
                         Lanjut Evaluasi
                     </a>
@@ -212,7 +212,7 @@
         </section>
 
         {{-- RIWAYAT MONITORING --}}
-        <section class="p-6 border-t border-slate-200">
+        <section class="p-4 sm:p-6 border-t border-slate-200">
             <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
                 <i data-feather="list" class="w-4 h-4 text-blue-600"></i>
                 <h2 class="text-sm font-bold text-slate-700">Riwayat Monitoring</h2>
@@ -220,8 +220,8 @@
 
             <div class="space-y-3">
                 @forelse($riwayatMonitoring as $item)
-                    <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
-                        <div class="flex items-center justify-between mb-2">
+                    <div class="border border-slate-200 bg-slate-50 rounded-xl p-3 sm:p-4">
+                        <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
                             <div>
                                 <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full">
                                     Monitoring ke-{{ $item->monitoring_ke }}
@@ -242,12 +242,12 @@
                             </span>
                         </div>
 
-                        <p class="text-sm text-slate-600 leading-relaxed">
+                        <p class="text-sm text-slate-600 leading-relaxed break-words">
                             {{ $item->catatan_perkembangan ?: '-' }}
                         </p>
                     </div>
                 @empty
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center">
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-6 sm:p-8 text-center">
                         <i data-feather="clock" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
                         <p class="text-sm text-slate-400">Belum ada riwayat monitoring selesai.</p>
                     </div>

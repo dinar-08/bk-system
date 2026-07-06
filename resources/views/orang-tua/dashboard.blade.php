@@ -42,24 +42,35 @@
             $pemanggilanTerbaru = $laporanUtama->pemanggilan->sortByDesc('tanggal_pemanggilan')->first();
         @endphp
 
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-5">
-            <div class="flex items-start gap-5">
-                <div
-                    class="w-20 h-20 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex-shrink-0 flex items-center justify-center">
-                    @if($laporanUtama->siswa->foto)
-                        <img src="{{ route('foto.siswa', $laporanUtama->siswa->id) }}" class="w-full h-full object-cover"
-                            alt="Foto Siswa">
-                    @else
-                        <i data-feather="user" class="w-8 h-8 text-blue-300"></i>
-                    @endif
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 mb-5">
+            <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
+                <div class="flex items-start gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex-shrink-0 flex items-center justify-center">
+                        @if($laporanUtama->siswa->foto)
+                            <img src="{{ route('foto.siswa', $laporanUtama->siswa->id) }}" class="w-full h-full object-cover"
+                                alt="Foto Siswa">
+                        @else
+                            <i data-feather="user" class="w-7 h-7 sm:w-8 sm:h-8 text-blue-300"></i>
+                        @endif
+                    </div>
+
+                    <div class="flex-1 min-w-0 sm:hidden">
+                        <p class="font-bold text-slate-800 text-sm truncate">{{ $laporanUtama->siswa->nama_siswa }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Kelas {{ $laporanUtama->siswa->kelas }} · NIS {{ $laporanUtama->siswa->nis }}
+                        </p>
+                    </div>
                 </div>
 
-                <div class="flex-1">
-                    <p class="font-bold text-slate-800 text-base">{{ $laporanUtama->siswa->nama_siswa }}</p>
-                    <p class="text-sm text-slate-500 mt-0.5">
+                <div class="flex-1 min-w-0 w-full">
+                    <p class="hidden sm:block font-bold text-slate-800 text-base">
+                        {{ $laporanUtama->siswa->nama_siswa }}
+                    </p>
+                    <p class="hidden sm:block text-sm text-slate-500 mt-0.5">
                         Kelas {{ $laporanUtama->siswa->kelas }} · NIS {{ $laporanUtama->siswa->nis }}
                     </p>
-                    <p class="text-sm text-slate-600 mt-2">
+                    <p class="text-xs sm:text-sm text-slate-600 mt-2 break-words">
                         Jenis Masalah:
                         <span class="font-semibold text-slate-800">
                             {{ $laporanUtama->jenis_masalah ?? 'Menunggu verifikasi Guru BK' }}
@@ -68,13 +79,13 @@
                 </div>
 
                 <a href="{{ route('orang_tua.laporan.show', $laporanUtama->id) }}"
-                    class="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-xs font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all">
+                    class="flex-shrink-0 w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-xs font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all">
                     <i data-feather="eye" class="w-3.5 h-3.5"></i>
                     Lihat Detail
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                 <div class="bg-slate-50 rounded-xl px-4 py-3">
                     <p class="text-xs text-slate-400 mb-1.5">Status Laporan</p>
                     <span
@@ -97,17 +108,17 @@
         </div>
     @else
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-5">
-            <div class="relative">
-                <video autoplay muted loop playsinline class="w-full">
+            <div class="relative aspect-video sm:aspect-auto">
+                <video autoplay muted loop playsinline class="w-full h-full sm:h-auto object-cover">
                     <source src="{{ asset('asset/ayo_bercerita.mp4') }}" type="video/mp4">
                 </video>
 
                 <div class="absolute inset-0 bg-blue-900/40"></div>
 
                 <a href="{{ route('orang_tua.laporan.create') }}"
-                    class="absolute bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
+                    class="absolute bottom-4 right-4 sm:bottom-5 sm:right-5 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
                     title="Buat Laporan Baru">
-                    <i data-feather="plus" class="w-6 h-6"></i>
+                    <i data-feather="plus" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </a>
             </div>
         </div>

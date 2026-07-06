@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
     <title>@yield('title', 'Lapor Bu!!')</title>
@@ -33,7 +33,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 9px 12px;
+            padding: 11px 12px;
             border-radius: 10px;
             font-size: 13.5px;
             font-weight: 500;
@@ -73,6 +73,18 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
         }
+
+        /* ---- Penyesuaian khusus mobile ---- */
+        @media (max-width: 1023px) {
+            #sidebar {
+                width: min(78vw, 260px);
+            }
+
+            /* aman dari notch / status bar HP */
+            header.mobile-topbar {
+                padding-top: calc(0.75rem + env(safe-area-inset-top));
+            }
+        }
     </style>
 </head>
 
@@ -90,9 +102,18 @@
             style="background:#1d4ed8;">
 
             {{-- Logo full width --}}
-            <div class="flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.15);">
-                <img src="{{ asset('asset/logo.png') }}" alt="Logo" class="w-full object-contain p-4"
-                    style="max-height:100px;">
+            <div class="flex-shrink-0 flex items-center justify-between"
+                style="border-bottom:1px solid rgba(255,255,255,0.15);">
+                <img src="{{ asset('asset/logo.png') }}" alt="Logo" class="w-full object-contain p-3 lg:p-4"
+                    style="max-height:80px;">
+
+                {{-- Tombol tutup, hanya tampil di mobile --}}
+                <button onclick="closeSidebar()" class="lg:hidden text-white/70 p-2 mr-2 flex-shrink-0"
+                    aria-label="Tutup menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             {{-- Nav --}}
@@ -176,16 +197,16 @@
         <div class="flex-1 flex flex-col lg:ml-60">
 
             {{-- Topbar mobile --}}
-            <header class="lg:hidden sticky top-0 z-10 px-4 py-3 flex items-center gap-3 shadow-sm"
+            <header class="mobile-topbar lg:hidden sticky top-0 z-10 px-4 pb-3 flex items-center gap-3 shadow-sm"
                 style="background:#1d4ed8;">
 
-                <button onclick="openSidebar()" class="text-white p-1 -ml-1">
+                <button onclick="openSidebar()" class="text-white p-2 -ml-2 flex-shrink-0" aria-label="Buka menu">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
 
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     @php
                         $hour = now('Asia/Jakarta')->hour;
 
@@ -197,11 +218,11 @@
                         };
                     @endphp
 
-                    <h1 class="font-semibold text-white text-sm">
+                    <h1 class="font-semibold text-white text-sm truncate">
                         {{ $greeting }}, {{ auth()->user()->name ?? 'Admin' }}
                     </h1>
 
-                    <p class="text-xs text-blue-100 mt-0.5">
+                    <p class="text-[11px] text-blue-100 mt-0.5 truncate">
                         {{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}
                         •
                         {{ now('Asia/Jakarta')->format('H:i') }} WIB
@@ -237,18 +258,18 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 @if (session('success'))
                     <div
-                        class="mb-5 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
-                        <i data-feather="check-circle" class="w-4 h-4 flex-shrink-0"></i>
+                        class="mb-4 sm:mb-5 flex items-start sm:items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-[13px] sm:text-sm">
+                        <i data-feather="check-circle" class="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0"></i>
                         {{ session('success') }}
                     </div>
                 @endif
                 @if (session('error'))
                     <div
-                        class="mb-5 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                        <i data-feather="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+                        class="mb-4 sm:mb-5 flex items-start sm:items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-[13px] sm:text-sm">
+                        <i data-feather="alert-circle" class="w-4 h-4 flex-shrink-0 mt-0.5 sm:mt-0"></i>
                         {{ session('error') }}
                     </div>
                 @endif
@@ -266,6 +287,7 @@
             s.classList.remove('-translate-x-full');
             o.classList.remove('hidden');
             setTimeout(() => o.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
         }
         function closeSidebar() {
             const s = document.getElementById('sidebar');
@@ -273,6 +295,7 @@
             s.classList.add('-translate-x-full');
             o.classList.add('opacity-0');
             setTimeout(() => o.classList.add('hidden'), 300);
+            document.body.style.overflow = '';
         }
     </script>
 
