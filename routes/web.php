@@ -34,6 +34,15 @@ use App\Http\Controllers\OrangTua\PerkembanganController;
 */
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return match (auth()->user()->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'bk' => redirect()->route('bk.dashboard'),
+            'orang_tua' => redirect()->route('orang_tua.dashboard'),
+            default => redirect()->route('login'),
+        };
+    }
+
     return redirect()->route('login');
 });
 
