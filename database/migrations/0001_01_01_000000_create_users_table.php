@@ -15,7 +15,11 @@ return new class extends Migration {
             $table->string('name');
             $table->string('username')->unique();
             $table->enum('role', ['admin', 'bk', 'orang_tua']);
+            $table->enum('status_akun', ['aktif', 'nonaktif'])->default('aktif');
+            $table->string('foto')->nullable();
+            $table->boolean('must_change_password')->default(false);
             $table->string('password');
+            $table->string('default_password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

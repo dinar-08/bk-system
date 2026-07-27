@@ -8,8 +8,11 @@ class Pemanggilan extends Model
 {
     protected $table = 'pemanggilan';
 
+    protected $primaryKey = 'pemanggilan_id';   // ← TAMBAHKAN INI
+
     protected $fillable = [
         'laporan_id',
+        'nip',
         'tanggal_pemanggilan',
         'waktu_pemanggilan',
         'pihak_dipanggil',
@@ -22,6 +25,11 @@ class Pemanggilan extends Model
 
     public function laporan()
     {
-        return $this->belongsTo(Laporan::class);
+        return $this->belongsTo(Laporan::class, 'laporan_id', 'laporan_id');
+    }
+
+    public function guruBk()
+    {
+        return $this->belongsTo(GuruBK::class, 'nip', 'nip');
     }
 }

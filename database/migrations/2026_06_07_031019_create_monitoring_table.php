@@ -13,27 +13,38 @@ return new class extends Migration {
         Schema::create('monitoring', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('laporan_id')
-                ->constrained('laporan')
+            $table->unsignedBigInteger('laporan_id');
+
+            $table->foreign('laporan_id')
+                ->references('laporan_id')
+                ->on('laporan')
                 ->cascadeOnDelete();
 
-            $table->foreignId('guru_bk_id')
-                ->constrained('guru_bk')
-                ->cascadeOnDelete();
+            $table->string('nip')->nullable();
+            $table->foreign('nip')
+                ->references('nip')->on('guru_bk')
+                ->nullOnDelete();
 
             $table->date('tanggal_monitoring');
+            $table->time('waktu_monitoring')->nullable();
+
+            $table->date('tanggal_monitoring_berikutnya')->nullable();
+            $table->time('waktu_monitoring_berikutnya')->nullable();
 
             $table->integer('monitoring_ke');
+
+            $table->enum('status_monitoring', [
+                'terjadwal',
+                'selesai',
+            ])->default('selesai');
 
             $table->enum('status_perkembangan', [
                 'membaik',
                 'stabil',
-                'menurun'
+                'menurun',
             ]);
 
             $table->text('catatan_perkembangan');
-
-            $table->text('tindak_lanjut');
 
             $table->timestamps();
         });

@@ -11,15 +11,15 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('siswa', function (Blueprint $table) {
-            $table->id();
+            $table->string('nis')->primary();
 
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->string('nis')->unique();
             $table->string('nama_siswa');
             $table->string('kelas');
+            $table->string('tahun_ajaran')->nullable();
 
             $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
 
@@ -30,6 +30,10 @@ return new class extends Migration {
             $table->string('nama_ortu')->nullable();
 
             $table->string('no_whatsapp')->nullable();
+
+            $table->string('foto')->nullable();
+
+            $table->timestamp('last_data_updated_at')->nullable();
 
             $table->timestamps();
         });

@@ -14,7 +14,7 @@ class PemanggilanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'laporan_id' => ['required', 'exists:laporan,id'],
+            'laporan_id' => ['required', 'exists:laporan,laporan_id'],
             'tanggal_pemanggilan' => ['required', 'date'],
             'waktu_pemanggilan' => ['required'],
             'pihak_dipanggil' => ['required', 'in:siswa,orang_tua,siswa_orang_tua'],
@@ -25,7 +25,7 @@ class PemanggilanController extends Controller
 
         $pemanggilan = Pemanggilan::create([
             'laporan_id' => $validated['laporan_id'],
-            'guru_bk_id' => $guruBk->id, // Fix B6: simpan guru BK
+            'nip' => $guruBk->nip, // Fix B6: simpan guru BK
             'tanggal_pemanggilan' => $validated['tanggal_pemanggilan'],
             'waktu_pemanggilan' => $validated['waktu_pemanggilan'],
             'pihak_dipanggil' => $validated['pihak_dipanggil'],
@@ -35,7 +35,7 @@ class PemanggilanController extends Controller
             'tanggal_monitoring' => null,
         ]);
 
-        Laporan::where('id', $validated['laporan_id'])->update(['status' => 'pemanggilan']);
+        Laporan::where('laporan_id', $validated['laporan_id'])->update(['status' => 'pemanggilan']);
 
         $pemanggilan->load('laporan.siswa.user');
         if ($pemanggilan->laporan?->siswa?->user) {
@@ -53,6 +53,7 @@ class PemanggilanController extends Controller
             'status_kehadiran' => ['required', 'in:belum,hadir,tidak_hadir'],
             'tindak_lanjut' => ['required', 'in:belum,monitoring,selesai'],
             'tanggal_monitoring' => ['nullable', 'date'],
+            'waktu_monitoring' => ['nullable', 'date_format:H:i'],
             'catatan' => ['nullable'],
         ]);
 
@@ -79,16 +80,16 @@ class PemanggilanController extends Controller
                 $laporan = $pemanggilan->laporan;
                 $laporan->update(['status' => 'monitoring']);
 
-                if (!Monitoring::where('laporan_id', $laporan->id)->where('monitoring_ke', 1)->exists()) {
+                if (!Monitoring::where('laporan_id', $laporan->laporan_id)->where('monitoring_ke', 1)->exists()) {
                     Monitoring::create([
-                        'laporan_id' => $laporan->id,
-                        'guru_bk_id' => $guruBk->id,
+                        'laporan_id' => $laporan->laporan_id,
+                        'nip' => $guruBk->nip,
                         'tanggal_monitoring' => $validated['tanggal_monitoring'],
+                        'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
                         'monitoring_ke' => 1,
                         'status_monitoring' => 'terjadwal',
                         'status_perkembangan' => 'stabil',
                         'catatan_perkembangan' => '-',
-                        'tindak_lanjut' => '-',
                         'tanggal_monitoring_berikutnya' => null,
                     ]);
                 }

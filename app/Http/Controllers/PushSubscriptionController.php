@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 
 class PushSubscriptionController extends Controller
 {
-    /**
-     * Simpan / perbarui subscription push browser milik user yang sedang login.
-     * Dipanggil dari JS setelah user mengizinkan notifikasi (Notification.requestPermission
-     * -> pushManager.subscribe) di layout.
-     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -24,6 +19,7 @@ class PushSubscriptionController extends Controller
             endpoint: $validated['endpoint'],
             key: $validated['keys']['p256dh'],
             token: $validated['keys']['auth'],
+            contentEncoding: 'aes128gcm',
         );
 
         return response()->json(['status' => 'ok']);

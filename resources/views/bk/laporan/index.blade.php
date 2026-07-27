@@ -46,7 +46,7 @@
                             <span class="w-1.5 h-1.5 rounded-full {{ $cfg['dot'] }} animate-pulse flex-shrink-0"></span>
                             {{ $cfg['label'] }}
                         </span>
-                        <span class="text-xs text-slate-400 font-mono flex-shrink-0">#{{ $item->id }}</span>
+                        <span class="text-xs text-slate-400 font-mono flex-shrink-0">#{{ $item->laporan_id }}</span>
                     </div>
                     <h3 class="font-bold text-slate-800 text-sm leading-snug mb-3 line-clamp-2">{{ $item->judul_laporan }}</h3>
                     <div class="space-y-1.5 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-5">
@@ -59,7 +59,7 @@
                             <span class="truncate">{{ ucfirst($item->kategori ?? '-') }}</span>
                         </div>
                     </div>
-                    <a href="{{ route('bk.laporan.show', $item->id) }}"
+                    <a href="{{ route('bk.laporan.show', $item->laporan_id) }}"
                         class="flex items-center justify-center gap-1.5 w-full py-2.5 sm:py-2 bg-blue-50 hover:bg-blue-700 active:bg-blue-800 text-blue-700 hover:text-white text-sm font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all duration-200">
                         Lihat Detail
                         <i data-feather="arrow-right" class="w-4 h-4"></i>
@@ -91,7 +91,7 @@
                             <span class="w-1.5 h-1.5 rounded-full {{ $cfg['dot'] }} flex-shrink-0"></span>
                             {{ $cfg['label'] }}
                         </span>
-                        <span class="text-xs text-slate-400 font-mono flex-shrink-0">#{{ $item->id }}</span>
+                        <span class="text-xs text-slate-400 font-mono flex-shrink-0">#{{ $item->laporan_id }}</span>
                     </div>
                     <h3 class="font-bold text-slate-800 text-sm leading-snug mb-3 line-clamp-2">{{ $item->judul_laporan }}</h3>
                     <div class="space-y-1.5 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-5">
@@ -104,7 +104,7 @@
                             <span class="truncate">{{ ucfirst($item->kategori ?? '-') }}</span>
                         </div>
                     </div>
-                    <a href="{{ route('bk.laporan.show', $item->id) }}"
+                    <a href="{{ route('bk.laporan.show', $item->laporan_id) }}"
                         class="flex items-center justify-center gap-1.5 w-full py-2.5 sm:py-2 bg-slate-50 hover:bg-blue-700 active:bg-blue-800 text-slate-600 hover:text-white text-sm font-semibold rounded-xl border border-slate-200 hover:border-blue-700 transition-all duration-200">
                         Lihat Detail
                         <i data-feather="arrow-right" class="w-4 h-4"></i>

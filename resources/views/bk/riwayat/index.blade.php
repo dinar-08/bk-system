@@ -29,11 +29,11 @@
     </div>
 
     <form id="filterRiwayat" method="GET" action="{{ route('bk.riwayat.index') }}"
-        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-7">
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4 mb-7">
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
 
-            <div>
+            <div class="col-span-2 sm:col-span-1">
                 <label for="filter-nama" class="text-xs font-medium text-slate-600 block mb-1">Nama Siswa</label>
                 <input type="text" id="filter-nama" name="nama" value="{{ request('nama') }}" placeholder="Cari nama..."
                     autocomplete="off"
@@ -68,14 +68,14 @@
 
             <div class="flex items-end gap-2">
                 <a href="{{ route('bk.riwayat.exportPdf', request()->query()) }}"
-                    class="flex-1 inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 rounded-xl transition">
-                    <i data-feather="download" class="w-4 h-4"></i>
+                    class="flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-medium py-2 rounded-xl transition">
+                    <i data-feather="download" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                     PDF
                 </a>
 
                 <a href="{{ route('bk.riwayat.index') }}"
-                    class="flex-1 inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium py-2 rounded-xl transition">
-                    <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                    class="flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs sm:text-sm font-medium py-2 rounded-xl transition">
+                    <i data-feather="refresh-cw" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                     Reset
                 </a>
             </div>
@@ -131,36 +131,44 @@
                         $foto = optional($siswa)->foto;
                     @endphp
 
-                    <a href="{{ route('bk.riwayat.show', $item->id) }}"
-                        class="block rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 active:scale-[0.98] transition-transform">
+                    <a href="{{ route('bk.riwayat.show', $item->laporan_id) }}"
+                        class="block rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-sm active:scale-[0.98] transition-transform">
 
-                        <div class="relative h-32 w-full bg-center bg-cover">
-                            @if(optional($siswa)->foto)
-                                <img src="{{ route('foto.siswa', $siswa->id) }}"alt="{{ $nama }}"
-                                class="absolute inset-0 w-full h-full object-cover">
+                        <div class="relative h-28 w-full bg-center bg-cover bg-slate-100">
+                            @if($foto)
+                                <img src="{{ route('foto.siswa', $siswa->nis) }}" alt="{{ $nama }}"
+                                    class="absolute inset-0 w-full h-full object-cover"
+                                    onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+
+                                <div
+                                    class="hidden absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                    <span class="text-white/40 text-3xl font-extrabold">
+                                        {{ strtoupper(substr($nama, 0, 1)) }}
+                                    </span>
+                                </div>
                             @else
                                 <div
-                                class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
-                                <span class="text-white/30 text-4xl font-extrabold">
-                                {{ strtoupper(substr($nama, 0, 1)) }}
-                                </span>
+                                    class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                    <span class="text-white/40 text-3xl font-extrabold">
+                                        {{ strtoupper(substr($nama, 0, 1)) }}
+                                    </span>
                                 </div>
                             @endif
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
                             <span
-                                class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $statusBadgeMobile }} bg-white/90">
+                                class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $statusBadgeMobile }} bg-white shadow-sm">
                                 {{ $statusLabel }}
                             </span>
-                            <p class="absolute left-2 bottom-2 right-2 text-white text-xs font-bold leading-tight line-clamp-2">
+                            <p class="absolute left-2.5 bottom-2 right-2.5 text-white text-xs font-bold leading-tight line-clamp-2 drop-shadow">
                                 {{ $nama }}
                             </p>
                         </div>
 
-                        <div class="p-2.5">
-                            <p class="text-[11px] text-slate-500">
+                        <div class="p-3">
+                            <p class="text-[11px] text-slate-400 font-medium">
                                 Kelas {{ optional($siswa)->kelas ?? '-' }}
                             </p>
-                            <p class="text-xs text-slate-700 font-medium line-clamp-2 mt-0.5">
+                            <p class="text-xs text-slate-700 font-semibold line-clamp-2 mt-1 leading-snug">
                                 {{ $item->judul_laporan ?? $item->jenis_masalah ?? '-' }}
                             </p>
                         </div>
@@ -171,39 +179,54 @@
             {{-- DESKTOP: strip kartu dengan efek hover melebar --}}
             <div class="hidden md:flex flex-row flex-nowrap overflow-x-auto pb-3">
                 @foreach($dataPreview as $item)
-                        @php
-                            $status = $item->status ?? '-';
+                    @php
+                        $status = $item->status ?? '-';
 
-                            $statusBadge = $status === 'selesai'
-                                ? 'bg-green-400/20 text-green-200 border border-green-300/30'
-                                : 'bg-red-400/20 text-red-200 border border-red-300/30';
+                        $statusBadge = $status === 'selesai'
+                            ? 'bg-green-400/20 text-green-200 border border-green-300/30'
+                            : 'bg-red-400/20 text-red-200 border border-red-300/30';
 
-                            $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
+                        $statusLabel = $status === 'selesai' ? 'Selesai' : 'Dirujuk';
 
-                            $siswa = $item->siswa;
-                            $nama = optional($siswa)->nama_siswa ?? '-';
-                            $foto = optional($siswa)->foto;
-                        @endphp
+                        $siswa = $item->siswa;
+                        $nama = optional($siswa)->nama_siswa ?? '-';
+                        $foto = optional($siswa)->foto;
+                    @endphp
 
-                        @if(optional($siswa)->foto)
-                            <img src="{{ route('foto.siswa', $siswa->id) }}" alt="{{ $nama }}"
-                                class="absolute inset-0 w-full h-full object-cover">
+                    <div class="group relative shrink-0 h-[330px] border-r-4 border-white bg-center overflow-hidden transition-all duration-500 ease-out cursor-pointer"
+                        style="width: 58px;" onmouseenter="this.style.width='284px'" onmouseleave="this.style.width='58px'">
+
+                        {{-- Background foto / fallback --}}
+                        @if($foto)
+                            <img src="{{ route('foto.siswa', $siswa->nis) }}" alt="{{ $nama }}"
+                                class="absolute inset-0 w-full h-full object-cover"
+                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+
+                            <div
+                                class="hidden absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
+                                <span class="text-white/60 text-8xl font-extrabold">
+                                    {{ strtoupper(substr($nama, 0, 1)) }}
+                                </span>
+                            </div>
                         @else
                             <div
                                 class="absolute inset-0 bg-gradient-to-b from-blue-500 via-blue-700 to-blue-950 flex items-center justify-center">
-                                <span class="text-white/20 text-8xl font-extrabold">
+                                <span class="text-white/60 text-8xl font-extrabold">
                                     {{ strtoupper(substr($nama, 0, 1)) }}
                                 </span>
                             </div>
                         @endif
 
+                        {{-- Overlay --}}
                         <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-black/25 to-black/90"></div>
 
+                        {{-- Nama vertikal saat card kecil --}}
                         <p class="absolute left-4 bottom-4 max-w-[250px] text-white text-xs font-extrabold tracking-[2px] uppercase whitespace-nowrap transition-all duration-300 group-hover:opacity-0"
                             style="transform: rotate(-90deg); transform-origin: left bottom;">
                             {{ $nama }}
                         </p>
 
+                        {{-- Detail saat hover --}}
                         <div
                             class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div>
@@ -230,7 +253,7 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('bk.riwayat.show', $item->id) }}"
+                            <a href="{{ route('bk.riwayat.show', $item->laporan_id) }}"
                                 class="block w-full bg-white text-slate-900 rounded-xl py-3 text-center font-semibold hover:bg-slate-50 transition-colors">
                                 Lihat Detail Permasalahan
                             </a>
@@ -251,7 +274,6 @@
             const formFilter = document.getElementById('filterRiwayat');
             let timer;
 
-            // Input teks: submit otomatis setelah berhenti mengetik (debounce).
             document.querySelectorAll('.filter-input-text').forEach(function (input) {
                 input.addEventListener('input', function () {
                     clearTimeout(timer);
@@ -261,8 +283,6 @@
                 });
             });
 
-            // Select: submit langsung saat dipilih, tanpa debounce.
-            // (sengaja tidak dipasangi listener 'input' juga, agar tidak submit dua kali)
             document.querySelectorAll('.filter-input-select').forEach(function (select) {
                 select.addEventListener('change', function () {
                     clearTimeout(timer);

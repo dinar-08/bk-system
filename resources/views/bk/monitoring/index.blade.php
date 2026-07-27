@@ -31,7 +31,7 @@
         <div
             class="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0 lg:overflow-visible scrollbar-hide">
             <button type="submit" name="kategori" value="semua" class="shrink-0 h-9 lg:h-11 px-4 lg:px-5 text-xs lg:text-sm font-semibold rounded-full transition whitespace-nowrap
-                            {{ $kategoriAktif === 'semua'
+                                {{ $kategoriAktif === 'semua'
         ? 'bg-blue-600 text-white shadow-sm'
         : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                 Semua
@@ -39,7 +39,7 @@
 
             @foreach($kategoriConfig as $key => $cfg)
                 <button type="submit" name="kategori" value="{{ $key }}" class="shrink-0 h-9 lg:h-11 px-4 lg:px-5 text-xs lg:text-sm font-semibold rounded-full transition whitespace-nowrap
-                                            {{ $kategoriAktif === $key
+                                                    {{ $kategoriAktif === $key
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600' }}">
                     {{ $cfg['label'] }}
@@ -171,7 +171,7 @@
                     </div>
 
                     {{-- Tombol --}}
-                    <a href="{{ route('bk.monitoring.show', $item->id) }}"
+                    <a href="{{ route('bk.monitoring.show', $item->laporan_id) }}"
                         class="relative shrink-0 inline-flex items-center justify-center w-9 h-9 lg:w-[140px] lg:h-10 rounded-full border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-500 overflow-hidden group/button uppercase mt-0.5 lg:mt-0">
 
                         <span

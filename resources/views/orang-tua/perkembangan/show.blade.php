@@ -40,7 +40,7 @@
                     <div
                         class="w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3.5 sm:mb-4">
                         @if($laporan->siswa->foto)
-                            <img src="{{ asset('storage/' . $laporan->siswa->foto) }}" class="w-full h-full object-cover"
+                            <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}" class="w-full h-full object-cover"
                                 alt="Foto Siswa">
                         @else
                             <i data-feather="user" class="w-10 h-10 text-blue-200"></i>
@@ -76,7 +76,7 @@
                         </div>
 
                         @if($laporan->bukti)
-                            <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                            <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
                                 class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-bold hover:bg-blue-800 transition">
                                 <i data-feather="paperclip" class="w-4 h-4"></i>
                                 Lihat Bukti
@@ -96,8 +96,12 @@
                     <div>
                         <p class="font-semibold text-blue-700 text-sm">Jadwal Monitoring Berikutnya</p>
                         <p class="text-blue-600 text-sm mt-0.5">
-                            Monitoring ke-{{ $monitoringTerjadwal->monitoring_ke }} pada tanggal
-                            <span class="font-bold">{{ $monitoringTerjadwal->tanggal_monitoring }}</span>
+                            Monitoring ke-{{ $monitoringTerjadwal->monitoring_ke }} pada
+                            <span
+                                class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->tanggal_monitoring)->translatedFormat('d F Y') }}</span>
+                            pukul
+                            <span
+                                class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->waktu_monitoring)->format('H:i') }}</span>
                         </p>
                     </div>
                 </div>
@@ -169,9 +173,9 @@
                                 <p class="text-xs text-slate-400 mt-1.5">{{ $item->tanggal_monitoring }}</p>
                             </div>
                             <span class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold
-                                                            @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
-                                                            @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
-                                                            @else bg-red-100 text-red-700 @endif">
+                                                                            @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
+                                                                            @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
+                                                                            @else bg-red-100 text-red-700 @endif">
                                 {{ ucfirst($item->status_perkembangan) }}
                             </span>
                         </div>

@@ -34,7 +34,7 @@
             <p class="text-sm text-slate-500 mt-0.5">Kosongkan password jika tidak ingin mengubahnya.</p>
         </div>
 
-        <form action="{{ route('admin.guru-bk.update', $guruBk->id) }}" method="POST">
+        <form action="{{ route('admin.guru-bk.update', $guruBk->nip) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -62,6 +62,26 @@
                     <input type="password" name="password"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
                     <p class="text-xs text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah password.</p>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto</label>
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-16 h-16 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            @if($guruBk->foto)
+                                <img src="{{ route('foto.guru-bk', $guruBk->nip) }}" class="w-full h-full object-cover"
+                                    alt="Foto {{ $guruBk->nama }}">
+                            @else
+                                <span
+                                    class="text-blue-700 font-bold text-lg">{{ strtoupper(substr($guruBk->nama, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" name="foto" accept="image/*"
+                                class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 focus:border-blue-500 focus:ring-blue-500">
+                            <p class="text-xs text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah foto.</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat</label>

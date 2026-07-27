@@ -19,22 +19,26 @@
             <p class="text-sm text-slate-500 mt-0.5">Isi semua data dengan lengkap dan benar.</p>
         </div>
 
-        <form action="{{ route('bk.laporan.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('bk.laporan.store') }}" method="POST" enctype="multipart/form-data" id="formLaporan">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
 
                 {{-- Cari Siswa --}}
-                <div>
+                <div class="relative">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Siswa</label>
 
                     <input type="text" id="nama_siswa" autocomplete="off" placeholder="contoh: Dinar"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        value="{{ old('nama_siswa') }}"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-                    <input type="hidden" name="siswa_id" id="siswa_id" value="{{ old('siswa_id') }}">
+                    <input type="hidden" name="nis" id="nis" value="{{ old('nis') }}">
 
-                    <div id="hasil_siswa" class="mt-2 space-y-2"></div>
+                    {{-- Dropdown autocomplete: menyatu langsung dengan input, tanpa celah --}}
+                    <div id="hasil_siswa"
+                        class="hidden absolute left-0 right-0 top-full -mt-px z-20 bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-lg overflow-hidden">
+                    </div>
 
-                    @error('siswa_id')
+                    @error('nis')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -44,10 +48,10 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kelas</label>
 
                     <select id="kelas_siswa"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
                         <option value="">Pilih kelas</option>
                         @foreach($siswa->pluck('kelas')->unique()->sort() as $k)
-                            <option value="{{ $k }}">{{ $k }}</option>
+                            <option value="{{ $k }}" {{ old('kelas_siswa') == $k ? 'selected' : '' }}>{{ $k }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -59,7 +63,7 @@
                     </label>
 
                     <select name="kategori" id="kategori" required
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('kategori') border-red-300 @enderror">
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('kategori') border-red-300 @enderror">
 
                         <option value="">Pilih kategori</option>
 
@@ -80,7 +84,7 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jenis Masalah</label>
                     <input type="text" name="jenis_masalah" value="{{ old('jenis_masalah') }}"
                         placeholder="Contoh: Bolos, bertengkar, terlambat"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('jenis_masalah') border-red-300 @enderror">
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('jenis_masalah') border-red-300 @enderror">
                     @error('jenis_masalah')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
@@ -89,7 +93,7 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Laporan</label>
                     <input type="text" name="judul_laporan" value="{{ old('judul_laporan') }}"
                         placeholder="Contoh: Laporan Perilaku Siswa"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('judul_laporan') border-red-300 @enderror">
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('judul_laporan') border-red-300 @enderror">
                     @error('judul_laporan')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
@@ -98,7 +102,7 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deskripsi Laporan</label>
                     <textarea name="deskripsi" rows="5"
                         placeholder="Tuliskan deskripsi permasalahan siswa secara lengkap..."
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none @error('deskripsi') border-red-300 @enderror">{{ old('deskripsi') }}</textarea>
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none @error('deskripsi') border-red-300 @enderror">{{ old('deskripsi') }}</textarea>
                     @error('deskripsi')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
@@ -122,11 +126,13 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <div
+                class="mt-6 pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3
+                                            sticky bottom-0 -mx-4 sm:mx-0 px-4 sm:px-0 pb-4 sm:pb-0 bg-white sm:bg-transparent sm:static">
                 <a href="{{ route('bk.laporan.index') }}"
-                    class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors text-center w-full sm:w-auto">Batal</a>
+                    class="px-5 py-3 sm:py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors text-center w-full sm:w-auto">Batal</a>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors w-full sm:w-auto">Simpan
+                    class="px-5 py-3 sm:py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors w-full sm:w-auto">Simpan
                     Laporan</button>
             </div>
         </form>
@@ -136,55 +142,98 @@
         const siswaData = @json($siswa);
         const namaInput = document.getElementById('nama_siswa');
         const kelasSelect = document.getElementById('kelas_siswa');
-        const siswaIdInput = document.getElementById('siswa_id');
+        const siswaIdInput = document.getElementById('nis');
         const hasilSiswa = document.getElementById('hasil_siswa');
+        const formLaporan = document.getElementById('formLaporan');
 
+        function tutupDropdown() {
+            hasilSiswa.innerHTML = '';
+            hasilSiswa.classList.add('hidden');
+            namaInput.classList.remove('rounded-b-none');
+        }
+
+        function bukaDropdown() {
+            hasilSiswa.classList.remove('hidden');
+            namaInput.classList.add('rounded-b-none');
+        }
+
+        function pilihSiswa(siswa) {
+            namaInput.value = siswa.nama_siswa;
+            siswaIdInput.value = siswa.nis;
+
+            // Jika kelas sebelumnya kosong, isi otomatis sesuai data siswa yang dipilih.
+            // Jika kelas sudah dipilih sebelumnya, biarkan (hasil pencarian memang sudah difilter ke kelas itu).
+            if (!kelasSelect.value) {
+                kelasSelect.value = siswa.kelas;
+            }
+
+            tutupDropdown();
+        }
+
+        // Pencarian bisa dimulai dari field mana saja (nama atau kelas), tanpa urutan tertentu.
         function cariSiswa() {
             const nama = namaInput.value.toLowerCase().trim();
             const kelas = kelasSelect.value;
 
             siswaIdInput.value = '';
-            hasilSiswa.innerHTML = '';
+            tutupDropdown();
 
-            if (nama.length < 2 || kelas === '') return;
+            // nama belum diketik / terlalu pendek -> diam saja
+            if (nama.length < 2) return;
 
-            const hasil = siswaData.filter(item =>
-                item.kelas === kelas &&
-                item.nama_siswa.toLowerCase().includes(nama)
-            );
+            let hasil;
+
+            if (kelas === '') {
+                // Skenario 2: kelas belum dipilih -> cari di seluruh siswa/kelas
+                hasil = siswaData.filter(item =>
+                    item.nama_siswa.toLowerCase().includes(nama)
+                );
+            } else {
+                // Skenario 1: kelas sudah dipilih -> cari hanya di kelas tersebut
+                hasil = siswaData.filter(item =>
+                    item.kelas === kelas &&
+                    item.nama_siswa.toLowerCase().includes(nama)
+                );
+            }
 
             if (hasil.length === 0) {
-                hasilSiswa.innerHTML = `<p class="text-xs text-red-500">Siswa tidak ditemukan.</p>`;
+                hasilSiswa.innerHTML = `
+                        <div class="px-4 py-3 text-xs text-red-500">
+                            ${kelas === '' ? 'Siswa tidak ditemukan.' : 'Siswa tidak ditemukan di kelas ini.'}
+                        </div>`;
+                bukaDropdown();
                 return;
             }
+
+            // cocok ke 1 siswa saja -> nama, NIS, dan kelas otomatis terisi, dropdown tidak perlu tampil
             if (hasil.length === 1) {
-                const siswa = hasil[0];
-
-                namaInput.value = siswa.nama_siswa;
-                siswaIdInput.value = siswa.id;
-
-                hasilSiswa.innerHTML = '';
-
+                pilihSiswa(hasil[0]);
                 return;
             }
 
-            hasil.forEach(siswa => {
+            // ada beberapa hasil -> tampilkan sebagai satu dropdown menyatu (mirip Google), baris dipisah garis tipis
+            hasil.forEach((siswa, idx) => {
                 const item = document.createElement('button');
                 item.type = 'button';
-                item.className = 'w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-blue-50 text-sm';
+                item.className = 'w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left text-sm hover:bg-blue-50 active:bg-blue-100 transition-colors'
+                    + (idx !== hasil.length - 1 ? ' border-b border-slate-100' : '');
+
+                // NIS tidak ditampilkan di layar, tapi tetap tersimpan lewat objek siswa saat dipilih.
+                // Kelas tetap ditampilkan sebagai pembeda hanya kalau pencarian lintas kelas (kelas belum dipilih).
+                const identitas = kelas === '' ? `Kelas ${siswa.kelas}` : '';
 
                 item.innerHTML = `
-                <p class="font-semibold text-slate-700">${siswa.nama_siswa}</p>
-            `;
+                                        <span class="font-medium text-slate-700 truncate">${siswa.nama_siswa}</span>
+                                        ${identitas ? `<span class="text-xs text-slate-400 flex-shrink-0">${identitas}</span>` : ''}
+                                    `;
 
                 item.onclick = function () {
-                    namaInput.value = siswa.nama_siswa;
-                    siswaIdInput.value = siswa.id;
-
-                    hasilSiswa.innerHTML = '';
+                    pilihSiswa(siswa);
                 };
                 hasilSiswa.appendChild(item);
             });
+
+            bukaDropdown();
         }
 
         function previewBukti(input) {
@@ -208,8 +257,26 @@
             }
         }
 
+        // pencarian dipicu baik saat mengetik nama maupun saat kelas berubah
         namaInput.addEventListener('input', cariSiswa);
         kelasSelect.addEventListener('change', cariSiswa);
+
+        // tutup dropdown kalau user klik di luar area input/dropdown
+        document.addEventListener('click', function (e) {
+            if (!namaInput.contains(e.target) && !hasilSiswa.contains(e.target)) {
+                tutupDropdown();
+            }
+        });
+
+        // cegah submit kalau siswa belum benar-benar dipilih dari daftar
+        formLaporan.addEventListener('submit', function (e) {
+            if (!siswaIdInput.value) {
+                e.preventDefault();
+                hasilSiswa.innerHTML = `<div class="px-4 py-3 text-xs text-red-500">Silakan pilih siswa dari daftar terlebih dahulu.</div>`;
+                bukaDropdown();
+                namaInput.focus();
+            }
+        });
     </script>
 
 @endsection

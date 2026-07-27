@@ -24,10 +24,10 @@ class MonitoringBaruNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'laporan_id' => $this->laporan->id,
+            'laporan_id' => $this->laporan->laporan_id,
             'judul' => 'Monitoring Baru',
             'pesan' => "Ada update monitoring baru untuk laporan: {$this->laporan->judul_laporan}",
-            'url' => route('orang_tua.perkembangan.show', $this->laporan->id),
+            'url' => route('orang_tua.perkembangan.show', $this->laporan->laporan_id),
         ];
     }
 
@@ -38,6 +38,6 @@ class MonitoringBaruNotification extends Notification
             ->icon('/asset/logo.png')
             ->body("Ada update monitoring baru untuk laporan: {$this->laporan->judul_laporan}")
             ->action('Lihat Detail', 'lihat')
-            ->data(['url' => route('orang_tua.perkembangan.show', $this->laporan->id)]);
+            ->data(['url' => route('orang_tua.perkembangan.show', $this->laporan->laporan_id)]);
     }
 }

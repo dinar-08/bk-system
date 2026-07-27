@@ -77,7 +77,7 @@
                 {{-- FOTO --}}
                 <div class="flex justify-center">
                     <img src="{{ $laporan->siswa->foto
-        ? route('foto.siswa', $laporan->siswa->id)
+        ? route('foto.siswa', $laporan->siswa->nis)
         : asset('asset/default-user.png') }}"
                         class="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl object-cover border border-slate-200 shadow-sm">
                 </div>
@@ -177,7 +177,7 @@
 
                 @if($laporan->bukti)
                     <div class="md:col-span-2">
-                        <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                        <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-bold hover:bg-blue-800 transition">
                             <i data-feather="paperclip" class="w-4 h-4"></i>
                             Lihat Bukti
@@ -268,13 +268,13 @@
                             </div>
 
                             <span class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-bold
-                                                                @if($item->status_perkembangan == 'membaik')
-                                                                    bg-green-50 text-green-700 border border-green-200
-                                                                @elseif($item->status_perkembangan == 'stabil')
-                                                                    bg-blue-50 text-blue-700 border border-blue-200
-                                                                @else
-                                                                    bg-red-50 text-red-700 border border-red-200
-                                                                @endif">
+                                                                        @if($item->status_perkembangan == 'membaik')
+                                                                            bg-green-50 text-green-700 border border-green-200
+                                                                        @elseif($item->status_perkembangan == 'stabil')
+                                                                            bg-blue-50 text-blue-700 border border-blue-200
+                                                                        @else
+                                                                            bg-red-50 text-red-700 border border-red-200
+                                                                        @endif">
                                 {{ ucfirst($item->status_perkembangan) }}
                             </span>
                         </div>

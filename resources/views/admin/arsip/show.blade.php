@@ -39,7 +39,7 @@
 
         {{-- Header --}}
         <div class="px-5 sm:px-6 py-4 border-b border-slate-100 flex justify-end">
-            <form action="{{ route('admin.siswa.destroy', $siswa->id) }}" method="POST">
+            <form action="{{ route('admin.siswa.destroy', $siswa->nis) }}" method="POST">
                 @csrf
                 @method('DELETE')
 
@@ -56,7 +56,7 @@
             <div class="flex flex-col lg:flex-row gap-5 lg:items-center">
                 <div class="w-24 h-24 rounded-3xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
                     @if($siswa->foto)
-                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_siswa }}"
+                        <img src="{{ route('foto.siswa', $siswa->nis) }}" alt="{{ $siswa->nama_siswa }}"
                             class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center text-5xl font-extrabold text-slate-300">
@@ -124,7 +124,7 @@
                 @php
                     $tanggalMulai = $laporan->created_at;
                     $tanggalSelesai = $laporan->evaluasi?->created_at ?? $laporan->evaluasi?->tanggal_evaluasi ?? null;
-                    $detailId = 'detail-laporan-' . $laporan->id;
+                    $detailId = 'detail-laporan-' . $laporan->laporan_id;
                     $status = $laporan->status ?? 'baru';
                     $kategori = $laporan->kategori ?? 'lain-lain';
                 @endphp
@@ -211,7 +211,7 @@
                                 @forelse($laporan->pemanggilan as $item)
                                     <div class="bg-white border border-slate-100 rounded-2xl p-4 mb-2">
                                         <p class="text-sm font-bold text-slate-700">
-                                            {{ \Carbon\Carbon::parse($item->tanggal_panggilan)->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($item->tanggal_pemanggilan)->format('d M Y') }}
                                         </p>
                                         <p class="text-xs text-slate-500 mt-1">
                                             Kehadiran:

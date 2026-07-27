@@ -10,7 +10,7 @@ class Evaluasi extends Model
 
     protected $fillable = [
         'laporan_id',
-        'guru_bk_id',
+        'nip',
         'tanggal_evaluasi',
         'hasil_evaluasi',
         'status_akhir',
@@ -23,6 +23,6 @@ class Evaluasi extends Model
 
     public function guruBk()
     {
-        return $this->belongsTo(GuruBK::class, 'guru_bk_id');
+        return $this->belongsTo(GuruBK::class, 'nip', 'nip');
     }
 }

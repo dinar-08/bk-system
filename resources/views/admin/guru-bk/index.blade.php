@@ -23,10 +23,10 @@
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-200">
                 <tr>
+                    <th class="px-5 py-4 text-left font-semibold text-slate-600">Foto</th>
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">Nama</th>
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">NIP</th>
-                    <th class="px-5 py-4 text-left font-semibold text-slate-600">No HP</th>
-                    <th class="px-5 py-4 text-left font-semibold text-slate-600">Username</th>
+                    <th class="px-5 py-4 text-left font-semibold text-slate-600">Nomor WA</th>
                     <th class="px-5 py-4 text-left font-semibold text-slate-600">Alamat</th>
                     <th class="px-5 py-4 text-center font-semibold text-slate-600">Aksi</th>
                 </tr>
@@ -35,21 +35,24 @@
                 @forelse($guruBk as $item)
                     <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                         <td class="px-5 py-4">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
-                                    {{ strtoupper(substr($item->nama, 0, 1)) }}
-                                </div>
-                                <span class="font-medium text-slate-800">{{ $item->nama }}</span>
+                            <div class="w-14 h-14 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
+                                @if($item->foto)
+                                    <img src="{{ route('foto.guru-bk', $item->nip) }}" class="w-full h-full object-cover"
+                                        alt="Foto {{ $item->nama }}">
+                                @else
+                                    <span class="text-blue-700 font-bold text-sm">{{ strtoupper(substr($item->nama, 0, 1)) }}</span>
+                                @endif
                             </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <span class="font-medium text-slate-800">{{ $item->nama }}</span>
                         </td>
                         <td class="px-5 py-4 text-slate-600">{{ $item->nip }}</td>
                         <td class="px-5 py-4 text-slate-600">{{ $item->no_hp }}</td>
-                        <td class="px-5 py-4 text-slate-600">{{ $item->user->username ?? '-' }}</td>
                         <td class="px-5 py-4 text-slate-600">{{ $item->alamat }}</td>
                         <td class="px-5 py-4">
                             <div class="flex items-center justify-center gap-2">
-                                <a href="{{ route('admin.guru-bk.edit', $item->id) }}"
+                                <a href="{{ route('admin.guru-bk.edit', $item->nip) }}"
                                     class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold hover:bg-blue-100 transition-colors">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
                                         viewBox="0 0 24 24">
@@ -58,7 +61,7 @@
                                     </svg>
                                     Edit
                                 </a>
-                                <form action="{{ route('admin.guru-bk.destroy', $item->id) }}" method="POST" class="inline">
+                                <form action="{{ route('admin.guru-bk.destroy', $item->nip) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button onclick="return confirm('Hapus data Guru BK ini?')"
@@ -76,7 +79,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-5 py-14 text-center">
+                        <td colspan="6" class="px-5 py-14 text-center">
                             <svg class="w-10 h-10 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor"
                                 stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"

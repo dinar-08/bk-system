@@ -27,7 +27,7 @@ class JadwalPemanggilanNotification extends Notification
         $laporan = $this->pemanggilan->laporan;
 
         return [
-            'laporan_id' => $laporan->id,
+            'laporan_id' => $laporan->laporan_id,
             'judul' => 'Jadwal Pemanggilan Baru',
             'pesan' => "Anak Anda ({$laporan->siswa->nama_siswa}) dijadwalkan dipanggil pada {$this->tanggalFormat()} pukul {$this->waktuFormat()} terkait laporan: {$laporan->judul_laporan}",
             'url' => route('orang_tua.laporan.index'),

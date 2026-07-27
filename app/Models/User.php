@@ -15,6 +15,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasPushSubscriptions;
 
     /**
+     * Jumlah percobaan login gagal berturut-turut sebelum akun
+     * ditampilkan sebagai "terkunci" di halaman login.
+     */
+    public const MAX_FAILED_LOGIN_ATTEMPTS = 3;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -28,6 +34,7 @@ class User extends Authenticatable
         'must_change_password',
         'password',
         'default_password',
+        'failed_login_attempts',
     ];
 
     /**
@@ -63,6 +70,35 @@ class User extends Authenticatable
     public function siswa()
     {
         return $this->hasOne(Siswa::class);
+    }
+
+    /**
+     * Akun dianggap terkunci setelah gagal login berturut-turut
+     * sebanyak MAX_FAILED_LOGIN_ATTEMPTS kali. Statusnya otomatis
+     * lepas begitu username + password yang benar berhasil dicocokkan
+     * (lihat resetFailedLoginAttempts()) — tidak ada jeda waktu.
+     */
+    public function isLoginLocked(): bool
+    {
+        return $this->failed_login_attempts >= self::MAX_FAILED_LOGIN_ATTEMPTS;
+    }
+
+    /**
+     * Dipanggil setiap kali percobaan login untuk akun ini gagal.
+     */
+    public function incrementFailedLoginAttempts(): void
+    {
+        $this->increment('failed_login_attempts');
+    }
+
+    /**
+     * Dipanggil setiap kali login untuk akun ini berhasil.
+     */
+    public function resetFailedLoginAttempts(): void
+    {
+        if ($this->failed_login_attempts !== 0) {
+            $this->update(['failed_login_attempts' => 0]);
+        }
     }
 
 }

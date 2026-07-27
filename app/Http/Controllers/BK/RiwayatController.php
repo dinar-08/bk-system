@@ -30,7 +30,7 @@ class RiwayatController extends Controller
     public function index(Request $request)
     {
         $laporan = $this->queryRiwayat($request)
-            ->join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+            ->join('siswa', 'laporan.nis', '=', 'siswa.nis')
             ->orderBy('siswa.kelas')
             ->orderBy('siswa.nis')
             ->select('laporan.*')

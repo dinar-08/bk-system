@@ -29,8 +29,8 @@
     $photoUrl = null;
     if ($photo) {
         $photoUrl = match (true) {
-            $role === 'orang_tua' && $dataProfil => route('foto.siswa', $dataProfil->id),
-            $role === 'bk' && $dataProfil        => route('foto.guru-bk', $dataProfil->id),
+            $role === 'orang_tua' && $dataProfil => route('foto.siswa', $dataProfil->nis),
+            $role === 'bk' && $dataProfil        => route('foto.guru-bk', $dataProfil->nip),
             default                              => route('foto.user', $user->id),
         };
     }

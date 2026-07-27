@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.siswa.update', $siswa->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.siswa.update', $siswa->nis) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -43,7 +43,7 @@
                     <div
                         class="w-24 h-24 rounded-2xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3 shadow-sm">
                         @if($siswa->foto)
-                            <img src="{{ asset('storage/' . $siswa->foto) }}" class="w-full h-full object-cover"
+                            <img src="{{ route('foto.siswa', $siswa->nis) }}" class="w-full h-full object-cover"
                                 alt="Foto Siswa">
                         @else
                             <i data-feather="user" class="w-8 h-8 text-blue-200"></i>

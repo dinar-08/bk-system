@@ -44,7 +44,7 @@
 
                     <div class="w-28 h-28 sm:w-32 sm:h-32 mx-auto lg:mx-0 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
-                            <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
+                            <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
                         @else
                             <div class="text-center">
@@ -80,7 +80,7 @@
 
                 @if($laporan->status === 'baru')
                     {{-- BELUM DIVERIFIKASI: kategori & jenis masalah jadi form --}}
-                    <form action="{{ route('bk.laporan.update', $laporan->id) }}" method="POST" class="space-y-3">
+                    <form action="{{ route('bk.laporan.update', $laporan->laporan_id) }}" method="POST" class="space-y-3">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="status" value="pemanggilan">
@@ -116,7 +116,7 @@
                         <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
                             <p class="text-xs text-slate-400 mb-0.5">Lampiran</p>
                             @if($laporan->bukti)
-                                <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                                <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
                                     class="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1">
                                     <i data-feather="paperclip" class="w-3 h-3"></i>
                                     Lihat Bukti
@@ -166,7 +166,7 @@
                         <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
                             <p class="text-xs text-slate-400 mb-0.5">Lampiran</p>
                             @if($laporan->bukti)
-                                <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                                <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
                                     class="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1">
                                     <i data-feather="paperclip" class="w-3 h-3"></i>
                                     Lihat Bukti
@@ -188,8 +188,15 @@
 
         {{-- JADWAL PEMANGGILAN --}}
         @php
+            // Workaround: query manual langsung ke tabel pemanggilan berdasarkan laporan_id,
+            // karena relasi Eloquent $laporan->pemanggilan salah menebak nama foreign key
+            // (primary key custom 'laporan_id' membuat Laravel nebak 'laporan_laporan_id').
+            $daftarPemanggilan = \App\Models\Pemanggilan::where('laporan_id', $laporan->laporan_id)
+                ->orderByDesc('created_at')
+                ->get();
+
             // Ambil data pemanggilan paling terakhir (berdasarkan waktu dibuat)
-            $pemanggilanTerakhir = $laporan->pemanggilan->sortByDesc('created_at')->first();
+            $pemanggilanTerakhir = $daftarPemanggilan->first();
 
             // Perlu dijadwalkan ulang jika pemanggilan terakhir statusnya "Tidak Hadir"
             // dan tindak lanjutnya belum "selesai"
@@ -198,7 +205,7 @@
                 && $pemanggilanTerakhir->tindak_lanjut !== 'selesai';
 
             // Tampilkan form jika: belum ada pemanggilan sama sekali, ATAU perlu dijadwalkan ulang
-            $tampilkanFormJadwal = $laporan->pemanggilan->isEmpty() || $perluJadwalUlang;
+            $tampilkanFormJadwal = $daftarPemanggilan->isEmpty() || $perluJadwalUlang;
         @endphp
 
         @if($laporan->status === 'pemanggilan' && $tampilkanFormJadwal)
@@ -206,7 +213,7 @@
                 <div class="flex items-center gap-2 mb-5 pb-4 border-b border-slate-100">
                     <i data-feather="phone" class="w-4 h-4 text-blue-600"></i>
                     <h2 class="text-sm font-bold text-slate-700">
-                        {{ $laporan->pemanggilan->isEmpty() ? 'Jadwalkan Pemanggilan' : 'Jadwalkan Pemanggilan Ulang' }}
+                        {{ $daftarPemanggilan->isEmpty() ? 'Jadwalkan Pemanggilan' : 'Jadwalkan Pemanggilan Ulang' }}
                     </h2>
                 </div>
 
@@ -221,7 +228,7 @@
 
                 <form action="{{ route('bk.pemanggilan.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="laporan_id" value="{{ $laporan->id }}">
+                    <input type="hidden" name="laporan_id" value="{{ $laporan->laporan_id }}">
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -261,7 +268,7 @@
                         <button type="submit"
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900">
                             <i data-feather="calendar" class="w-4 h-4"></i>
-                            {{ $laporan->pemanggilan->isEmpty() ? 'Simpan Jadwal Pemanggilan' : 'Simpan Jadwal Pemanggilan Ulang' }}
+                            {{ $daftarPemanggilan->isEmpty() ? 'Simpan Jadwal Pemanggilan' : 'Simpan Jadwal Pemanggilan Ulang' }}
                         </button>
                     </div>
                 </form>
@@ -276,11 +283,11 @@
             </div>
 
             <div class="space-y-4">
-                @forelse($laporan->pemanggilan->sortByDesc('created_at') as $index => $item)
+                @forelse($daftarPemanggilan as $index => $item)
                     <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
                         <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
                             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                Pemanggilan ke-{{ $laporan->pemanggilan->count() - $index }}
+                                Pemanggilan ke-{{ $daftarPemanggilan->count() - $index }}
                             </span>
                             @if($item->status_kehadiran === 'tidak_hadir')
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold whitespace-nowrap">
@@ -319,14 +326,14 @@
                         @endif
 
                         @if($item->status_kehadiran === 'belum')
-                            <form action="{{ route('bk.pemanggilan.update', $item->id) }}" method="POST"
-                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <form action="{{ route('bk.pemanggilan.update', $item->pemanggilan_id) }}" method="POST"
+                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 @csrf
                                 @method('PUT')
 
                                 <div>
-                                    <label for="status_kehadiran_{{ $item->id }}" class="block text-xs text-slate-400 mb-1">Status Kehadiran</label>
-                                    <select id="status_kehadiran_{{ $item->id }}" name="status_kehadiran"
+                                    <label for="status_kehadiran_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Status Kehadiran</label>
+                                    <select id="status_kehadiran_{{ $item->pemanggilan_id }}" name="status_kehadiran"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->status_kehadiran == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="hadir" {{ $item->status_kehadiran == 'hadir' ? 'selected' : '' }}>Hadir</option>
@@ -335,8 +342,8 @@
                                 </div>
 
                                 <div>
-                                    <label for="tindak_lanjut_{{ $item->id }}" class="block text-xs text-slate-400 mb-1">Tindak Lanjut</label>
-                                    <select id="tindak_lanjut_{{ $item->id }}" name="tindak_lanjut"
+                                    <label for="tindak_lanjut_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tindak Lanjut</label>
+                                    <select id="tindak_lanjut_{{ $item->pemanggilan_id }}" name="tindak_lanjut"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->tindak_lanjut == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="monitoring" {{ $item->tindak_lanjut == 'monitoring' ? 'selected' : '' }}>Lanjut Monitoring</option>
@@ -345,15 +352,22 @@
                                 </div>
 
                                 <div>
-                                    <label for="tanggal_monitoring_{{ $item->id }}" class="block text-xs text-slate-400 mb-1">Tanggal Monitoring</label>
-                                    <input type="date" id="tanggal_monitoring_{{ $item->id }}" name="tanggal_monitoring"
+                                    <label for="tanggal_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tanggal Monitoring</label>
+                                    <input type="date" id="tanggal_monitoring_{{ $item->pemanggilan_id }}" name="tanggal_monitoring"
                                         value="{{ old('tanggal_monitoring', $item->tanggal_monitoring) }}"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
                                 <div>
-                                    <label for="catatan_{{ $item->id }}" class="block text-xs text-slate-400 mb-1">Catatan</label>
-                                    <input type="text" id="catatan_{{ $item->id }}" name="catatan"
+                                    <label for="waktu_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Jam Monitoring</label>
+                                    <input type="time" id="waktu_monitoring_{{ $item->pemanggilan_id }}" name="waktu_monitoring" step="60"
+                                        value="{{ old('waktu_monitoring') }}"
+                                        class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
+                                </div>
+
+                                <div>
+                                    <label for="catatan_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Catatan</label>
+                                    <input type="text" id="catatan_{{ $item->pemanggilan_id }}" name="catatan"
                                         value="{{ old('catatan', $item->catatan) }}"
                                         placeholder="Catatan"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
@@ -384,7 +398,7 @@
                                         . "Mohon hadir tepat waktu. Terima kasih.";
                                 @endphp
 
-                                <div class="sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row flex-wrap justify-end gap-3">
+                                <div class="sm:col-span-2 lg:col-span-3 flex flex-col sm:flex-row flex-wrap justify-end gap-3">
                                     @if($nomorWa)
                                         <a href="https://wa.me/{{ $nomorWa }}?text={{ urlencode($pesan) }}"
                                             target="_blank"

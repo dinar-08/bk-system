@@ -11,16 +11,16 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('guru_bk', function (Blueprint $table) {
-            $table->id();
+            $table->string('nip')->primary();
 
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->string('nama');
-            $table->string('nip')->unique();
-            $table->string('no_hp');
+            $table->string('no_hp')->nullable();
             $table->text('alamat')->nullable();
+            $table->string('foto')->nullable();
 
             $table->timestamps();
         });

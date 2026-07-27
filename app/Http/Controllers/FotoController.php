@@ -10,13 +10,19 @@ use Illuminate\Support\Facades\Storage;
 
 class FotoController extends Controller
 {
-    // Bukti laporan kasus: admin & BK boleh lihat semua, orang tua cuma bukti kasus anaknya sendiri
+    // Bukti laporan kasus: BK hanya boleh lihat laporan yang dia tangani sendiri (dicocokkan via nip),
+    // orang tua cuma bukti kasus anaknya sendiri.
+    // Admin sengaja TIDAK diberi akses karena bukti bersifat sensitif/privat.
     public function bukti(Laporan $laporan)
     {
         $user = auth()->user();
         $siswa = $laporan->siswa;
 
-        $boleh = in_array($user->role, ['admin', 'bk'])
+        $guruBk = $user->role === 'bk'
+            ? GuruBK::where('user_id', $user->id)->first()
+            : null;
+
+        $boleh = ($guruBk && $laporan->nip === $guruBk->nip)
             || ($user->role === 'orang_tua' && $siswa && $siswa->user_id === $user->id);
 
         abort_unless($boleh, 403, 'Anda tidak punya akses ke file ini.');

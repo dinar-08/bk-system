@@ -37,7 +37,7 @@
                 @foreach($dataSiswa as $item)
                     <div class="relative rounded-2xl overflow-hidden min-h-[230px] bg-slate-800 shadow-sm">
                         @if($item->foto)
-                            <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_siswa }}"
+                            <img src="{{ route('foto.siswa', $item->nis) }}" alt="{{ $item->nama_siswa }}"
                                 class="absolute inset-0 w-full h-full object-cover opacity-70">
                         @else
                             <div
@@ -52,12 +52,12 @@
 
                         <div class="relative z-10 p-4 min-h-[230px] flex flex-col justify-between">
                             <div class="flex justify-end gap-2">
-                                <a href="{{ route('admin.arsip.show', $item->id) }}" title="Lihat Arsip"
+                                <a href="{{ route('admin.arsip.show', $item->nis) }}" title="Lihat Arsip"
                                     class="w-9 h-9 rounded-full bg-white/90 text-slate-700 flex items-center justify-center hover:bg-slate-800 hover:text-white transition">
                                     <i data-feather="eye" class="w-4 h-4"></i>
                                 </a>
 
-                                <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST">
+                                <form action="{{ route('admin.siswa.destroy', $item->nis) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
 
@@ -118,12 +118,12 @@
                         <div
                             class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div class="flex justify-end gap-2">
-                                <a href="{{ route('admin.arsip.show', $item->id) }}" title="Lihat Arsip"
+                                <a href="{{ route('admin.arsip.show', $item->nis) }}" title="Lihat Arsip"
                                     class="w-10 h-10 rounded-full bg-white/90 text-slate-700 flex items-center justify-center hover:bg-slate-800 hover:text-white transition">
                                     <i data-feather="eye" class="w-4 h-4"></i>
                                 </a>
 
-                                <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST">
+                                <form action="{{ route('admin.siswa.destroy', $item->nis) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
 

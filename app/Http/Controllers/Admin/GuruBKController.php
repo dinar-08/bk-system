@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class GuruBKController extends Controller
 {
@@ -30,10 +31,20 @@ class GuruBKController extends Controller
             'nip' => ['required', 'string', 'max:50', 'unique:guru_bk,nip', 'unique:users,username'],
             'no_hp' => ['required', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+            ],
+            'foto' => ['nullable', 'image', 'max:2048'],
+        ], [
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated, $request) {
             $user = User::create([
                 'name' => $validated['nama'],
                 'username' => $validated['nip'],
@@ -41,12 +52,17 @@ class GuruBKController extends Controller
                 'password' => Hash::make($validated['password']),
             ]);
 
+            $fotoPath = $request->hasFile('foto')
+                ? $request->file('foto')->store('guru-bk', 'local')
+                : null;
+
             GuruBK::create([
                 'user_id' => $user->id,
                 'nama' => $validated['nama'],
                 'nip' => $validated['nip'],
                 'no_hp' => $validated['no_hp'],
                 'alamat' => $validated['alamat'] ?? null,
+                'foto' => $fotoPath,
             ]);
         });
 
@@ -75,19 +91,37 @@ class GuruBKController extends Controller
 
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:150'],
-            'nip' => ['required', 'string', 'max:50', 'unique:guru_bk,nip,' . $guruBk->id, 'unique:users,username,' . $guruBk->user_id],
+            'nip' => ['required', 'string', 'max:50', 'unique:guru_bk,nip,' . $guruBk->nip . ',nip', 'unique:users,username,' . $guruBk->user_id],
             'no_hp' => ['required', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+            ],
+            'foto' => ['nullable', 'image', 'max:2048'],
+        ], [
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
         ]);
 
-        DB::transaction(function () use ($guruBk, $validated) {
-            $guruBk->update([
+        DB::transaction(function () use ($guruBk, $validated, $request) {
+            $dataUpdate = [
                 'nama' => $validated['nama'],
                 'nip' => $validated['nip'],
                 'no_hp' => $validated['no_hp'],
                 'alamat' => $validated['alamat'] ?? null,
-            ]);
+            ];
+
+            if ($request->hasFile('foto')) {
+                if ($guruBk->foto && Storage::disk('local')->exists($guruBk->foto)) {
+                    Storage::disk('local')->delete($guruBk->foto);
+                }
+                $dataUpdate['foto'] = $request->file('foto')->store('guru-bk', 'local');
+            }
+
+            $guruBk->update($dataUpdate);
 
             $userData = [
                 'name' => $validated['nama'],
@@ -109,6 +143,10 @@ class GuruBKController extends Controller
     public function destroy(string $id)
     {
         $guruBk = GuruBK::with('user')->findOrFail($id);
+
+        if ($guruBk->foto && Storage::disk('local')->exists($guruBk->foto)) {
+            Storage::disk('local')->delete($guruBk->foto);
+        }
 
         if ($guruBk->user) {
             $guruBk->user->delete();

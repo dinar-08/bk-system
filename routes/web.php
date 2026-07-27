@@ -175,12 +175,8 @@ Route::middleware(['auth', 'role:bk', 'must.change.password'])->group(function (
     Route::get('/bk/riwayat/export/pdf', [RiwayatController::class, 'exportPdf'])
         ->name('bk.riwayat.exportPdf');
 
-    Route::get('/admin/import-siswa/download-hasil', [ImportSiswaController::class, 'downloadHasil'])
-        ->name('admin.import-siswa.download-hasil');
-
     Route::get('/bk/riwayat/{id}/download', [RiwayatController::class, 'downloadKasus'])
         ->name('bk.download.kasus');
-
 
     Route::get('/bk/download/semua-pdf', [DownloadController::class, 'downloadSemuaPdf'])
         ->name('bk.download.semua-pdf');

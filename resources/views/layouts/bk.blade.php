@@ -19,6 +19,9 @@
 
         #sidebar {
             transition: transform 0.3s ease;
+            /* fallback dulu untuk browser lama, baru dioverride dvh di bawah */
+            height: 100vh;
+            height: 100dvh;
         }
 
         #overlay {
@@ -62,6 +65,12 @@
             padding: 18px 12px 6px;
         }
 
+        /* Footer sidebar (tombol Keluar) selalu diberi jarak aman
+           dari gesture bar / home indicator HP supaya tidak ketiban. */
+        #sidebar-footer {
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+        }
+
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -94,7 +103,7 @@
 
         {{-- SIDEBAR --}}
         <aside id="sidebar"
-            class="fixed left-0 top-0 h-screen w-[80%] max-w-[260px] lg:w-60 flex flex-col z-30 -translate-x-full lg:translate-x-0 shadow-lg"
+            class="fixed left-0 top-0 w-[80%] max-w-[260px] lg:w-60 flex flex-col z-30 -translate-x-full lg:translate-x-0 shadow-lg lg:h-screen"
             style="background:#1d4ed8;">
 
             {{-- Logo + tombol close (mobile) --}}
@@ -111,7 +120,7 @@
             </div>
 
             {{-- Nav --}}
-            <nav class="flex-1 px-3 py-3 overflow-y-auto">
+            <nav class="flex-1 min-h-0 px-3 py-3 overflow-y-auto">
                 <p class="nav-section">Menu</p>
                 <a href="{{ route('bk.dashboard') }}"
                     class="nav-link {{ request()->routeIs('bk.dashboard') ? 'active' : '' }}">
@@ -164,7 +173,7 @@
             </nav>
 
             {{-- Footer --}}
-            <div class="p-3" style="border-top:1px solid rgba(255,255,255,0.15);">
+            <div id="sidebar-footer" class="flex-shrink-0 p-3" style="border-top:1px solid rgba(255,255,255,0.15);">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"

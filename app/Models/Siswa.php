@@ -8,19 +8,23 @@ class Siswa extends Model
 {
     protected $table = 'siswa';
 
+    protected $primaryKey = 'nis';
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
-        'user_id',
         'nis',
+        'user_id',
         'nama_siswa',
+        'kelas',
+        'tahun_ajaran',
         'jenis_kelamin',
         'tanggal_lahir',
         'alamat',
-        'kelas',
         'nama_ortu',
         'no_whatsapp',
         'foto',
         'last_data_updated_at',
-        'tahun_ajaran',
     ];
 
     protected $casts = [
@@ -35,7 +39,7 @@ class Siswa extends Model
 
     public function laporan()
     {
-        return $this->hasMany(Laporan::class);
+        return $this->hasMany(Laporan::class, 'nis', 'nis');
     }
 
     public function sudahUpdateDiPeriode(PeriodeUpdate $periode): bool

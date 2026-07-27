@@ -11,15 +11,16 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('laporan', function (Blueprint $table) {
-            $table->id();
+            $table->id('laporan_id');
 
-            $table->foreignId('siswa_id')
-                ->constrained('siswa')
+            $table->string('nis');
+            $table->foreign('nis')
+                ->references('nis')->on('siswa')
                 ->cascadeOnDelete();
 
-            $table->foreignId('guru_bk_id')
-                ->nullable()
-                ->constrained('guru_bk')
+            $table->string('nip')->nullable();
+            $table->foreign('nip')
+                ->references('nip')->on('guru_bk')
                 ->nullOnDelete();
 
             $table->string('judul_laporan');
@@ -29,7 +30,7 @@ return new class extends Migration {
                 'sosial',
                 'perilaku',
                 'emosional',
-                'lain-lain'
+                'lain-lain',
             ])->nullable();
 
             $table->string('jenis_masalah')->nullable();
@@ -42,7 +43,8 @@ return new class extends Migration {
                 'baru',
                 'pemanggilan',
                 'monitoring',
-                'selesai'
+                'selesai',
+                'dirujuk',
             ])->default('baru');
 
             $table->timestamps();

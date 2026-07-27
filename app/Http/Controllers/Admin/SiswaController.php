@@ -113,7 +113,7 @@ class SiswaController extends Controller
                 'required',
                 'string',
                 'max:50',
-                'unique:siswa,nis,' . $siswa->id,
+                'unique:siswa,nis,' . $siswa->nis . ',nis',
                 'unique:users,username,' . $siswa->user_id,
             ],
             'nama_siswa' => ['required', 'string', 'max:150'],
@@ -193,9 +193,9 @@ class SiswaController extends Controller
             ->where('kelas', $validated['kelas'])
             ->get();
 
-        $siswaIds = $siswaDikelas->pluck('id');
+        $siswaIds = $siswaDikelas->pluck('nis');
 
-        $kasusAktif = Laporan::whereIn('siswa_id', $siswaIds)
+        $kasusAktif = Laporan::whereIn('nis', $siswaIds)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->with('siswa')
             ->get();

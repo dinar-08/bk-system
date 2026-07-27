@@ -116,7 +116,7 @@
                             <div
                                 class="w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 bg-blue-50 border border-slate-100">
                                 @if(optional($laporan->siswa)->foto)
-                                    <img src="{{ route('foto.siswa', $laporan->siswa->id) }}" class="w-full h-full object-cover"
+                                    <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}" class="w-full h-full object-cover"
                                         alt="Foto Siswa">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-blue-50">

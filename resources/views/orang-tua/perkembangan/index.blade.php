@@ -54,7 +54,7 @@
                 $tanggalLaporan = $item->created_at->format('d M Y');
 
                 $jadwalMonitoring = $tanggalMonitoring
-                    ? \Carbon\Carbon::parse($tanggalMonitoring)->format('d M Y')
+                    ? \Carbon\Carbon::parse($tanggalMonitoring)->format('d M Y') . ' pukul ' . \Carbon\Carbon::parse($monitoringTerbaru?->waktu_monitoring)->format('H:i')
                     : null;
             @endphp
 
@@ -70,7 +70,7 @@
                     </span>
                 </div>
 
-                <a href="{{ route('orang_tua.perkembangan.show', $item->id) }}" class="group block">
+                <a href="{{ route('orang_tua.perkembangan.show', $item->laporan_id) }}" class="group block">
                     <h3
                         class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                         {{ $item->judul_laporan }}
@@ -98,7 +98,7 @@
                     {{ $perkembanganLabel }}
                 </p>
 
-                <a href="{{ route('orang_tua.perkembangan.show', $item->id) }}"
+                <a href="{{ route('orang_tua.perkembangan.show', $item->laporan_id) }}"
                     class="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-900 mt-3 transition">
                     Lihat Selengkapnya
                     <i data-feather="arrow-right" class="w-4 h-4"></i>

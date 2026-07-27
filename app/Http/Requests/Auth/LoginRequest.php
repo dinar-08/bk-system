@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests\Auth;
 
-use Illuminate\Auth\Events\Lockout;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
@@ -36,51 +34,38 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * Akun dikunci (secara tampilan/pesan) setelah gagal login
+     * berturut-turut sebanyak User::MAX_FAILED_LOGIN_ATTEMPTS kali.
+     * Tidak ada jeda waktu — begitu username & password yang benar
+     * dimasukkan, counter langsung direset dan login berhasil seperti biasa.
+     *
      * @throws ValidationException
      */
     public function authenticate(): void
     {
-        $this->ensureIsNotRateLimited();
+        $user = User::where('username', $this->string('username'))->first();
 
-        if (!Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        if (Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
+            // Login berhasil -> lepas status terkunci akun ini.
+            $user?->resetFailedLoginAttempts();
 
-            throw ValidationException::withMessages([
-                'username' => trans('auth.failed'),
-            ]);
-        }
-
-        RateLimiter::clear($this->throttleKey());
-    }
-
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws ValidationException
-     */
-    public function ensureIsNotRateLimited(): void
-    {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
-        event(new Lockout($this));
+        // Login gagal. Kalau username-nya memang terdaftar, tambah counter
+        // gagalnya. Kalau username tidak ditemukan, tidak ada apa pun yang
+        // perlu dihitung (tidak ada akun yang bisa "dikunci").
+        $user?->incrementFailedLoginAttempts();
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        if ($user && $user->isLoginLocked()) {
+            throw ValidationException::withMessages([
+                'username' => 'Akun terkunci karena 3x salah memasukkan username/password. '
+                    . 'Silakan masukkan username dan password yang benar untuk membuka kembali.',
+            ]);
+        }
 
         throw ValidationException::withMessages([
-            'username' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'username' => 'Username atau password tidak sesuai.',
         ]);
-    }
-
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
-    public function throttleKey(): string
-    {
-        return Str::transliterate(Str::lower($this->string('username')) . '|' . $this->ip());
     }
 }

@@ -26,7 +26,7 @@ class LaporanController extends Controller
 
     public function create()
     {
-        $siswa = Siswa::select('id', 'nama_siswa', 'nis', 'kelas')
+        $siswa = Siswa::select('nis', 'nama_siswa', 'kelas')
             ->orderBy('nama_siswa')
             ->get();
 
@@ -40,7 +40,7 @@ class LaporanController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $validated = $request->validate([
-            'siswa_id' => ['required', 'exists:siswa,id'],
+            'nis' => ['required', 'exists:siswa,nis'],
             'judul_laporan' => ['required', 'string', 'max:150'],
             'kategori' => ['required', 'in:' . implode(',', self::KATEGORI)],
             'jenis_masalah' => ['required', 'string', 'max:150'],
@@ -55,8 +55,8 @@ class LaporanController extends Controller
         }
 
         $laporan = Laporan::create([
-            'siswa_id' => $validated['siswa_id'],
-            'guru_bk_id' => $guruBk->id,
+            'nis' => $validated['nis'],
+            'nip' => $guruBk->nip,
             'judul_laporan' => $validated['judul_laporan'],
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
@@ -102,15 +102,15 @@ class LaporanController extends Controller
         ]);
 
         $laporan->update([
-            'guru_bk_id' => $guruBk->id,
+            'nip' => $guruBk->nip,
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
             'status' => 'pemanggilan',
         ]);
 
         Pemanggilan::create([
-            'laporan_id' => $laporan->id,
-            'guru_bk_id' => $guruBk->id,
+            'laporan_id' => $laporan->laporan_id,
+            'nip' => $guruBk->nip,
             'tanggal_pemanggilan' => $validated['tanggal_pemanggilan'],
             'waktu_pemanggilan' => $validated['waktu_pemanggilan'],
             'pihak_dipanggil' => $validated['pihak_dipanggil'],
@@ -121,7 +121,7 @@ class LaporanController extends Controller
         ]);
 
         return redirect()
-            ->route('bk.laporan.show', $laporan->id)
+            ->route('bk.laporan.show', $laporan->laporan_id)
             ->with('success', 'Detail laporan dan jadwal pemanggilan berhasil disimpan.');
     }
 
@@ -146,14 +146,14 @@ class LaporanController extends Controller
         ]);
 
         $laporan->update([
-            'guru_bk_id' => $guruBk->id,
+            'nip' => $guruBk->nip,
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
             'status' => $validated['status'],
         ]);
 
         return redirect()
-            ->route('bk.laporan.show', $laporan->id)
+            ->route('bk.laporan.show', $laporan->laporan_id)
             ->with('success', 'Laporan berhasil diperbarui.');
     }
 

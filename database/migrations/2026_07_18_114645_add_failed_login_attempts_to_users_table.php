@@ -11,16 +11,19 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('status_akun', ['aktif', 'nonaktif'])
-                ->default('aktif')
-                ->after('role');
+            // Menghitung percobaan login gagal berturut-turut.
+            // Direset ke 0 setiap kali login berhasil.
+            $table->unsignedTinyInteger('failed_login_attempts')->default(0)->after('must_change_password');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('status_akun');
+            $table->dropColumn('failed_login_attempts');
         });
     }
 };

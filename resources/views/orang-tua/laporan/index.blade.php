@@ -95,7 +95,7 @@
                         </span>
                     </div>
 
-                    <a href="{{ route('orang_tua.laporan.show', $l->id) }}" class="group block">
+                    <a href="{{ route('orang_tua.laporan.show', $l->laporan_id) }}" class="group block">
                         <h3
                             class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                             {{ $l->judul_laporan }}
@@ -113,7 +113,7 @@
                         {{ $l->deskripsi }}
                     </p>
 
-                    <a href="{{ route('orang_tua.laporan.show', $l->id) }}"
+                    <a href="{{ route('orang_tua.laporan.show', $l->laporan_id) }}"
                         class="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-900 mt-3 transition">
                         Lihat Selengkapnya
                         <i data-feather="arrow-right" class="w-4 h-4"></i>
@@ -149,7 +149,7 @@
                         </span>
                     </div>
 
-                    <a href="{{ route('orang_tua.laporan.show', $l->id) }}" class="group block">
+                    <a href="{{ route('orang_tua.laporan.show', $l->laporan_id) }}" class="group block">
                         <h3
                             class="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-blue-700 transition">
                             {{ $l->judul_laporan }}
@@ -160,7 +160,7 @@
                         {{ $l->deskripsi }}
                     </p>
 
-                    <a href="{{ route('orang_tua.laporan.show', $l->id) }}"
+                    <a href="{{ route('orang_tua.laporan.show', $l->laporan_id) }}"
                         class="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-900 mt-3 transition">
                         Lihat Selengkapnya
                         <i data-feather="arrow-right" class="w-4 h-4"></i>

@@ -49,7 +49,7 @@
                     <div
                         class="w-full h-28 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
-                            <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
+                            <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
                                 class="w-full h-full object-cover" alt="Foto Siswa">
                         @else
                             <div class="text-center">
@@ -135,8 +135,8 @@
                 <form action="{{ route('bk.monitoring.store') }}" method="POST">
                     @csrf
 
-                    <input type="hidden" name="laporan_id" value="{{ $laporan->id }}">
-                    <input type="hidden" name="monitoring_id" value="{{ $monitoringTerjadwal->id }}">
+                    <input type="hidden" name="laporan_id" value="{{ $laporan->laporan_id }}">
+                    <input type="hidden" name="monitoring_id" value="{{ $monitoringTerjadwal->monitoring_id }}">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -202,7 +202,7 @@
                         </p>
                     </div>
 
-                    <a href="{{ route('bk.evaluasi.show', $laporan->id) }}"
+                    <a href="{{ route('bk.evaluasi.show', $laporan->laporan_id) }}"
                         class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors w-full md:w-auto">
                         <i data-feather="check-square" class="w-4 h-4"></i>
                         Lanjut Evaluasi

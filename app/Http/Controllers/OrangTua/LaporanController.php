@@ -19,18 +19,18 @@ class LaporanController extends Controller
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
         $laporanAktif = Laporan::with(['siswa', 'guruBk'])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->latest()
             ->get();
 
         $laporanRiwayat = Laporan::with(['siswa', 'guruBk'])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->whereIn('status', ['selesai', 'dirujuk'])
             ->latest()
             ->get();
 
-        $adaLaporanBerjalan = Laporan::where('siswa_id', $siswa->id)
+        $adaLaporanBerjalan = Laporan::where('nis', $siswa->nis)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
 
@@ -48,7 +48,7 @@ class LaporanController extends Controller
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
-        $kasusAktif = Laporan::where('siswa_id', $siswa->id)
+        $kasusAktif = Laporan::where('nis', $siswa->nis)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
 
@@ -64,7 +64,7 @@ class LaporanController extends Controller
     {
         $siswa = Siswa::where('user_id', auth()->id())->firstOrFail();
 
-        $kasusAktif = Laporan::where('siswa_id', $siswa->id)
+        $kasusAktif = Laporan::where('nis', $siswa->nis)
             ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
             ->exists();
 
@@ -93,8 +93,8 @@ class LaporanController extends Controller
         }
 
         $laporan = Laporan::create([
-            'siswa_id' => $siswa->id,
-            'guru_bk_id' => null,
+            'nis' => $siswa->nis,
+            'nip' => null,
             'judul_laporan' => $validated['judul_laporan'],
             'kategori' => null,
             'jenis_masalah' => null,
@@ -126,7 +126,7 @@ class LaporanController extends Controller
             'monitoring',
             'evaluasi',
         ])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->findOrFail($id);
 
         $this->tandaiNotifikasiLaporanDibaca();

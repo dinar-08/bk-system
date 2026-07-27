@@ -30,7 +30,7 @@ class EvaluasiController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $validated = $request->validate([
-            'laporan_id' => ['required', 'exists:laporan,id'],
+            'laporan_id' => ['required', 'exists:laporan,laporan_id'],
             'tanggal_evaluasi' => ['required', 'date'],
             'hasil_evaluasi' => ['required', 'string'],
             'status_akhir' => ['required', 'in:selesai,dirujuk'],
@@ -38,13 +38,13 @@ class EvaluasiController extends Controller
 
         Evaluasi::create([
             'laporan_id' => $validated['laporan_id'],
-            'guru_bk_id' => $guruBk->id,
+            'nip' => $guruBk->nip,
             'tanggal_evaluasi' => $validated['tanggal_evaluasi'],
             'hasil_evaluasi' => $validated['hasil_evaluasi'],
             'status_akhir' => $validated['status_akhir'],
         ]);
 
-        Laporan::where('id', $validated['laporan_id'])
+        Laporan::where('laporan_id', $validated['laporan_id'])
             ->update([
                 'status' => $validated['status_akhir'],
             ]);

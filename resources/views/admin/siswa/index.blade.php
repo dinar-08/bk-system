@@ -177,7 +177,7 @@
 
                         {{-- Background foto / fallback --}}
                         @if($item->foto)
-                            <img src="{{ route('foto.siswa', $item->id) }}" alt="{{ $item->nama_siswa }}"
+                            <img src="{{ route('foto.siswa', $item->nis) }}" alt="{{ $item->nama_siswa }}"
                                 class="absolute inset-0 w-full h-full object-cover"
                                 onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
 
@@ -209,12 +209,12 @@
                         <div
                             class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div class="flex justify-end gap-2">
-                                <a href="{{ route('admin.siswa.edit', $item->id) }}" title="Edit Data"
+                                <a href="{{ route('admin.siswa.edit', $item->nis) }}" title="Edit Data"
                                     class="w-10 h-10 rounded-full bg-white/90 text-blue-700 flex items-center justify-center hover:bg-blue-700 hover:text-white transition">
                                     <i data-feather="edit-2" class="w-4 h-4"></i>
                                 </a>
 
-                                <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST">
+                                <form action="{{ route('admin.siswa.destroy', $item->nis) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" title="Nonaktifkan"
@@ -400,7 +400,7 @@
             @if($errors->any())
                 openPeriodeModal();
             @endif
-                    });
+                        });
     </script>
 
 @endsection

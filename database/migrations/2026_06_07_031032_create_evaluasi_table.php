@@ -11,16 +11,19 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('evaluasi', function (Blueprint $table) {
-            $table->id();
+            $table->id('evaluasi_id');
 
-            $table->foreignId('laporan_id')
-                ->unique()
-                ->constrained('laporan')
+            $table->unsignedBigInteger('laporan_id')->unique();
+            $table->foreign('laporan_id')
+                ->references('laporan_id')
+                ->on('laporan')
                 ->cascadeOnDelete();
 
-            $table->foreignId('guru_bk_id')
-                ->constrained('guru_bk')
-                ->cascadeOnDelete();
+            $table->string('nip')->nullable();
+            $table->foreign('nip')
+                ->references('nip')
+                ->on('guru_bk')
+                ->nullOnDelete();
 
             $table->date('tanggal_evaluasi');
 
@@ -28,8 +31,7 @@ return new class extends Migration {
 
             $table->enum('status_akhir', [
                 'selesai',
-                'monitoring_lanjutan',
-                'saran_rujukan'
+                'dirujuk',
             ]);
 
             $table->timestamps();

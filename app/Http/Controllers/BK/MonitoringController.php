@@ -41,8 +41,8 @@ class MonitoringController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $validated = $request->validate([
-            'laporan_id' => ['required', 'exists:laporan,id'],
-            'monitoring_id' => ['nullable', 'exists:monitoring,id'],
+            'laporan_id' => ['required', 'exists:laporan,laporan_id'],
+            'monitoring_id' => ['nullable', 'exists:monitoring,monitoring_id'],
             'tanggal_monitoring' => ['required', 'date'],
             'waktu_monitoring' => ['nullable', 'date_format:H:i'],
             'tanggal_monitoring_berikutnya' => ['nullable', 'date'],
@@ -52,12 +52,12 @@ class MonitoringController extends Controller
         ]);
 
         if (!empty($validated['monitoring_id'])) {
-            $monitoring = Monitoring::where('id', $validated['monitoring_id'])
+            $monitoring = Monitoring::where('monitoring_id', $validated['monitoring_id'])
                 ->where('laporan_id', $validated['laporan_id'])
                 ->firstOrFail();
 
             $monitoring->update([
-                'guru_bk_id' => $guruBk->id,
+                'nip' => $guruBk->nip,
                 'tanggal_monitoring' => $validated['tanggal_monitoring'],
                 'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
                 'status_monitoring' => 'selesai',
@@ -68,7 +68,7 @@ class MonitoringController extends Controller
             ]);
 
             if ($request->filled('tanggal_monitoring_berikutnya')) {
-                $this->buatJadwalMonitoringBerikutnya($validated, $guruBk->id, $monitoring->monitoring_ke);
+                $this->buatJadwalMonitoringBerikutnya($validated, $guruBk->nip, $monitoring->monitoring_ke);
 
                 return back()->with('success', 'Hasil monitoring berhasil disimpan dan jadwal berikutnya sudah dibuat.');
             }
@@ -82,7 +82,7 @@ class MonitoringController extends Controller
 
         $monitoring = Monitoring::create([
             'laporan_id' => $validated['laporan_id'],
-            'guru_bk_id' => $guruBk->id,
+            'nip' => $guruBk->nip,
             'tanggal_monitoring' => $validated['tanggal_monitoring'],
             'waktu_monitoring' => $validated['waktu_monitoring'] ?? null,
             'monitoring_ke' => $monitoringKe,
@@ -93,10 +93,10 @@ class MonitoringController extends Controller
             'waktu_monitoring_berikutnya' => $validated['waktu_monitoring_berikutnya'] ?? null,
         ]);
 
-        Laporan::where('id', $validated['laporan_id'])
+        Laporan::where('laporan_id', $validated['laporan_id'])
             ->update([
                 'status' => 'monitoring',
-                'guru_bk_id' => $guruBk->id,
+                'nip' => $guruBk->nip,
             ]);
 
         $laporanUntukNotif = Laporan::with('siswa.user')->find($validated['laporan_id']);
@@ -105,7 +105,7 @@ class MonitoringController extends Controller
         }
 
         if ($request->filled('tanggal_monitoring_berikutnya')) {
-            $this->buatJadwalMonitoringBerikutnya($validated, $guruBk->id, $monitoring->monitoring_ke);
+            $this->buatJadwalMonitoringBerikutnya($validated, $guruBk->nip, $monitoring->monitoring_ke);
 
             return back()->with('success', 'Catatan monitoring berhasil ditambahkan dan jadwal berikutnya sudah dibuat.');
         }
@@ -139,7 +139,7 @@ class MonitoringController extends Controller
         ]);
 
         if ($request->filled('tanggal_monitoring_berikutnya')) {
-            $this->buatJadwalMonitoringBerikutnya($validated, $monitoring->guru_bk_id, $monitoring->monitoring_ke, $monitoring->laporan_id);
+            $this->buatJadwalMonitoringBerikutnya($validated, $monitoring->nip, $monitoring->monitoring_ke, $monitoring->laporan_id);
 
             return back()->with('success', 'Catatan monitoring berhasil diperbarui dan jadwal berikutnya sudah dibuat.');
         }
@@ -158,13 +158,13 @@ class MonitoringController extends Controller
 
     private function buatJadwalMonitoringBerikutnya(
         array $validated,
-        int $guruBkId,
+        string $guruBkId,
         int $monitoringKeSaatIni,
         ?int $laporanId = null
     ): Monitoring {
         return Monitoring::create([
             'laporan_id' => $laporanId ?? $validated['laporan_id'],
-            'guru_bk_id' => $guruBkId,
+            'nip' => $guruBkId,
             'tanggal_monitoring' => $validated['tanggal_monitoring_berikutnya'],
             'waktu_monitoring' => $validated['waktu_monitoring_berikutnya'] ?? null,
             'monitoring_ke' => $monitoringKeSaatIni + 1,

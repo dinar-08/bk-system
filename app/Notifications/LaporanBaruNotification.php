@@ -24,7 +24,7 @@ class LaporanBaruNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'laporan_id' => $this->laporan->id,
+            'laporan_id' => $this->laporan->laporan_id,
             'judul' => 'Laporan Baru',
             'pesan' => "Anak Anda ({$this->laporan->siswa->nama_siswa}) mendapat laporan baru: {$this->laporan->judul_laporan}",
             'url' => route('orang_tua.laporan.index'),

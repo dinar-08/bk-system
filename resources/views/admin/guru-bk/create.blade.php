@@ -34,10 +34,15 @@
             <p class="text-sm text-slate-500 mt-0.5">Isi seluruh data dengan benar.</p>
         </div>
 
-        <form action="{{ route('admin.guru-bk.store') }}" method="POST">
+        <form action="{{ route('admin.guru-bk.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto (opsional)</label>
+                    <input type="file" name="foto" accept="image/*"
+                        class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 focus:border-blue-500 focus:ring-blue-500">
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Guru BK</label>
                     <input type="text" name="nama" value="{{ old('nama') }}"
@@ -51,21 +56,21 @@
                         required>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor HP</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor WA</label>
                     <input type="text" name="no_hp" value="{{ old('no_hp') }}"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat</label>
+                    <textarea name="alamat" rows="3"
+                        class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('alamat') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
                     <input type="password" name="password"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat</label>
-                    <textarea name="alamat" rows="3"
-                        class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('alamat') }}</textarea>
                 </div>
             </div>
 

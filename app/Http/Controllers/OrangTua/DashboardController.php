@@ -20,7 +20,7 @@ class DashboardController extends Controller
             'monitoring',
             'evaluasi',
         ])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->latest()
             ->get();
 

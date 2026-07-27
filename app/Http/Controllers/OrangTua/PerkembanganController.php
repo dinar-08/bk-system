@@ -21,7 +21,7 @@ class PerkembanganController extends Controller
             'monitoring',
             'evaluasi',
         ])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->where('status', 'monitoring')
             ->latest()
             ->get();
@@ -45,7 +45,7 @@ class PerkembanganController extends Controller
             },
             'evaluasi',
         ])
-            ->where('siswa_id', $siswa->id)
+            ->where('nis', $siswa->nis)
             ->where('status', 'monitoring')
             ->findOrFail($id);
 

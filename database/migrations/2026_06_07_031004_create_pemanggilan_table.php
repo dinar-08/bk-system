@@ -11,11 +11,19 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('pemanggilan', function (Blueprint $table) {
-            $table->id();
+            $table->id('pemanggilan_id');
 
-            $table->foreignId('laporan_id')
-                ->constrained('laporan')
+            $table->unsignedBigInteger('laporan_id');
+            $table->foreign('laporan_id')
+                ->references('laporan_id')
+                ->on('laporan')
                 ->cascadeOnDelete();
+
+            $table->string('nip')->nullable();
+            $table->foreign('nip')
+                ->references('nip')
+                ->on('guru_bk')
+                ->nullOnDelete();
 
             $table->date('tanggal_pemanggilan');
 
@@ -24,7 +32,7 @@ return new class extends Migration {
             $table->enum('pihak_dipanggil', [
                 'siswa',
                 'orang_tua',
-                'siswa_orang_tua'
+                'siswa_orang_tua',
             ]);
 
             $table->text('tujuan');
@@ -32,13 +40,21 @@ return new class extends Migration {
             $table->enum('status_kehadiran', [
                 'belum',
                 'hadir',
-                'tidak_hadir'
+                'tidak_hadir',
             ])->default('belum');
+
+            $table->enum('tindak_lanjut', [
+                'belum',
+                'monitoring',
+                'selesai',
+            ])->default('belum');
+
+            $table->date('tanggal_monitoring')->nullable();
 
             $table->text('catatan')->nullable();
 
             $table->timestamps();
-        });
+        }); 
     }
 
     /**

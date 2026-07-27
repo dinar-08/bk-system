@@ -24,7 +24,7 @@ class EvaluasiBaruNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'laporan_id' => $this->laporan->id,
+            'laporan_id' => $this->laporan->laporan_id,
             'judul' => 'Evaluasi Selesai',
             'pesan' => "Evaluasi untuk laporan \"{$this->laporan->judul_laporan}\" sudah selesai.",
             'url' => route('orang_tua.laporan.index'),

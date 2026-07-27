@@ -29,7 +29,7 @@
             {{ ucfirst(str_replace('_', ' ', $statusAkhir)) }}
         </span>
 
-        <a href="{{ route('bk.download.kasus', $laporan->id) }}"
+        <a href="{{ route('bk.download.kasus', $laporan->laporan_id) }}"
             class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors flex-1 sm:flex-none">
             <i data-feather="download" class="w-4 h-4"></i>
             <span class="whitespace-nowrap">Download Permasalahan</span>
@@ -53,7 +53,7 @@
 
                 <div class="w-full h-28 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                     @if(optional($laporan->siswa)->foto)
-                        <img src="{{ route('foto.siswa', $laporan->siswa->id) }}"
+                        <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
                             class="w-full h-full object-cover" alt="Foto Siswa">
                     @else
                         <div class="text-center">
@@ -111,7 +111,7 @@
                         <p class="text-sm text-slate-700 leading-relaxed break-words">{{ $laporan->deskripsi ?? '-' }}</p>
 
                         @if($laporan->bukti)
-                            <a href="{{ route('bukti.show', $laporan->id) }}" target="_blank"
+                            <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
                                 class="inline-flex items-center justify-center gap-2 mt-4 px-4 py-2 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 w-full sm:w-auto">
                                 <i data-feather="paperclip" class="w-4 h-4"></i>
                                 Lihat Bukti

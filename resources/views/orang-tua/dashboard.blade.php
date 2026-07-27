@@ -48,7 +48,7 @@
                     <div
                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex-shrink-0 flex items-center justify-center">
                         @if($laporanUtama->siswa->foto)
-                            <img src="{{ route('foto.siswa', $laporanUtama->siswa->id) }}" class="w-full h-full object-cover"
+                            <img src="{{ route('foto.siswa', $laporanUtama->siswa->nis) }}" class="w-full h-full object-cover"
                                 alt="Foto Siswa">
                         @else
                             <i data-feather="user" class="w-7 h-7 sm:w-8 sm:h-8 text-blue-300"></i>
@@ -78,7 +78,7 @@
                     </p>
                 </div>
 
-                <a href="{{ route('orang_tua.laporan.show', $laporanUtama->id) }}"
+                <a href="{{ route('orang_tua.laporan.show', $laporanUtama->laporan_id) }}"
                     class="flex-shrink-0 w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-xs font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all">
                     <i data-feather="eye" class="w-3.5 h-3.5"></i>
                     Lihat Detail

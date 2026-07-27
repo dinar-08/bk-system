@@ -48,11 +48,16 @@
 
             </div>
 
+            @php
+                $pesanError = $errors->first('username');
+                $terkunci = $pesanError && str_contains($pesanError, 'terkunci');
+            @endphp
+
             @if ($errors->any())
                 <div
-                    class="mb-5 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                    <i data-feather="alert-circle" class="h-5 w-5 shrink-0"></i>
-                    <span>Username atau password tidak sesuai.</span>
+                    class="mb-5 flex items-center gap-3 rounded-2xl border {{ $terkunci ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-red-200 bg-red-50 text-red-600' }} px-4 py-3 text-sm">
+                    <i data-feather="{{ $terkunci ? 'lock' : 'alert-circle' }}" class="h-5 w-5 shrink-0"></i>
+                    <span>{{ $pesanError ?? 'Username atau password tidak sesuai.' }}</span>
                 </div>
             @endif
 

@@ -26,19 +26,19 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $siswaPerKelas = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
-            ->select('siswa.kelas', DB::raw('COUNT(DISTINCT laporan.siswa_id) as jumlah'))
+        $siswaPerKelas = Laporan::join('siswa', 'laporan.nis', '=', 'siswa.nis')
+            ->select('siswa.kelas', DB::raw('COUNT(DISTINCT laporan.nis) as jumlah'))
             ->groupBy('siswa.kelas')
             ->orderBy('siswa.kelas')
             ->pluck('jumlah', 'siswa.kelas')
             ->toArray();
 
-        $genderChart = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+        $genderChart = Laporan::join('siswa', 'laporan.nis', '=', 'siswa.nis')
             ->selectRaw('siswa.jenis_kelamin, COUNT(*) as total')
             ->groupBy('siswa.jenis_kelamin')
             ->get();
 
-        $kelasChart = Laporan::join('siswa', 'laporan.siswa_id', '=', 'siswa.id')
+        $kelasChart = Laporan::join('siswa', 'laporan.nis', '=', 'siswa.nis')
             ->selectRaw('siswa.kelas, COUNT(*) as total')
             ->groupBy('siswa.kelas')
             ->orderByDesc('total')

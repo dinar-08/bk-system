@@ -23,10 +23,10 @@ class LaporanBaruBkNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'laporan_id' => $this->laporan->id,
+            'laporan_id' => $this->laporan->laporan_id,
             'judul' => 'Laporan Baru Masuk',
             'pesan' => "Laporan baru dari {$this->laporan->siswa->nama_siswa}: {$this->laporan->judul_laporan}",
-            'url' => route('bk.laporan.show', $this->laporan->id),
+            'url' => route('bk.laporan.show', $this->laporan->laporan_id),
         ];
     }
 
@@ -37,6 +37,6 @@ class LaporanBaruBkNotification extends Notification
             ->icon('/asset/logo.png')
             ->body("Laporan baru dari {$this->laporan->siswa->nama_siswa}: {$this->laporan->judul_laporan}")
             ->action('Lihat Detail', 'lihat')
-            ->data(['url' => route('bk.laporan.show', $this->laporan->id)]);
+            ->data(['url' => route('bk.laporan.show', $this->laporan->laporan_id)]);
     }
 }
