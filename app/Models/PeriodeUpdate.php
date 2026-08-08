@@ -8,6 +8,10 @@ class PeriodeUpdate extends Model
 {
     protected $table = 'periode_update';
 
+    protected $primaryKey = 'tahun_ajaran';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'tahun_ajaran',
         'tanggal_mulai',
@@ -32,6 +36,13 @@ class PeriodeUpdate extends Model
         return static::where('aktif', true)
             ->where('tanggal_mulai', '<=', now()->toDateString())
             ->where('tanggal_selesai', '>=', now()->toDateString())
+            ->first();
+    }
+
+    public static function terkini(): ?self
+    {
+        return static::where('tanggal_mulai', '<=', now())
+            ->orderByDesc('tanggal_mulai')
             ->first();
     }
 }

@@ -14,7 +14,6 @@ class PerkembanganController extends Controller
         $siswa = Siswa::where('user_id', auth()->id())
             ->firstOrFail();
 
-        // Laporan yang sudah 'selesai' atau 'dirujuk' otomatis pindah ke riwayat.
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
@@ -49,7 +48,6 @@ class PerkembanganController extends Controller
             ->where('status', 'monitoring')
             ->findOrFail($id);
 
-        // Tandai juga saat user langsung buka detail
         $this->tandaiNotifikasiMonitoringDibaca();
 
         return view('orang-tua.perkembangan.show', compact('siswa', 'laporan'));

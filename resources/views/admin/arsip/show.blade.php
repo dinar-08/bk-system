@@ -22,12 +22,15 @@
             'emosional' => 'bg-rose-50 text-rose-700 border-rose-200',
             'lain-lain' => 'bg-slate-50 text-slate-600 border-slate-200',
         ];
+
+        $backUrl = route('admin.arsip.index', array_filter([
+            'periode' => $siswa->tahun_ajaran ?? 'Data Lama',
+            'kelas' => $siswa->kelas,
+        ]));
     @endphp
 
-    {{-- Breadcrumb --}}
     <div class="flex items-center gap-2 text-sm mb-4">
-        <a href="{{ route('admin.arsip.index') }}"
-            class="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600 font-medium">
+        <a href="{{ $backUrl }}" class="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600 font-medium">
             <i data-feather="chevron-left" class="w-4 h-4"></i>
             Kembali
         </a>
@@ -37,7 +40,6 @@
 
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-        {{-- Header --}}
         <div class="px-5 sm:px-6 py-4 border-b border-slate-100 flex justify-end">
             <form action="{{ route('admin.siswa.destroy', $siswa->nis) }}" method="POST">
                 @csrf
@@ -51,7 +53,6 @@
             </form>
         </div>
 
-        {{-- Profil --}}
         <div class="p-5 sm:p-6">
             <div class="flex flex-col lg:flex-row gap-5 lg:items-center">
                 <div class="w-24 h-24 rounded-3xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
@@ -107,15 +108,14 @@
             </div>
         </div>
 
-        {{-- Garis pemisah --}}
         <div class="border-t border-slate-100"></div>
 
-        {{-- Riwayat --}}
         <div class="p-5 sm:p-6">
             <div class="mb-5 flex items-center gap-3">
                 <div class="w-1 h-6 bg-blue-700 rounded-full"></div>
                 <h2 class="text-lg font-bold text-slate-900">Riwayat Penanganan BK</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
+                <span
+                    class="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
                     {{ $siswa->laporan->count() }} laporan
                 </span>
             </div>
@@ -129,11 +129,11 @@
                     $kategori = $laporan->kategori ?? 'lain-lain';
                 @endphp
 
-                <div class="border-b border-red-100 last:border-b-0 py-6 first:pt-0 last:pb-0">
+                <div class="border-b border-blue-100 last:border-b-0 py-6 first:pt-0 last:pb-0">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:items-center">
 
                         <div class="lg:col-span-2 flex lg:block items-center gap-3">
-                            <p class="text-4xl font-extrabold text-red-600 leading-none">
+                            <p class="text-4xl font-extrabold text-blue-600 leading-none">
                                 {{ $tanggalMulai?->format('d') ?? '-' }}
                             </p>
 
@@ -164,7 +164,7 @@
                                 {{ $laporan->judul_laporan }}
                             </h3>
 
-                            <p class="text-sm text-slate-500 mt-1">
+                            <p class="text-sm text-blue-600 font-medium mt-1">
                                 {{ $tanggalMulai?->format('d M Y') ?? '-' }}
                                 <span class="mx-1">-</span>
                                 @if($tanggalSelesai)
@@ -184,7 +184,7 @@
 
                         <div class="lg:col-span-3 lg:text-right">
                             <button type="button" onclick="toggleDetail('{{ $detailId }}', this)"
-                                class="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-red-500 text-red-600 font-semibold text-sm hover:bg-red-600 hover:text-white transition">
+                                class="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-blue-500 text-blue-600 font-semibold text-sm hover:bg-blue-600 hover:text-white transition">
                                 <span>Lihat Detail</span>
                                 <i data-feather="chevron-down" class="w-4 h-4"></i>
                             </button>
@@ -297,12 +297,12 @@
 
             if (detail.classList.contains('hidden')) {
                 text.textContent = 'Lihat Detail';
-                button.classList.remove('bg-red-600', 'text-white');
-                button.classList.add('text-red-600');
+                button.classList.remove('bg-blue-600', 'text-white');
+                button.classList.add('text-blue-600');
             } else {
                 text.textContent = 'Tutup Detail';
-                button.classList.add('bg-red-600', 'text-white');
-                button.classList.remove('text-red-600');
+                button.classList.add('bg-blue-600', 'text-white');
+                button.classList.remove('text-blue-600');
             }
 
             if (typeof feather !== 'undefined') {

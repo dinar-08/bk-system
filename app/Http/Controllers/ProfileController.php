@@ -43,7 +43,7 @@ class ProfileController extends Controller
         ));
     }
 
-    // Halaman update data siswa (dipanggil saat periode wajib update)
+    //wajib update
     public function editSiswa(Request $request)
     {
         $user = $request->user();
@@ -78,19 +78,15 @@ class ProfileController extends Controller
             'alamat' => $validated['alamat'] ?? null,
             'nama_ortu' => $validated['nama_ortu'],
             'no_whatsapp' => $validated['no_whatsapp'],
-            // Catat tahun ajaran dari periode update yang sedang aktif,
-            // supaya kolom ini ikut terisi otomatis saat orang tua update data.
             'tahun_ajaran' => $periode->tahun_ajaran ?? $siswa->tahun_ajaran,
             'last_data_updated_at' => now(),
         ];
 
         if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
             if ($siswa->foto)
                 Storage::disk('local')->delete($siswa->foto);
             $fotoPath = $request->file('foto')->store('foto-profil', 'local');
             $updateData['foto'] = $fotoPath;
-            // Sinkron ke tabel users juga
             $user->update(['foto' => $fotoPath]);
         }
 
@@ -100,20 +96,17 @@ class ProfileController extends Controller
             $siswa->tandaiSudahUpdate($periode);
         }
 
-        // Sinkron nama ke users
         $user->update(['name' => $validated['nama_siswa']]);
 
         return redirect()->route('orang_tua.dashboard')
             ->with('success', 'Data berhasil diperbarui.');
     }
 
-    // Halaman ganti password pertama kali (must_change_password = true)
     public function showChangePassword()
     {
         if (!auth()->check())
             return redirect()->route('login');
 
-        // Jika sudah tidak wajib ganti, redirect ke dashboard sesuai role
         if (!auth()->user()->must_change_password) {
             return redirect()->to($this->redirectAfterRole(auth()->user()->role));
         }
@@ -146,12 +139,10 @@ class ProfileController extends Controller
             ->with('success', 'Password berhasil diganti. Selamat datang!');
     }
 
-    // Update profil umum (admin, BK, orang tua via halaman /profile)
     public function update(Request $request)
     {
         $user = $request->user();
 
-        // Kosongkan password jika tidak diisi
         if (trim((string) $request->input('password')) === '') {
             $request->merge([
                 'password' => null,
@@ -159,7 +150,6 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Tentukan apakah kondisi wajib isi semua field
         $periode = null;
         $wajibUpdate = false;
         $siswa = null;
@@ -173,19 +163,14 @@ class ProfileController extends Controller
             }
         }
 
-        // Kondisi wajib isi semua field:
-        // 1. Login pertama (must_change_password = true)
-        // 2. Periode update aktif dan belum update
         $wajibIsiLengkap = $user->role === 'orang_tua' &&
             ($user->must_change_password || $wajibUpdate);
 
-        // ── Validasi ──────────────────────────────────────────────────
         $rules = [
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
 
         if ($wajibIsiLengkap) {
-            // Foto wajib diisi jika belum ada foto
             $rules['foto'] = [$siswa && $siswa->foto ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
             $rules['nama_siswa'] = ['required', 'string', 'max:150'];
             $rules['jenis_kelamin'] = ['required', 'in:L,P'];
@@ -231,7 +216,6 @@ class ProfileController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        // ── Update tabel users ────────────────────────────────────────
         $updateUser = [];
 
         if ($user->role === 'orang_tua') {
@@ -246,7 +230,6 @@ class ProfileController extends Controller
             $updateUser['must_change_password'] = false;
         }
 
-        // Foto untuk admin/bk disimpan di users
         if ($user->role !== 'orang_tua' && $request->hasFile('foto')) {
             if ($user->foto) {
                 Storage::disk('local')->delete($user->foto);
@@ -256,7 +239,6 @@ class ProfileController extends Controller
 
         $user->update($updateUser);
 
-        // ── Update tabel siswa (khusus orang_tua) ────────────────────
         if ($user->role === 'orang_tua' && $siswa) {
             $updateSiswa = [
                 'nama_siswa' => $request->nama_siswa ?? $siswa->nama_siswa,
@@ -266,12 +248,9 @@ class ProfileController extends Controller
                 'kelas' => $request->kelas ?? $siswa->kelas,
                 'nama_ortu' => $request->nama_ortu ?? $siswa->nama_ortu,
                 'no_whatsapp' => $request->no_whatsapp ?? $siswa->no_whatsapp,
-                // Catat tahun ajaran dari periode update yang sedang aktif,
-                // supaya kolom ini ikut terisi otomatis saat orang tua update data.
                 'tahun_ajaran' => $periode->tahun_ajaran ?? $siswa->tahun_ajaran,
             ];
 
-            // Foto untuk orang_tua disimpan di siswa
             if ($request->hasFile('foto')) {
                 if ($siswa->foto) {
                     Storage::disk('local')->delete($siswa->foto);
@@ -286,7 +265,6 @@ class ProfileController extends Controller
             }
         }
 
-        // ── Update tabel guru_bk (khusus bk) ─────────────────────────
         if ($user->role === 'bk') {
             $gurubk = GuruBK::where('user_id', $user->id)->first();
             if ($gurubk) {
@@ -296,8 +274,6 @@ class ProfileController extends Controller
                     'alamat' => $request->alamat ?? $gurubk->alamat,
                 ];
 
-                // Foto BK disimpan di guru_bk jika ada kolomnya,
-                // kalau tidak ada hapus baris ini
                 if ($request->hasFile('foto')) {
                     if ($gurubk->foto) {
                         Storage::disk('local')->delete($gurubk->foto);

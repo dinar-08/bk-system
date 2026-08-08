@@ -283,11 +283,11 @@
             </div>
 
             <div class="space-y-4">
-                @forelse($daftarPemanggilan as $index => $item)
+                @forelse($daftarPemanggilan as $item)
                     <div class="border border-slate-200 bg-slate-50 rounded-xl p-4">
                         <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
                             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                Pemanggilan ke-{{ $daftarPemanggilan->count() - $index }}
+                                Pemanggilan
                             </span>
                             @if($item->status_kehadiran === 'tidak_hadir')
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold whitespace-nowrap">
@@ -331,9 +331,24 @@
                                 @csrf
                                 @method('PUT')
 
+                                {{-- Reschedule: edit tanggal & waktu pemanggilan --}}
+                                <div>
+                                    <label for="tanggal_pemanggilan_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tanggal Pemanggilan</label>
+                                    <input type="date" id="tanggal_pemanggilan_{{ $item->pemanggilan_id }}" name="tanggal_pemanggilan" required
+                                        value="{{ old('tanggal_pemanggilan', $item->tanggal_pemanggilan) }}"
+                                        class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
+                                </div>
+
+                                <div>
+                                    <label for="waktu_pemanggilan_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Waktu Pemanggilan</label>
+                                    <input type="time" id="waktu_pemanggilan_{{ $item->pemanggilan_id }}" name="waktu_pemanggilan" required
+                                        value="{{ old('waktu_pemanggilan', $item->waktu_pemanggilan) }}"
+                                        class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
+                                </div>
+
                                 <div>
                                     <label for="status_kehadiran_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Status Kehadiran</label>
-                                    <select id="status_kehadiran_{{ $item->pemanggilan_id }}" name="status_kehadiran"
+                                    <select id="status_kehadiran_{{ $item->pemanggilan_id }}" name="status_kehadiran" required
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->status_kehadiran == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="hadir" {{ $item->status_kehadiran == 'hadir' ? 'selected' : '' }}>Hadir</option>
@@ -343,7 +358,7 @@
 
                                 <div>
                                     <label for="tindak_lanjut_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tindak Lanjut</label>
-                                    <select id="tindak_lanjut_{{ $item->pemanggilan_id }}" name="tindak_lanjut"
+                                    <select id="tindak_lanjut_{{ $item->pemanggilan_id }}" name="tindak_lanjut" required
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->tindak_lanjut == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="monitoring" {{ $item->tindak_lanjut == 'monitoring' ? 'selected' : '' }}>Lanjut Monitoring</option>
@@ -353,21 +368,21 @@
 
                                 <div>
                                     <label for="tanggal_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tanggal Monitoring</label>
-                                    <input type="date" id="tanggal_monitoring_{{ $item->pemanggilan_id }}" name="tanggal_monitoring"
+                                    <input type="date" id="tanggal_monitoring_{{ $item->pemanggilan_id }}" name="tanggal_monitoring" required
                                         value="{{ old('tanggal_monitoring', $item->tanggal_monitoring) }}"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
                                 <div>
                                     <label for="waktu_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Jam Monitoring</label>
-                                    <input type="time" id="waktu_monitoring_{{ $item->pemanggilan_id }}" name="waktu_monitoring" step="60"
+                                    <input type="time" id="waktu_monitoring_{{ $item->pemanggilan_id }}" name="waktu_monitoring" step="60" required
                                         value="{{ old('waktu_monitoring') }}"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
                                 <div>
                                     <label for="catatan_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Catatan</label>
-                                    <input type="text" id="catatan_{{ $item->pemanggilan_id }}" name="catatan"
+                                    <input type="text" id="catatan_{{ $item->pemanggilan_id }}" name="catatan" required
                                         value="{{ old('catatan', $item->catatan) }}"
                                         placeholder="Catatan"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
@@ -389,13 +404,16 @@
                                         ->isoFormat('dddd, D MMMM YYYY');
                                     $wkt = \Carbon\Carbon::parse($item->waktu_pemanggilan)->format('H:i') . ' WIB';
 
-                                    $pesan = "Assalamualaikum Bapak/Ibu {$namaOrtu},\n\n"
-                                        . "Kami dari Guru BK SDIT Al-Kautsar mengundang Bapak/Ibu untuk hadir ke sekolah terkait ananda *{$namaSiswa}*.\n\n"
-                                        . "Tanggal: {$tgl}\n"
-                                        . "Waktu: {$wkt}\n"
-                                        . "Tujuan: {$item->tujuan}\n"
-                                        . "Guru BK: {$namaGuruBk}\n\n"
-                                        . "Mohon hadir tepat waktu. Terima kasih.";
+                                    $pesan = "Assalamualaikum Wr. Wb.\n\n"
+                                        . "Selamat siang Bapak/Ibu {$namaOrtu}\n\n"
+                                        . "Saya {$namaGuruBk} dari SDIT Al-Kautsar. Sehubungan dengan laporan Bapak/Ibu terkait kondisi ananda {$namaSiswa}, "
+                                        . "maka kami mengharapkan kehadiran Bapak/Ibu untuk berdiskusi mencari solusi terbaik bagi ananda. "
+                                        . "Kami mengusulkan pertemuan dilaksanakan hari {$tgl} pukul {$wkt}. "
+                                        . "Jika waktu tersebut kurang cocok, kami memohon kesediaan Bapak/Ibu untuk konfirmasi waktu luang Bapak/Ibu. "
+                                        . "Demikian undangan ini kami sampaikan, terima kasih atas perhatiannya.\n\n\n"
+                                        . "Wassalamualaikum Wr. Wb.\n\n"
+                                        . "Hormat Kami\n"
+                                        . "{$namaGuruBk}";
                                 @endphp
 
                                 <div class="sm:col-span-2 lg:col-span-3 flex flex-col sm:flex-row flex-wrap justify-end gap-3">

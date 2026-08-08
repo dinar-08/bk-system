@@ -65,7 +65,6 @@ class SiswaController extends Controller
             'nis' => ['required', 'string', 'max:50', 'unique:siswa,nis', 'unique:users,username'],
             'nama_siswa' => ['required', 'string', 'max:150'],
             'kelas' => ['required', 'string', 'max:50'],
-            'tahun_ajaran' => ['nullable', 'string', 'max:20'],
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -81,12 +80,14 @@ class SiswaController extends Controller
                 'must_change_password' => true,
             ]);
 
+            $periodeAktif = PeriodeUpdate::aktifSekarang() ?? PeriodeUpdate::terkini();
+
             Siswa::create([
                 'user_id' => $user->id,
                 'nis' => $validated['nis'],
                 'nama_siswa' => $validated['nama_siswa'],
                 'kelas' => $validated['kelas'],
-                'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
+                'tahun_ajaran' => optional($periodeAktif)->tahun_ajaran,
             ]);
 
             session()->flash('password_baru', $password);
@@ -118,7 +119,6 @@ class SiswaController extends Controller
             ],
             'nama_siswa' => ['required', 'string', 'max:150'],
             'kelas' => ['required', 'string', 'max:50'],
-            'tahun_ajaran' => ['nullable', 'string', 'max:20'],
             'jenis_kelamin' => ['nullable', 'in:L,P'],
             'tanggal_lahir' => ['nullable', 'date'],
             'no_whatsapp' => ['nullable', 'string', 'max:20'],
@@ -132,7 +132,6 @@ class SiswaController extends Controller
                 'nis' => $validated['nis'],
                 'nama_siswa' => $validated['nama_siswa'],
                 'kelas' => $validated['kelas'],
-                'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
                 'jenis_kelamin' => $validated['jenis_kelamin'] ?? null,
                 'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
                 'no_whatsapp' => $validated['no_whatsapp'] ?? null,
@@ -146,14 +145,9 @@ class SiswaController extends Controller
                     'username' => $validated['nis'],
                 ];
 
-                // Password hanya diganti kalau admin benar-benar mengisinya.
-                // Dibiarkan kosong = password lama tetap dipakai.
                 if (!empty($validated['password'])) {
                     $dataUser['password'] = Hash::make($validated['password']);
                     $dataUser['default_password'] = $validated['password'];
-                    // Sama seperti pembuatan akun baru: paksa ganti password
-                    // saat login berikutnya, supaya password titipan admin
-                    // tidak dipakai terus-menerus oleh orang tua.
                     $dataUser['must_change_password'] = true;
                 }
 
@@ -170,12 +164,18 @@ class SiswaController extends Controller
         $siswa = Siswa::with('user')->findOrFail($id);
 
         if ($siswa->user) {
-            $statusBaru = ($siswa->user->status_akun ?? 'aktif') === 'aktif'
-                ? 'nonaktif'
-                : 'aktif';
+            $sedangAktif = ($siswa->user->status_akun ?? 'aktif') === 'aktif';
+            $statusBaru = $sedangAktif ? 'nonaktif' : 'aktif';
 
             $siswa->user->update([
                 'status_akun' => $statusBaru,
+                'nonaktif_at' => $statusBaru === 'nonaktif' ? now() : null,
+            ]);
+
+            $siswa->update([
+                'tahun_ajaran' => $statusBaru === 'nonaktif'
+                    ? optional(PeriodeUpdate::terkini())->tahun_ajaran
+                    : null,
             ]);
         }
 
@@ -212,10 +212,17 @@ class SiswaController extends Controller
                 ]);
         }
 
+        $periodeTerkini = PeriodeUpdate::terkini();
+
         foreach ($siswaDikelas as $item) {
             if ($item->user) {
                 $item->user->update([
                     'status_akun' => 'nonaktif',
+                    'nonaktif_at' => now(),
+                ]);
+
+                $item->update([
+                    'tahun_ajaran' => optional($periodeTerkini)->tahun_ajaran,
                 ]);
             }
         }

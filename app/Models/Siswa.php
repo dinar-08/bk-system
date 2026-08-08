@@ -37,6 +37,11 @@ class Siswa extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function periodeUpdate()
+    {
+        return $this->belongsTo(PeriodeUpdate::class, 'tahun_ajaran', 'tahun_ajaran');
+    }
+
     public function laporan()
     {
         return $this->hasMany(Laporan::class, 'nis', 'nis');

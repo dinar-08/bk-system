@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GuruBK;
 use App\Models\Laporan;
 use App\Models\Pemanggilan;
+use App\Models\PeriodeUpdate;
 use App\Models\Siswa;
 use App\Notifications\LaporanBaruNotification;
 use Illuminate\Http\Request;
@@ -26,7 +27,11 @@ class LaporanController extends Controller
 
     public function create()
     {
-        $siswa = Siswa::select('nis', 'nama_siswa', 'kelas')
+
+        $siswa = Siswa::select('nis', 'nama_siswa', 'kelas', 'user_id')
+            ->whereHas('user', function ($query) {
+                $query->where('status_akun', 'aktif');
+            })
             ->orderBy('nama_siswa')
             ->get();
 
@@ -40,13 +45,33 @@ class LaporanController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $validated = $request->validate([
-            'nis' => ['required', 'exists:siswa,nis'],
+            'nis' => [
+                'required',
+                'exists:siswa,nis',
+                function ($attribute, $value, $fail) {
+                    $siswa = Siswa::with('user')->where('nis', $value)->first();
+
+                    if (!$siswa || !$siswa->user || $siswa->user->status_akun !== 'aktif') {
+                        $fail('Siswa ini tidak aktif dan tidak bisa dilaporkan.');
+                    }
+                },
+            ],
             'judul_laporan' => ['required', 'string', 'max:150'],
             'kategori' => ['required', 'in:' . implode(',', self::KATEGORI)],
             'jenis_masalah' => ['required', 'string', 'max:150'],
             'deskripsi' => ['required', 'string'],
             'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,mp3,mp4,mov,wav,m4a,ogg', 'max:51200'],
         ]);
+
+        $siswa = Siswa::where('nis', $validated['nis'])->firstOrFail();
+
+        $periodeAktif = PeriodeUpdate::where('aktif', true)->first();
+
+        if (!$periodeAktif) {
+            return back()
+                ->withInput()
+                ->with('error', 'Tidak ada periode/tahun ajaran yang aktif. Hubungi admin untuk mengaktifkan periode terlebih dahulu.');
+        }
 
         $buktiPath = null;
 
@@ -57,6 +82,8 @@ class LaporanController extends Controller
         $laporan = Laporan::create([
             'nis' => $validated['nis'],
             'nip' => $guruBk->nip,
+            'tahun_ajaran' => $periodeAktif->tahun_ajaran, 
+            'kelas' => $siswa->kelas,                      
             'judul_laporan' => $validated['judul_laporan'],
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],

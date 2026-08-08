@@ -9,7 +9,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class DownloadController extends Controller
 {
-    // Download 1 kasus sebagai PDF menggunakan view + dompdf
     public function downloadKasusPdf(string $id)
     {
         $laporan = Laporan::with([
@@ -28,7 +27,6 @@ class DownloadController extends Controller
         return $pdf->download($namaFile);
     }
 
-    // Download semua kasus sebagai Excel
     public function downloadSemuaExcel(Request $request)
     {
         $laporan = Laporan::with(['siswa', 'guruBk', 'evaluasi'])->get();
@@ -69,7 +67,6 @@ class DownloadController extends Controller
         }, 'semua-kasus-bk-' . now()->format('Ymd') . '.xlsx', $headers);
     }
 
-    // Download semua kasus sebagai PDF
     public function downloadSemuaPdf()
     {
         $laporan = Laporan::with(['siswa', 'guruBk', 'evaluasi'])->latest()->get();

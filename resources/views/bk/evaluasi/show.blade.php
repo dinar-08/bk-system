@@ -51,11 +51,11 @@
                         <h2 class="text-sm font-bold text-slate-700">Data Siswa</h2>
                     </div>
 
-                    <div class="w-full h-32 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
-                        @if(optional($laporan->siswa)->foto)
-                            <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
-                                class="w-full h-full object-cover" alt="Foto Siswa">
-                        @else
+                   <div class="w-28 h-28 sm:w-32 sm:h-32 mx-auto lg:mx-0 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
+                    @if(optional($laporan->siswa)->foto)
+                    <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
+                    class="w-full h-full object-cover" alt="Foto Siswa">
+                    @else
                             <div class="text-center">
                                 <i data-feather="user" class="w-8 h-8 text-slate-300 mx-auto mb-1"></i>
                                 <p class="text-xs text-slate-400">Foto Siswa</p>

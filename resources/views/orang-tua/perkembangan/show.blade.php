@@ -37,8 +37,7 @@
                     </div>
 
                     {{-- Foto --}}
-                    <div
-                        class="w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3.5 sm:mb-4">
+                    <div class="w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3.5 sm:mb-4">
                         @if($laporan->siswa->foto)
                             <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}" class="w-full h-full object-cover"
                                 alt="Foto Siswa">
@@ -48,7 +47,12 @@
                     </div>
 
                     <div class="space-y-2.5">
-                        @foreach([['Nama', $laporan->siswa->nama_siswa], ['Kelas', $laporan->siswa->kelas], ['NIS', $laporan->siswa->nis], ['Orang Tua', $laporan->siswa->nama_ortu]] as [$label, $val])
+                        @foreach([
+                            ['Nama', $laporan->siswa->nama_siswa],
+                            ['Kelas', $laporan->siswa->kelas],
+                            ['NIS', $laporan->siswa->nis],
+                            ['Orang Tua', $laporan->siswa->nama_ortu],
+                        ] as [$label, $val])
                             <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
                                 <p class="text-sm font-semibold text-slate-700">{{ $val ?? '-' }}</p>
@@ -64,12 +68,18 @@
                         <h2 class="text-sm font-bold text-slate-700">Data Permasalahan</h2>
                     </div>
                     <div class="space-y-2.5">
-                        @foreach([['Judul', $laporan->judul_laporan], ['Kategori', ucfirst($laporan->kategori ?? '-')], ['Jenis Masalah', $laporan->jenis_masalah ?? '-'], ['Status', ucfirst($laporan->status)]] as [$label, $val])
+                        @foreach([
+                            ['Judul', $laporan->judul_laporan],
+                            ['Kategori', ucfirst($laporan->kategori ?? '-')],
+                            ['Jenis Masalah', $laporan->jenis_masalah ?? '-'],
+                            ['Status', ucfirst($laporan->status)],
+                        ] as [$label, $val])
                             <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3">
                                 <p class="text-xs text-slate-400 mb-0.5">{{ $label }}</p>
                                 <p class="text-sm font-semibold text-slate-700">{{ $val }}</p>
                             </div>
                         @endforeach
+
                         <div class="bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3">
                             <p class="text-xs text-slate-400 mb-1">Deskripsi</p>
                             <p class="text-sm text-slate-700 leading-relaxed">{{ $laporan->deskripsi }}</p>
@@ -88,8 +98,7 @@
 
             {{-- JADWAL MONITORING BERIKUTNYA --}}
             @if($monitoringTerjadwal)
-                <div
-                    class="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 mt-5 sm:mt-6 flex items-start sm:items-center gap-3 sm:gap-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 mt-5 sm:mt-6 flex items-start sm:items-center gap-3 sm:gap-4">
                     <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                         <i data-feather="calendar" class="w-5 h-5 text-blue-600"></i>
                     </div>
@@ -97,11 +106,9 @@
                         <p class="font-semibold text-blue-700 text-sm">Jadwal Monitoring Berikutnya</p>
                         <p class="text-blue-600 text-sm mt-0.5">
                             Monitoring ke-{{ $monitoringTerjadwal->monitoring_ke }} pada
-                            <span
-                                class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->tanggal_monitoring)->translatedFormat('d F Y') }}</span>
+                            <span class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->tanggal_monitoring)->translatedFormat('d F Y') }}</span>
                             pukul
-                            <span
-                                class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->waktu_monitoring)->format('H:i') }}</span>
+                            <span class="font-bold">{{ \Carbon\Carbon::parse($monitoringTerjadwal->waktu_monitoring)->format('H:i') }}</span>
                         </p>
                     </div>
                 </div>
@@ -173,9 +180,9 @@
                                 <p class="text-xs text-slate-400 mt-1.5">{{ $item->tanggal_monitoring }}</p>
                             </div>
                             <span class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold
-                                                                            @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
-                                                                            @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
-                                                                            @else bg-red-100 text-red-700 @endif">
+                                @if($item->status_perkembangan == 'membaik') bg-green-100 text-green-700
+                                @elseif($item->status_perkembangan == 'stabil') bg-blue-100 text-blue-700
+                                @else bg-red-100 text-red-700 @endif">
                                 {{ ucfirst($item->status_perkembangan) }}
                             </span>
                         </div>

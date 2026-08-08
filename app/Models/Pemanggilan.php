@@ -8,7 +8,7 @@ class Pemanggilan extends Model
 {
     protected $table = 'pemanggilan';
 
-    protected $primaryKey = 'pemanggilan_id';   // ← TAMBAHKAN INI
+    protected $primaryKey = 'pemanggilan_id';  
 
     protected $fillable = [
         'laporan_id',

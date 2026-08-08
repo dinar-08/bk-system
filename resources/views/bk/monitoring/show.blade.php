@@ -47,10 +47,10 @@
                         <h2 class="text-sm font-bold text-slate-700">Data Siswa</h2>
                     </div>
                     <div
-                        class="w-full h-28 sm:h-36 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
+                        class="w-28 h-28 sm:w-32 sm:h-32 mx-auto lg:mx-0 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden mb-4">
                         @if(optional($laporan->siswa)->foto)
-                            <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
-                                class="w-full h-full object-cover" alt="Foto Siswa">
+                        <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}"
+                        class="w-full h-full object-cover" alt="Foto Siswa">
                         @else
                             <div class="text-center">
                                 <i data-feather="user" class="w-8 h-8 text-slate-300 mx-auto mb-1"></i>
@@ -92,6 +92,19 @@
                                 <p class="text-sm font-semibold text-slate-700 break-words">{{ $val ?: '-' }}</p>
                             </div>
                         @endforeach
+
+                        <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-200">
+                            <p class="text-xs text-slate-400 mb-0.5">Lampiran</p>
+                            @if($laporan->bukti)
+                                <a href="{{ route('bukti.show', $laporan->laporan_id) }}" target="_blank"
+                                    class="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1">
+                                    <i data-feather="paperclip" class="w-3 h-3"></i>
+                                    Lihat Bukti
+                                </a>
+                            @else
+                                <p class="text-sm text-slate-400">Tidak ada</p>
+                            @endif
+                        </div>
 
                         <div class="px-3 sm:px-4 py-2.5 sm:py-3 min-h-[100px] sm:min-h-[120px]">
                             <p class="text-xs text-slate-400 mb-1">Deskripsi</p>

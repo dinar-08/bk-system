@@ -13,6 +13,8 @@ class Laporan extends Model
     protected $fillable = [
         'nis',
         'nip',
+        'tahun_ajaran', 
+        'kelas',        
         'judul_laporan',
         'kategori',
         'jenis_masalah',
@@ -31,6 +33,11 @@ class Laporan extends Model
         return $this->belongsTo(GuruBK::class, 'nip', 'nip');
     }
 
+    public function periodeUpdate()
+    {
+        return $this->belongsTo(PeriodeUpdate::class, 'tahun_ajaran', 'tahun_ajaran');
+    }
+
     public function pemanggilan()
     {
         return $this->hasMany(Pemanggilan::class, 'laporan_id', 'laporan_id');
@@ -44,5 +51,16 @@ class Laporan extends Model
     public function evaluasi()
     {
         return $this->hasOne(Evaluasi::class, 'laporan_id', 'laporan_id');
+    }
+
+    public function scopePeriodeAktif($query)
+    {
+        $periodeAktif = PeriodeUpdate::terkini();
+
+        if ($periodeAktif) {
+            $query->where('laporan.tahun_ajaran', $periodeAktif->tahun_ajaran);
+        }
+
+        return $query;
     }
 }

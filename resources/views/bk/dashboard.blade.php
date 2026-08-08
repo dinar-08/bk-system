@@ -108,7 +108,7 @@
 
             <div class="divide-y divide-slate-50">
                 @foreach($daftarLaporan as $laporan)
-                    <a href="{{ route('bk.laporan.show', $laporan->id) }}"
+                    <a href="{{ route('bk.laporan.show', $laporan->laporan_id) }}"
                         class="px-4 sm:px-5 py-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 hover:bg-slate-50 transition-colors">
 
                         {{-- Foto + Nama: selalu satu baris penuh di mobile --}}

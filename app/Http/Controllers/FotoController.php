@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class FotoController extends Controller
 {
-    // Bukti laporan kasus: BK hanya boleh lihat laporan yang dia tangani sendiri (dicocokkan via nip),
-    // orang tua cuma bukti kasus anaknya sendiri.
-    // Admin sengaja TIDAK diberi akses karena bukti bersifat sensitif/privat.
     public function bukti(Laporan $laporan)
     {
         $user = auth()->user();
@@ -31,7 +28,6 @@ class FotoController extends Controller
         return Storage::disk('local')->response($laporan->bukti);
     }
 
-    // Foto siswa: admin & BK boleh lihat semua, orang tua cuma boleh lihat foto anaknya sendiri
     public function siswa(Siswa $siswa)
     {
         $user = auth()->user();
@@ -44,8 +40,6 @@ class FotoController extends Controller
 
         return Storage::disk('local')->response($siswa->foto);
     }
-
-    // Foto guru BK: admin, bk, dan orang tua (staf sekolah, risiko rendah) boleh lihat
     public function guruBk(GuruBK $guruBk)
     {
         $user = auth()->user();
@@ -56,7 +50,6 @@ class FotoController extends Controller
         return Storage::disk('local')->response($guruBk->foto);
     }
 
-    // Foto akun (dipakai di halaman profil admin/bk): hanya pemilik akun & admin
     public function user(User $user)
     {
         $auth = auth()->user();

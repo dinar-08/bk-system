@@ -32,6 +32,7 @@ class PeriodeUpdateController extends Controller
         return redirect()->route('admin.siswa.index')
             ->with('success', 'Periode update berhasil diperbarui.');
     }
+
     public function destroy(string $id)
     {
         PeriodeUpdate::findOrFail($id)->delete();

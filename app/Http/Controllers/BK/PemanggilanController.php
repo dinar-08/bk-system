@@ -50,12 +50,25 @@ class PemanggilanController extends Controller
         $pemanggilan = Pemanggilan::with('laporan')->findOrFail($id);
 
         $validated = $request->validate([
+            'tanggal_pemanggilan' => ['nullable', 'date'],
+            'waktu_pemanggilan' => ['nullable'],
             'status_kehadiran' => ['required', 'in:belum,hadir,tidak_hadir'],
             'tindak_lanjut' => ['required', 'in:belum,monitoring,selesai'],
             'tanggal_monitoring' => ['nullable', 'date'],
             'waktu_monitoring' => ['nullable', 'date_format:H:i'],
             'catatan' => ['nullable'],
         ]);
+
+        // Cek apakah ini reschedule: pemanggilan masih berstatus "belum"
+        // dan tanggal/waktu yang dikirim beda dari yang tersimpan.
+        $jadwalBerubah = false;
+        if ($pemanggilan->status_kehadiran === 'belum' && $validated['status_kehadiran'] === 'belum') {
+            $tanggalBaru = $validated['tanggal_pemanggilan'] ?? $pemanggilan->tanggal_pemanggilan;
+            $waktuBaru = $validated['waktu_pemanggilan'] ?? $pemanggilan->waktu_pemanggilan;
+
+            $jadwalBerubah = (string) $tanggalBaru !== (string) $pemanggilan->tanggal_pemanggilan
+                || (string) $waktuBaru !== (string) $pemanggilan->waktu_pemanggilan;
+        }
 
         if (
             $validated['status_kehadiran'] === 'hadir' &&
@@ -68,11 +81,23 @@ class PemanggilanController extends Controller
         }
 
         $pemanggilan->update([
+            'tanggal_pemanggilan' => $jadwalBerubah ? $validated['tanggal_pemanggilan'] : $pemanggilan->tanggal_pemanggilan,
+            'waktu_pemanggilan' => $jadwalBerubah ? $validated['waktu_pemanggilan'] : $pemanggilan->waktu_pemanggilan,
             'status_kehadiran' => $validated['status_kehadiran'],
             'tindak_lanjut' => $validated['tindak_lanjut'],
             'tanggal_monitoring' => $validated['tanggal_monitoring'] ?? null,
             'catatan' => $validated['catatan'] ?? null,
         ]);
+
+        // Kalau jadwal berubah (reschedule), kirim notifikasi baru dan stop di sini
+        if ($jadwalBerubah) {
+            $pemanggilan->load('laporan.siswa.user');
+            if ($pemanggilan->laporan?->siswa?->user) {
+                $pemanggilan->laporan->siswa->user->notify(new JadwalPemanggilanNotification($pemanggilan));
+            }
+
+            return back()->with('success', 'Jadwal pemanggilan berhasil diubah dan notifikasi baru telah dikirim.');
+        }
 
         if ($validated['status_kehadiran'] === 'hadir') {
             if ($validated['tindak_lanjut'] === 'monitoring') {
