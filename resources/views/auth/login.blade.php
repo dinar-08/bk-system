@@ -2,24 +2,34 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk | Lapor Bu!!</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://unpkg.com/feather-icons"></script>
+        <title>Lapor Bu!! — SDIT Al-Kautsar</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link rel="canonical" href="https://laporbubk.my.id/">
 
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-    </style>
-</head>
+        <meta name="description"
+            content="Lapor Bu!! - Sistem Informasi Bimbingan dan Konseling untuk memantau perkembangan siswa SDIT Muhammadiyah Al-Kautsar.">
+
+        <link rel="icon" type="image/png" href="{{ asset('asset/favicon.png') }}">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet">
+
+        <script src="https://unpkg.com/feather-icons"></script>
+
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <style>
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
+        </style>
+    </head>
 
 <body class="min-h-screen bg-blue-700 overflow-x-hidden">
 
