@@ -15,12 +15,16 @@ class FotoController extends Controller
         $user = auth()->user();
         $siswa = $laporan->siswa;
 
-        $guruBk = $user->role === 'bk'
-            ? GuruBK::where('user_id', $user->id)->first()
-            : null;
+        if ($user->role === 'bk') {
+            $guruBk = GuruBK::where('user_id', $user->id)->first();
 
-        $boleh = ($guruBk && $laporan->nip === $guruBk->nip)
-            || ($user->role === 'orang_tua' && $siswa && $siswa->user_id === $user->id);
+            // Laporan masih "baru" (belum ada yang menangani) → semua BK boleh lihat
+            // Laporan sudah diverifikasi/ditangani → hanya BK yang menangani (nip cocok)
+            $boleh = $laporan->status === 'baru'
+                || ($guruBk && $laporan->nip === $guruBk->nip);
+        } else {
+            $boleh = $user->role === 'orang_tua' && $siswa && $siswa->user_id === $user->id;
+        }
 
         abort_unless($boleh, 403, 'Anda tidak punya akses ke file ini.');
         abort_unless($laporan->bukti && Storage::disk('local')->exists($laporan->bukti), 404);
@@ -40,6 +44,7 @@ class FotoController extends Controller
 
         return Storage::disk('local')->response($siswa->foto);
     }
+
     public function guruBk(GuruBK $guruBk)
     {
         $user = auth()->user();

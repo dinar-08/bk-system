@@ -39,6 +39,7 @@ class PemanggilanController extends Controller
 
         $pemanggilan->load('laporan.siswa.user');
         if ($pemanggilan->laporan?->siswa?->user) {
+            // Jadwal pertama kali dibuat -> isReschedule tetap false (default)
             $pemanggilan->laporan->siswa->user->notify(new JadwalPemanggilanNotification($pemanggilan));
         }
 
@@ -93,7 +94,8 @@ class PemanggilanController extends Controller
         if ($jadwalBerubah) {
             $pemanggilan->load('laporan.siswa.user');
             if ($pemanggilan->laporan?->siswa?->user) {
-                $pemanggilan->laporan->siswa->user->notify(new JadwalPemanggilanNotification($pemanggilan));
+                // Reschedule -> tandai isReschedule: true, biar judul notifnya beda
+                $pemanggilan->laporan->siswa->user->notify(new JadwalPemanggilanNotification($pemanggilan, isReschedule: true));
             }
 
             return back()->with('success', 'Jadwal pemanggilan berhasil diubah dan notifikasi baru telah dikirim.');

@@ -35,7 +35,7 @@
                 @forelse($guruBk as $item)
                     <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                         <td class="px-5 py-4">
-                            <div class="w-14 h-14 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
+                            <div class="w-14 h-14 overflow-hidden bg-blue-100 flex items-center justify-center">
                                 @if($item->foto)
                                     <img src="{{ route('foto.guru-bk', $item->nip) }}" class="w-full h-full object-cover"
                                         alt="Foto {{ $item->nama }}">

@@ -34,57 +34,104 @@
             <p class="text-sm text-slate-500 mt-0.5">Isi seluruh data dengan benar.</p>
         </div>
 
-        <form action="{{ route('admin.guru-bk.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="form-tambah-guru-bk" action="{{ route('admin.guru-bk.store') }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto (opsional)</label>
-                    <input type="file" name="foto" accept="image/*"
-                        class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 focus:border-blue-500 focus:ring-blue-500">
+
+                    <button type="button" onclick="document.getElementById('foto-input').click()"
+                        class="relative w-24 h-24 rounded-2xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center shadow-sm group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                        <img id="foto-preview" src="" class="w-full h-full object-cover hidden" alt="Preview Foto">
+
+                        <i id="foto-placeholder-icon" data-feather="camera" class="w-7 h-7 text-blue-300"></i>
+
+                        <div
+                            class="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-colors flex items-center justify-center">
+                            <i data-feather="camera"
+                                class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </button>
+
+                    <input type="file" name="foto" id="foto-input" accept="image/*" class="hidden"
+                        onchange="previewFoto(this)">
+                    <p class="text-xs text-slate-400 mt-1.5">Klik kotak foto untuk memilih. Opsional.</p>
+                    @error('foto')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Guru BK</label>
-                    <input type="text" name="nama" value="{{ old('nama') }}"
+                    <input type="text" name="nama" value="{{ old('nama') }}" autocomplete="off"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
                 </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">NIP</label>
-                    <input type="text" name="nip" value="{{ old('nip') }}"
+                    <input type="text" name="nip" value="{{ old('nip') }}" autocomplete="username"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor WA</label>
-                    <input type="text" name="no_hp" value="{{ old('no_hp') }}"
+                    <input type="text" name="no_hp" value="{{ old('no_hp') }}" autocomplete="off"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
                 </div>
-                <div>
+
+                <div class="col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat</label>
                     <textarea name="alamat" rows="3"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('alamat') }}</textarea>
                 </div>
-                <div>
+
+                <div class="col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-                    <input type="password" name="password"
+                    <input type="password" name="password" autocomplete="new-password"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
                 </div>
             </div>
-
-            <div class="mt-6 pt-5 border-t border-slate-100 flex justify-end gap-3">
-                <a href="{{ route('admin.guru-bk.index') }}"
-                    class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-                    Batal
-                </a>
-                <button type="submit"
-                    class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
-                    Simpan Data
-                </button>
-            </div>
         </form>
     </div>
+
+    <div class="mt-5 flex justify-end gap-3">
+        <a href="{{ route('admin.guru-bk.index') }}"
+            class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            Batal
+        </a>
+        <button type="submit" form="form-tambah-guru-bk"
+            class="px-5 py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors">
+            Simpan Data
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        function previewFoto(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const preview = document.getElementById('foto-preview');
+            const placeholderIcon = document.getElementById('foto-placeholder-icon');
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholderIcon.classList.add('hidden');
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
 
 @endsection

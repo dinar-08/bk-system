@@ -2,7 +2,7 @@
 
 @section('title', 'Detail Laporan')
 @section('page-title', 'Detail Laporan')
-@section('page-subtitle', 'Informasi laporan, pemanggilan, monitoring, dan evaluasi anak')
+@section('page-subtitle', 'Informasi laporan dan pemanggilan anak')
 
 @section('content')
 
@@ -54,13 +54,6 @@
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
                 {{ $laporan->judul_laporan }}
             </h1>
-
-            <p class="text-sm text-slate-500 mt-2">
-                Guru BK:
-                <span class="font-semibold text-slate-700">
-                    {{ $laporan->guruBk->nama ?? 'Belum ditangani' }}
-                </span>
-            </p>
         </div>
 
         {{-- DATA ANAK --}}
@@ -154,6 +147,13 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase">Guru BK</p>
+                    <p class="text-sm font-semibold text-slate-800 mt-1">
+                        {{ $laporan->guruBk->nama ?? 'Belum ditangani' }}
+                    </p>
+                </div>
+
                 <div>
                     <p class="text-xs font-bold text-slate-400 uppercase">Kategori</p>
                     <p class="text-sm font-semibold text-slate-800 mt-1">
@@ -268,13 +268,13 @@
                             </div>
 
                             <span class="inline-flex w-fit px-3 py-1 rounded-full text-xs font-bold
-                                                                        @if($item->status_perkembangan == 'membaik')
-                                                                            bg-green-50 text-green-700 border border-green-200
-                                                                        @elseif($item->status_perkembangan == 'stabil')
-                                                                            bg-blue-50 text-blue-700 border border-blue-200
-                                                                        @else
-                                                                            bg-red-50 text-red-700 border border-red-200
-                                                                        @endif">
+                                        @if($item->status_perkembangan == 'membaik')
+                                            bg-green-50 text-green-700 border border-green-200
+                                        @elseif($item->status_perkembangan == 'stabil')
+                                            bg-blue-50 text-blue-700 border border-blue-200
+                                        @else
+                                            bg-red-50 text-red-700 border border-red-200
+                                        @endif">
                                 {{ ucfirst($item->status_perkembangan) }}
                             </span>
                         </div>
@@ -322,6 +322,7 @@
                 </div>
             @endif
         </section>
+
     </div>
 
 @endsection

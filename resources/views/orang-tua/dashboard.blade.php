@@ -18,17 +18,17 @@
         $statusLabel = [
             'baru' => 'Baru Dilaporkan',
             'pemanggilan' => 'Pemanggilan',
-            'monitoring' => 'Dalam Monitoring',
+            'monitoring' => 'Monitoring',
             'selesai' => 'Selesai',
             'dirujuk' => 'Dirujuk',
         ];
 
         $statusClass = [
-            'baru' => 'bg-blue-100 text-blue-700 border-blue-200',
-            'pemanggilan' => 'bg-amber-100 text-amber-700 border-amber-200',
-            'monitoring' => 'bg-green-100 text-green-700 border-green-200',
-            'selesai' => 'bg-slate-100 text-slate-600 border-slate-200',
-            'dirujuk' => 'bg-orange-100 text-orange-700 border-orange-200',
+            'baru' => 'bg-blue-50 text-blue-700 border-blue-200',
+            'pemanggilan' => 'bg-amber-50 text-amber-700 border-amber-200',
+            'monitoring' => 'bg-purple-50 text-purple-700 border-purple-200',
+            'selesai' => 'bg-green-50 text-green-700 border-green-200',
+            'dirujuk' => 'bg-red-50 text-red-700 border-red-200',
         ];
 
         $laporanUtama = $laporan->whereNotIn('status', ['selesai'])->first();
@@ -40,11 +40,18 @@
             $badgeLabel = $statusLabel[$laporanUtama->status] ?? ucfirst($laporanUtama->status);
             $badgeClass = $statusClass[$laporanUtama->status] ?? 'bg-slate-100 text-slate-600 border-slate-200';
             $pemanggilanTerbaru = $laporanUtama->pemanggilan->sortByDesc('tanggal_pemanggilan')->first();
+
+            // Jika status sudah masuk monitoring (atau lebih lanjut), arahkan ke halaman
+            // Detail Perkembangan. Selama masih baru/pemanggilan, arahkan ke Detail Laporan.
+            $rutePerkembangan = in_array($laporanUtama->status, ['monitoring', 'dirujuk', 'selesai']);
+            $urlDetail = $rutePerkembangan
+                ? route('orang_tua.perkembangan.show', $laporanUtama->laporan_id)
+                : route('orang_tua.laporan.show', $laporanUtama->laporan_id);
         @endphp
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 mb-5">
             <div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
-                <div class="flex items-start gap-4 w-full sm:w-auto">
+                <div class="flex items-start gap-4 w-full sm:w-auto flex-1">
                     <div
                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-blue-50 border border-slate-200 flex-shrink-0 flex items-center justify-center">
                         @if($laporanUtama->siswa->foto)
@@ -55,55 +62,47 @@
                         @endif
                     </div>
 
-                    <div class="flex-1 min-w-0 sm:hidden">
-                        <p class="font-bold text-slate-800 text-sm truncate">{{ $laporanUtama->siswa->nama_siswa }}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-slate-800 text-sm sm:text-base truncate">
+                            {{ $laporanUtama->siswa->nama_siswa }}
+                        </p>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
                             Kelas {{ $laporanUtama->siswa->kelas }} · NIS {{ $laporanUtama->siswa->nis }}
+                        </p>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-2 break-words">
+                            Jenis Masalah:
+                            <span class="font-semibold text-slate-800">
+                                {{ $laporanUtama->jenis_masalah ?? 'Menunggu verifikasi Guru BK' }}
+                            </span>
                         </p>
                     </div>
                 </div>
 
-                <div class="flex-1 min-w-0 w-full">
-                    <p class="hidden sm:block font-bold text-slate-800 text-base">
-                        {{ $laporanUtama->siswa->nama_siswa }}
-                    </p>
-                    <p class="hidden sm:block text-sm text-slate-500 mt-0.5">
-                        Kelas {{ $laporanUtama->siswa->kelas }} · NIS {{ $laporanUtama->siswa->nis }}
-                    </p>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2 break-words">
-                        Jenis Masalah:
-                        <span class="font-semibold text-slate-800">
-                            {{ $laporanUtama->jenis_masalah ?? 'Menunggu verifikasi Guru BK' }}
-                        </span>
-                    </p>
-                </div>
+                <div class="flex-shrink-0 w-full sm:w-auto flex flex-col gap-3 sm:items-end">
+                    <a href="{{ $urlDetail }}"
+                        class="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-xs font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all">
+                        <i data-feather="eye" class="w-3.5 h-3.5"></i>
+                        Lihat Detail
+                    </a>
 
-                <a href="{{ route('orang_tua.laporan.show', $laporanUtama->laporan_id) }}"
-                    class="flex-shrink-0 w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-blue-50 hover:bg-blue-700 text-blue-700 hover:text-white text-xs font-semibold rounded-xl border border-blue-100 hover:border-blue-700 transition-all">
-                    <i data-feather="eye" class="w-3.5 h-3.5"></i>
-                    Lihat Detail
-                </a>
+                    <div class="bg-slate-50 rounded-xl px-4 py-3 w-full sm:w-56">
+                        <p class="text-xs text-slate-400 mb-1.5">Jadwal Pemanggilan</p>
+                        <p class="text-sm font-semibold text-slate-800">
+                            @if($pemanggilanTerbaru)
+                                {{ $pemanggilanTerbaru->tanggal_pemanggilan }} · {{ $pemanggilanTerbaru->waktu_pemanggilan }}
+                            @else
+                                Belum dijadwalkan
+                            @endif
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                <div class="bg-slate-50 rounded-xl px-4 py-3">
-                    <p class="text-xs text-slate-400 mb-1.5">Status Laporan</p>
-                    <span
-                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">
-                        {{ $badgeLabel }}
-                    </span>
-                </div>
-
-                <div class="bg-slate-50 rounded-xl px-4 py-3">
-                    <p class="text-xs text-slate-400 mb-1.5">Jadwal Pemanggilan</p>
-                    <p class="text-sm font-semibold text-slate-800">
-                        @if($pemanggilanTerbaru)
-                            {{ $pemanggilanTerbaru->tanggal_pemanggilan }} · {{ $pemanggilanTerbaru->waktu_pemanggilan }}
-                        @else
-                            Belum dijadwalkan
-                        @endif
-                    </p>
-                </div>
+            <div class="bg-slate-50 rounded-xl px-4 py-3 mt-4">
+                <p class="text-xs text-slate-400 mb-1.5">Status Laporan</p>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">
+                    {{ $badgeLabel }}
+                </span>
             </div>
         </div>
     @else

@@ -68,8 +68,6 @@
             padding: 18px 12px 6px;
         }
 
-        /* Footer sidebar (tombol Keluar) selalu diberi jarak aman
-           dari gesture bar / home indicator HP supaya tidak ketiban. */
         #sidebar-footer {
             padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
         }
@@ -89,7 +87,6 @@
                 width: min(78vw, 260px);
             }
 
-            /* aman dari notch / status bar HP */
             header.mobile-topbar {
                 padding-top: calc(0.75rem + env(safe-area-inset-top));
             }
@@ -339,14 +336,11 @@
                     return;
                 }
 
-                let subscription = await registration.pushManager.getSubscription();
-                if (!subscription) {
-                    subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-                    });
-                }
-
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                });
+                
                 await fetch('{{ route('push-subscription.store') }}', {
                     method: 'POST',
                     headers: {

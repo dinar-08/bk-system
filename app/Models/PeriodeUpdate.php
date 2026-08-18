@@ -41,8 +41,9 @@ class PeriodeUpdate extends Model
 
     public static function terkini(): ?self
     {
-        return static::where('tanggal_mulai', '<=', now())
+        return static::where('aktif', true)
             ->orderByDesc('tanggal_mulai')
-            ->first();
+            ->first()
+            ?? static::orderByDesc('tanggal_mulai')->first();
     }
 }

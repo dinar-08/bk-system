@@ -17,8 +17,21 @@ class LaporanController extends Controller
 
     public function index()
     {
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
+        // Laporan "baru" (belum ada yang menangani) tampil untuk SEMUA guru BK,
+        // supaya siapa saja bisa mengambil dan memverifikasinya.
+        // Laporan yang sudah masuk status "pemanggilan" hanya tampil untuk
+        // guru BK yang memverifikasinya (nip cocok) - guru BK lain tidak lagi
+        // melihat laporan yang sudah ditangani rekannya.
         $laporan = Laporan::with(['siswa', 'guruBk'])
-            ->whereIn('status', ['baru', 'pemanggilan'])
+            ->where(function ($query) use ($guruBk) {
+                $query->where('status', 'baru')
+                    ->orWhere(function ($q) use ($guruBk) {
+                        $q->where('status', 'pemanggilan')
+                            ->where('nip', $guruBk->nip);
+                    });
+            })
             ->latest()
             ->get();
 
@@ -104,11 +117,19 @@ class LaporanController extends Controller
 
     public function show(string $id)
     {
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
             'pemanggilan',
         ])->findOrFail($id);
+
+        // Laporan yang masih "baru" boleh dibuka siapa saja (untuk diverifikasi/diambil).
+        // Laporan yang sudah ditangani guru BK lain tidak boleh diakses.
+        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses ke laporan ini.');
+        }
 
         return view('bk.laporan.show', compact('laporan'));
     }
@@ -118,6 +139,12 @@ class LaporanController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $laporan = Laporan::findOrFail($id);
+
+        // Cegah laporan yang sudah keburu diambil/diverifikasi guru BK lain
+        // diverifikasi ulang oleh guru BK yang berbeda.
+        if ($laporan->status !== 'baru') {
+            abort(403, 'Laporan ini sudah diverifikasi oleh guru BK lain.');
+        }
 
         $validated = $request->validate([
             'kategori' => ['required', 'in:' . implode(',', self::KATEGORI)],
@@ -154,7 +181,14 @@ class LaporanController extends Controller
 
     public function edit(string $id)
     {
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
         $laporan = Laporan::with('siswa')->findOrFail($id);
+
+        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses ke laporan ini.');
+        }
+
         $kategori = self::KATEGORI;
 
         return view('bk.laporan.edit', compact('laporan', 'kategori'));
@@ -165,6 +199,13 @@ class LaporanController extends Controller
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
         $laporan = Laporan::findOrFail($id);
+
+        // Laporan "baru" boleh diverifikasi (dan otomatis jadi milik) guru BK
+        // manapun yang pertama melakukannya. Laporan yang sudah ditangani
+        // guru BK lain tidak boleh diubah.
+        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah laporan ini.');
+        }
 
         $validated = $request->validate([
             'kategori' => ['required', 'in:' . implode(',', self::KATEGORI)],
@@ -186,7 +227,15 @@ class LaporanController extends Controller
 
     public function destroy(string $id)
     {
-        Laporan::findOrFail($id)->delete();
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
+        $laporan = Laporan::findOrFail($id);
+
+        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus laporan ini.');
+        }
+
+        $laporan->delete();
 
         return redirect()
             ->route('bk.laporan.index')

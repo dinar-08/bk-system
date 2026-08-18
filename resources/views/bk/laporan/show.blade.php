@@ -346,9 +346,11 @@
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
+                                {{-- Status Kehadiran: mengontrol tampil/sembunyi field-field di bawahnya --}}
                                 <div>
                                     <label for="status_kehadiran_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Status Kehadiran</label>
                                     <select id="status_kehadiran_{{ $item->pemanggilan_id }}" name="status_kehadiran" required
+                                        onchange="toggleHasilPemanggilan('{{ $item->pemanggilan_id }}')"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->status_kehadiran == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="hadir" {{ $item->status_kehadiran == 'hadir' ? 'selected' : '' }}>Hadir</option>
@@ -356,9 +358,12 @@
                                     </select>
                                 </div>
 
-                                <div>
+                                {{-- Field di bawah ini hanya relevan setelah pertemuan terjadi (status bukan "belum") --}}
+                                <div id="tindak_lanjut_wrapper_{{ $item->pemanggilan_id }}"
+                                    class="{{ $item->status_kehadiran === 'belum' ? 'hidden' : '' }}">
                                     <label for="tindak_lanjut_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tindak Lanjut</label>
-                                    <select id="tindak_lanjut_{{ $item->pemanggilan_id }}" name="tindak_lanjut" required
+                                    <select id="tindak_lanjut_{{ $item->pemanggilan_id }}" name="tindak_lanjut"
+                                        onchange="toggleMonitoring('{{ $item->pemanggilan_id }}')"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                         <option value="belum" {{ $item->tindak_lanjut == 'belum' ? 'selected' : '' }}>Belum</option>
                                         <option value="monitoring" {{ $item->tindak_lanjut == 'monitoring' ? 'selected' : '' }}>Lanjut Monitoring</option>
@@ -366,23 +371,26 @@
                                     </select>
                                 </div>
 
-                                <div>
+                                <div id="tanggal_monitoring_wrapper_{{ $item->pemanggilan_id }}"
+                                    class="{{ $item->tindak_lanjut === 'monitoring' ? '' : 'hidden' }}">
                                     <label for="tanggal_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Tanggal Monitoring</label>
-                                    <input type="date" id="tanggal_monitoring_{{ $item->pemanggilan_id }}" name="tanggal_monitoring" required
+                                    <input type="date" id="tanggal_monitoring_{{ $item->pemanggilan_id }}" name="tanggal_monitoring"
                                         value="{{ old('tanggal_monitoring', $item->tanggal_monitoring) }}"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
-                                <div>
+                                <div id="waktu_monitoring_wrapper_{{ $item->pemanggilan_id }}"
+                                    class="{{ $item->tindak_lanjut === 'monitoring' ? '' : 'hidden' }}">
                                     <label for="waktu_monitoring_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Jam Monitoring</label>
-                                    <input type="time" id="waktu_monitoring_{{ $item->pemanggilan_id }}" name="waktu_monitoring" step="60" required
+                                    <input type="time" id="waktu_monitoring_{{ $item->pemanggilan_id }}" name="waktu_monitoring" step="60"
                                         value="{{ old('waktu_monitoring') }}"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
                                 </div>
 
-                                <div>
+                                <div id="catatan_wrapper_{{ $item->pemanggilan_id }}"
+                                    class="{{ $item->status_kehadiran === 'belum' ? 'hidden' : '' }}">
                                     <label for="catatan_{{ $item->pemanggilan_id }}" class="block text-xs text-slate-400 mb-1">Catatan</label>
-                                    <input type="text" id="catatan_{{ $item->pemanggilan_id }}" name="catatan" required
+                                    <input type="text" id="catatan_{{ $item->pemanggilan_id }}" name="catatan"
                                         value="{{ old('catatan', $item->catatan) }}"
                                         placeholder="Catatan"
                                         class="w-full rounded-xl border-slate-200 text-sm px-3 py-2 focus:ring-blue-400">
@@ -444,4 +452,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleHasilPemanggilan(id) {
+            const status = document.getElementById('status_kehadiran_' + id).value;
+            const show = status !== 'belum';
+
+            document.getElementById('tindak_lanjut_wrapper_' + id).classList.toggle('hidden', !show);
+            document.getElementById('catatan_wrapper_' + id).classList.toggle('hidden', !show);
+
+            if (!show) {
+                document.getElementById('tanggal_monitoring_wrapper_' + id).classList.add('hidden');
+                document.getElementById('waktu_monitoring_wrapper_' + id).classList.add('hidden');
+            } else {
+                toggleMonitoring(id);
+            }
+        }
+
+        function toggleMonitoring(id) {
+            const tindakLanjut = document.getElementById('tindak_lanjut_' + id).value;
+            const show = tindakLanjut === 'monitoring';
+
+            document.getElementById('tanggal_monitoring_wrapper_' + id).classList.toggle('hidden', !show);
+            document.getElementById('waktu_monitoring_wrapper_' + id).classList.toggle('hidden', !show);
+        }
+    </script>
 @endsection

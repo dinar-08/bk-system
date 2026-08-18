@@ -7,8 +7,32 @@
 @section('content')
 
     @php
+        function urutanKelas($kelas)
+        {
+            $kelas = trim($kelas);
+
+            $isInternasional = stripos($kelas, 'internasional') !== false;
+            $grup = $isInternasional ? 1 : 0;
+
+            preg_match('/(\d+)/', $kelas, $angka);
+            $tingkat = isset($angka[1]) ? (int) $angka[1] : 999;
+
+            preg_match('/([A-Za-z]+)\s*$/', $kelas, $huruf);
+            $section = isset($huruf[1]) ? strtoupper($huruf[1]) : 'ZZ';
+
+            if (!isset($angka[1]) && !$isInternasional) {
+                $grup = 2; 
+            }
+
+            return sprintf('%d-%03d-%s', $grup, $tingkat, $section);
+        }
+
         $siswaAktif = $siswa->filter(fn($item) => ($item->user->status_akun ?? 'aktif') === 'aktif');
-        $siswaPerKelas = $siswaAktif->sortBy('nama_siswa')->groupBy('kelas');
+
+        $siswaPerKelas = $siswaAktif
+            ->groupBy('kelas')
+            ->sortKeysUsing(fn($a, $b) => urutanKelas($a) <=> urutanKelas($b))
+            ->map(fn($group) => $group->sortBy('nama_siswa'));
     @endphp
 
     <div class="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -175,7 +199,6 @@
                     <div class="group relative shrink-0 h-[330px] border-r-4 border-white bg-center overflow-hidden transition-all duration-500 ease-out cursor-pointer"
                         style="width: 58px;" onmouseenter="this.style.width='284px'" onmouseleave="this.style.width='58px'">
 
-                        {{-- Background foto / fallback --}}
                         @if($item->foto)
                             <img src="{{ route('foto.siswa', $item->nis) }}" alt="{{ $item->nama_siswa }}"
                                 class="absolute inset-0 w-full h-full object-cover"
@@ -196,16 +219,13 @@
                             </div>
                         @endif
 
-                        {{-- Overlay --}}
                         <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-black/20 to-black/90"></div>
 
-                        {{-- Nama vertikal saat card kecil --}}
                         <p class="absolute left-4 bottom-4 max-w-[250px] text-white text-xs font-extrabold tracking-[2px] uppercase whitespace-nowrap transition-all duration-300 group-hover:opacity-0"
                             style="transform: rotate(-90deg); transform-origin: left bottom;">
                             {{ $item->nama_siswa }}
                         </p>
 
-                        {{-- Detail saat hover --}}
                         <div
                             class="absolute inset-0 p-5 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div class="flex justify-end gap-2">
@@ -256,7 +276,6 @@
         </div>
     @endforelse
 
-    {{-- Modal Download Data --}}
     <div id="downloadModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-slate-900/40" onclick="closeDownloadModal()"></div>
 
@@ -316,7 +335,6 @@
         </div>
     </div>
 
-    {{-- Modal Periode Update --}}
     <div id="periodeModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-slate-900/40" onclick="closePeriodeModal()"></div>
 
@@ -400,7 +418,7 @@
             @if($errors->any())
                 openPeriodeModal();
             @endif
-                        });
+                            });
     </script>
 
 @endsection

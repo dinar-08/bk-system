@@ -1,2 +1,22 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /admin/
+Disallow: /bk/
+Disallow: /orang-tua/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password/
+Disallow: /confirm-password
+Disallow: /verify-email
+Disallow: /email/
+Disallow: /profile
+Disallow: /ganti-password-awal
+Disallow: /foto/
+Disallow: /bukti/
+Disallow: /storage/
+Disallow: /push-subscription
+Disallow: /logout
+
+Sitemap: https://laporbu.my.id/sitemap.xml

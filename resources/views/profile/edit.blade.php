@@ -19,13 +19,10 @@
         default => 'Siswa',
     };
 
-    // Foto: orang_tua ambil dari siswa, lainnya dari users
     $photo = $role === 'orang_tua'
         ? ($dataProfil->foto ?? null)
         : ($role === 'admin' ? ($user->foto ?? null) : ($dataProfil->foto ?? null));
 
-    // URL foto: semua foto bersifat privat, jadi diambil lewat route foto.*
-    // (bukan asset('storage/...')) supaya tetap melalui pengecekan akses di FotoController.
     $photoUrl = null;
     if ($photo) {
         $photoUrl = match (true) {
@@ -39,13 +36,11 @@
 
     $wajibIsiLengkap = $role === 'orang_tua' && ($mustChangePassword || (!empty($wajibUpdate) && $wajibUpdate));
 
-    // Foto wajib hanya jika belum ada foto sama sekali
     $fotoWajib = $wajibIsiLengkap && !$photo;
 @endphp
 
 <div class="space-y-6">
 
-    {{-- ✅ Profil berhasil disimpan --}}
     @if(session('status') === 'profile-updated')
         <div class="rounded-2xl border border-green-200 bg-green-50 px-5 py-4 flex gap-3">
             <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
@@ -59,7 +54,6 @@
         </div>
     @endif
 
-    {{-- 🔴 Wajib ganti password (password dari sistem) --}}
     @if($mustChangePassword)
         <div class="rounded-2xl border border-red-200 bg-red-50 p-5 flex gap-3">
             <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
@@ -77,7 +71,6 @@
         </div>
     @endif
 
-    {{-- 🟡 Wajib update data (periode update aktif) --}}
     @if(!$mustChangePassword && !empty($wajibUpdate) && $wajibUpdate)
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex gap-3">
             <svg class="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
@@ -96,7 +89,6 @@
         </div>
     @endif
 
-    {{-- Session warning dari middleware --}}
     @if(session('warning'))
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex gap-3">
             <svg class="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
@@ -111,7 +103,6 @@
         </div>
     @endif
 
-    {{-- Validasi error --}}
     @if($errors->any())
         <div class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
             <ul class="list-disc list-inside text-red-600 text-sm space-y-1">
@@ -135,7 +126,6 @@
             @csrf
             @method('PATCH')
 
-            {{-- FOTO PROFIL --}}
             <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-8 pb-8 border-b border-slate-200">
                 <div class="shrink-0">
                     <label for="foto-input" class="cursor-pointer block">
@@ -176,7 +166,6 @@
                     class="hidden">
             </div>
 
-            {{-- INFORMASI DASAR --}}
             <div class="mb-6">
                 <h3 class="text-base font-bold text-slate-900">Informasi Dasar</h3>
                 <p class="text-sm text-slate-500 mt-1">
@@ -204,7 +193,6 @@
                         <label class="block text-sm font-semibold text-slate-700 mb-2">NIS</label>
                         <input type="text" value="{{ $dataProfil->nis }}" readonly
                             class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-400 cursor-not-allowed">
-                        <p class="text-xs text-slate-400 mt-1">Hanya dapat diubah oleh admin.</p>
                     </div>
 
                     <div>
@@ -274,9 +262,8 @@
                             class="w-full rounded-2xl border px-4 py-3 text-sm focus:ring-4 focus:ring-blue-100 resize-none
                                 {{ $wajibIsiLengkap && !$dataProfil->alamat ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300 bg-white focus:border-blue-600' }}">{{ old('alamat', $dataProfil->alamat) }}</textarea>
                     </div>
-
                 @else
-                    {{-- BAGIAN ADMIN DAN BK --}}
+
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Akun</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}"
@@ -290,7 +277,6 @@
                         </label>
                         <input type="text" value="{{ $user->username }}" readonly
                             class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-400 cursor-not-allowed">
-                        <p class="text-xs text-slate-400 mt-1">Hanya dapat diubah oleh admin.</p>
                     </div>
 
                     @if($role === 'bk' && $dataProfil)

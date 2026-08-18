@@ -84,16 +84,31 @@
 
 <body class="bg-slate-50 text-slate-800">
 
+    {{-- ========================================================================= --}}
+    {{-- BAGIAN YANG DIUBAH: badge Monitoring sekarang difilter per guru BK login --}}
+    {{-- ========================================================================= --}}
     @php
         // ==== Data notifikasi BK ====
         $laporanBaruCount = \App\Models\Laporan::where('status', 'baru')->count();
 
+        // Monitoring yang mendekati jadwal (H & H+1), khusus milik guru BK yang login.
+        // Setelah laporan diverifikasi (nip terisi), seluruh proses monitoring
+        // ikut menyesuaikan ke guru BK yang menangani laporan tersebut, jadi
+        // badge ini juga harus dihitung per guru BK, bukan gabungan semua.
+        $guruBkLogin = \App\Models\GuruBK::where('user_id', auth()->id())->first();
+
         $batasMonitoring = now('Asia/Jakarta')->addDay()->toDateString(); // H (hari ini) & H+1 (besok)
 
-        $monitoringDekatCount = \App\Models\Monitoring::where('status_monitoring', 'terjadwal')
-            ->whereDate('tanggal_monitoring', '<=', $batasMonitoring)
-            ->count();
+        $monitoringDekatCount = $guruBkLogin
+            ? \App\Models\Monitoring::where('status_monitoring', 'terjadwal')
+                ->whereDate('tanggal_monitoring', '<=', $batasMonitoring)
+                ->where('nip', $guruBkLogin->nip)
+                ->count()
+            : 0;
     @endphp
+    {{-- ========================================================================= --}}
+    {{-- AKHIR BAGIAN YANG DIUBAH --}}
+    {{-- ========================================================================= --}}
 
     <div class="flex min-h-screen">
 
@@ -318,13 +333,12 @@
                 if (permission !== 'granted') {
                     return;
                 }
-                let subscription = await registration.pushManager.getSubscription();
-                if (!subscription) {
-                    subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-                    });
-                }
+
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                });
+                
                 await fetch('{{ route('push-subscription.store') }}', {
                     method: 'POST',
                     headers: {

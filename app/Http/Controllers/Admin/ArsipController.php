@@ -38,7 +38,6 @@ class ArsipController extends Controller
             ]);
         }
 
-        // Data flat untuk fitur search (dipakai JS, tidak lewat query lagi)
         $arsipJson = $arsip->map(function ($item) {
             return [
                 'nis' => $item->nis,

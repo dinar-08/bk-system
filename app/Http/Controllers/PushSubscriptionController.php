@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,6 +13,15 @@ class PushSubscriptionController extends Controller
             'keys.auth' => ['required', 'string'],
         ]);
 
+        $subscriptionModel = config('webpush.model') ?? \NotificationChannels\WebPush\PushSubscription::class;
+
+        $subscriptionModel::where('endpoint', $validated['endpoint'])
+            ->where(function ($query) use ($request) {
+                $query->where('subscribable_id', '!=', $request->user()->id)
+                    ->orWhere('subscribable_type', '!=', get_class($request->user()));
+            })
+            ->delete();
+
         $request->user()->updatePushSubscription(
             endpoint: $validated['endpoint'],
             key: $validated['keys']['p256dh'],
@@ -25,17 +32,12 @@ class PushSubscriptionController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    /**
-     * Hapus subscription (mis. saat user menonaktifkan notifikasi di device tersebut).
-     */
     public function destroy(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'endpoint' => ['required', 'string'],
         ]);
-
         $request->user()->deletePushSubscription($validated['endpoint']);
-
         return response()->json(['status' => 'ok']);
     }
 }

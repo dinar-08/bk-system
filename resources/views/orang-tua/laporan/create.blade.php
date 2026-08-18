@@ -93,8 +93,25 @@
                         Format: JPG, PNG, PDF, MP3, MP4, MOV, WAV · Maks 50MB
                     </p>
 
-                    <div id="previewWrapper" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
-                        <img id="previewImg" src="" alt="Preview" class="w-full object-cover max-h-56">
+                    {{-- Preview Gambar --}}
+                    <div id="previewWrapperImg" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
+                        <img id="previewImg" src="" alt="Preview" class="w-full object-contain max-h-[500px] bg-slate-100">
+                    </div>
+
+                    {{-- Preview Video --}}
+                    <div id="previewWrapperVideo"
+                        class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200 bg-black max-h-[500px] flex justify-center">
+                        <video id="previewVideo" controls class="h-full max-h-[500px] w-auto object-cover"></video>
+                    </div>
+
+                    {{-- Preview Audio --}}
+                    <div id="previewWrapperAudio" class="hidden mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                        <audio id="previewAudio" controls class="w-full"></audio>
+                    </div>
+
+                    {{-- Preview PDF --}}
+                    <div id="previewWrapperPdf" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
+                        <iframe id="previewPdf" src="" class="w-full h-[500px]"></iframe>
                     </div>
 
                     @error('bukti')
@@ -122,21 +139,55 @@
         function previewBukti(input) {
             const file = input.files[0];
 
-            if (file) {
-                document.getElementById('fileName').textContent = '✓ ' + file.name;
+            const wrappers = {
+                img: document.getElementById('previewWrapperImg'),
+                video: document.getElementById('previewWrapperVideo'),
+                audio: document.getElementById('previewWrapperAudio'),
+                pdf: document.getElementById('previewWrapperPdf'),
+            };
 
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
+            // Sembunyikan semua preview & bersihkan src lama
+            const hideAll = () => {
+                wrappers.img.classList.add('hidden');
+                wrappers.video.classList.add('hidden');
+                wrappers.audio.classList.add('hidden');
+                wrappers.pdf.classList.add('hidden');
 
-                    reader.onload = e => {
-                        document.getElementById('previewImg').src = e.target.result;
-                        document.getElementById('previewWrapper').classList.remove('hidden');
-                    };
+                document.getElementById('previewVideo').src = '';
+                document.getElementById('previewAudio').src = '';
+                document.getElementById('previewPdf').src = '';
+            };
 
-                    reader.readAsDataURL(file);
-                } else {
-                    document.getElementById('previewWrapper').classList.add('hidden');
-                }
+            if (!file) {
+                hideAll();
+                return;
+            }
+
+            document.getElementById('fileName').textContent = '✓ ' + file.name;
+            hideAll();
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    wrappers.img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+            } else if (file.type.startsWith('video/')) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewVideo').src = url;
+                wrappers.video.classList.remove('hidden');
+
+            } else if (file.type.startsWith('audio/')) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewAudio').src = url;
+                wrappers.audio.classList.remove('hidden');
+
+            } else if (file.type === 'application/pdf') {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewPdf').src = url;
+                wrappers.pdf.classList.remove('hidden');
             }
         }
     </script>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Evaluasi;
 use App\Models\GuruBK;
 use App\Models\Laporan;
+use App\Models\PeriodeUpdate;
 use App\Notifications\EvaluasiBaruNotification;
 use Illuminate\Http\Request;
 
@@ -44,9 +45,16 @@ class EvaluasiController extends Controller
             'status_akhir' => $validated['status_akhir'],
         ]);
 
+        $periodeAktif = PeriodeUpdate::terkini();
+
+        $laporanUntukUpdate = Laporan::find($validated['laporan_id']);
+
         Laporan::where('laporan_id', $validated['laporan_id'])
             ->update([
                 'status' => $validated['status_akhir'],
+                // Isi tahun_ajaran hanya jika sebelumnya masih kosong,
+                // supaya tidak menimpa nilai yang sudah benar.
+                'tahun_ajaran' => $laporanUntukUpdate->tahun_ajaran ?? $periodeAktif?->tahun_ajaran,
             ]);
 
         $laporan = Laporan::with('siswa.user')->find($validated['laporan_id']);
@@ -75,8 +83,11 @@ class EvaluasiController extends Controller
             'status_akhir' => $validated['status_akhir'],
         ]);
 
+        $periodeAktif = PeriodeUpdate::terkini();
+
         $evaluasi->laporan->update([
             'status' => $validated['status_akhir'],
+            'tahun_ajaran' => $evaluasi->laporan->tahun_ajaran ?? $periodeAktif?->tahun_ajaran,
         ]);
 
         $laporan = $evaluasi->laporan()->with('siswa.user')->first();

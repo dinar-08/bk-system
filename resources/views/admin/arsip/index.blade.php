@@ -11,14 +11,13 @@
         <p class="text-slate-500 mt-1 text-sm">Data siswa yang telah dinonaktifkan.</p>
     </div>
 
-    {{-- Navigasi: tombol kembali + breadcrumb + search --}}
     <div class="mb-5 flex items-center justify-between gap-3 flex-wrap">
         <div class="flex items-center flex-wrap gap-1 text-[13.5px]">
-            <button type="button" id="back-btn"
-                class="inline-flex items-center gap-0.5 font-semibold text-slate-500 hover:text-slate-900 py-0.5"
-                style="display:none;" onclick="goBack()">
-                <i data-feather="chevron-left" class="w-[15px] h-[15px]"></i> Kembali
-            </button>
+            <a href="#" id="back-btn" onclick="goBack(); return false;"
+                class="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600 font-medium py-0.5"
+                style="display:none;">
+                <i data-feather="chevron-left" class="w-4 h-4"></i> Kembali
+            </a>
             <span id="back-sep" class="text-slate-300" style="display:none;">/</span>
             <div id="breadcrumb" class="flex items-center flex-wrap gap-1.5">
                 <span class="font-semibold text-slate-900 cursor-default" data-level="root">Arsip Siswa</span>
@@ -26,8 +25,9 @@
         </div>
 
         <div class="relative w-48 shrink-0">
+            <i data-feather="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
             <input type="text" id="arsip-search" placeholder="Cari siswa..."
-                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800/20">
+                class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300">
         </div>
     </div>
 
@@ -42,30 +42,25 @@
 
             <div id="level-periode">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Pilih Tahun Ajaran</p>
-                <div class="flex flex-nowrap overflow-x-auto pb-3">
+                <div class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
                     @foreach($arsipPerPeriode as $tahunAjaran => $data)
-                        <div class="spine-card spine-periode group relative shrink-0 h-[240px] border-r-4 border-white bg-gradient-to-b from-slate-400 via-slate-600 to-slate-900 overflow-hidden cursor-pointer transition-all duration-500 ease-out"
-                            style="width: 56px;" onmouseenter="this.style.width='260px'" onmouseleave="this.style.width='56px'"
+                        <div class="periode-card group relative bg-white rounded-2xl border border-slate-200 p-5 cursor-pointer transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5"
+                            data-index="{{ $loop->index }}" data-label="{{ $tahunAjaran }}"
                             onclick="openPeriode({{ $loop->index }}, '{{ addslashes($tahunAjaran) }}')">
 
-                            <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/65"></div>
-
-                            <p
-                                class="spine-label absolute left-4 bottom-4 max-w-[210px] text-white text-xs font-extrabold tracking-[2px] uppercase whitespace-nowrap -rotate-90 origin-bottom-left transition-opacity duration-300 group-hover:opacity-0">
-                                {{ $tahunAjaran }}
-                            </p>
-
-                            <div
-                                class="absolute inset-0 p-[18px] flex flex-col justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                <i data-feather="archive" class="w-6 h-6 text-white/85"></i>
-                                <div>
-                                    <h3 class="text-white text-base font-extrabold leading-tight">{{ $tahunAjaran }}</h3>
-                                    <p class="text-white/80 text-xs mt-1">
-                                        {{ $data['kelas']->count() }} kelas &middot;
-                                        {{ $data['kelas']->flatten(1)->count() }} siswa
-                                    </p>
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
+                                    <i data-feather="archive" class="w-5 h-5 text-blue-600"></i>
                                 </div>
+                                <i data-feather="chevron-right"
+                                    class="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition mt-1"></i>
                             </div>
+
+                            <h3 class="text-base font-extrabold text-slate-900 leading-tight">{{ $tahunAjaran }}</h3>
+                            <p class="text-xs text-slate-500 mt-1">
+                                {{ $data['kelas']->count() }} kelas &middot;
+                                {{ $data['kelas']->flatten(1)->count() }} siswa
+                            </p>
                         </div>
                     @endforeach
                 </div>
@@ -74,28 +69,25 @@
             @foreach($arsipPerPeriode as $tahunAjaran => $data)
                 <div id="level-kelas-{{ $loop->index }}" class="level-kelas" style="display:none;">
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Pilih Kelas &middot;
-                        {{ $tahunAjaran }}</p>
-                    <div class="flex flex-nowrap overflow-x-auto pb-3">
+                        {{ $tahunAjaran }}
+                    </p>
+                    <div class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
                         @foreach($data['kelas'] as $kelas => $dataSiswa)
-                            <div class="spine-card spine-kelas group relative shrink-0 h-[240px] border-r-4 border-white bg-gradient-to-b from-slate-300 via-slate-500 to-slate-800 overflow-hidden cursor-pointer transition-all duration-500 ease-out"
-                                style="width: 56px;" onmouseenter="this.style.width='260px'" onmouseleave="this.style.width='56px'"
+                            <div class="kelas-card group relative bg-white rounded-2xl border border-slate-200 p-5 cursor-pointer transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5"
+                                data-periode-index="{{ $loop->parent->index }}" data-index="{{ $loop->index }}"
+                                data-label="{{ $kelas }}"
                                 onclick="openKelas({{ $loop->parent->index }}, {{ $loop->index }}, '{{ addslashes($kelas) }}')">
 
-                                <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/65"></div>
-
-                                <p
-                                    class="spine-label absolute left-4 bottom-4 max-w-[210px] text-white text-xs font-extrabold tracking-[2px] uppercase whitespace-nowrap -rotate-90 origin-bottom-left transition-opacity duration-300 group-hover:opacity-0">
-                                    Kelas {{ $kelas }}
-                                </p>
-
-                                <div
-                                    class="absolute inset-0 p-[18px] flex flex-col justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                    <i data-feather="users" class="w-6 h-6 text-white/85"></i>
-                                    <div>
-                                        <h3 class="text-white text-base font-extrabold leading-tight">Kelas {{ $kelas }}</h3>
-                                        <p class="text-white/80 text-xs mt-1">{{ $dataSiswa->count() }} siswa</p>
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
+                                        <i data-feather="users" class="w-5 h-5 text-blue-600"></i>
                                     </div>
+                                    <i data-feather="chevron-right"
+                                        class="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition mt-1"></i>
                                 </div>
+
+                                <h3 class="text-base font-extrabold text-slate-900 leading-tight">Kelas {{ $kelas }}</h3>
+                                <p class="text-xs text-slate-500 mt-1">{{ $dataSiswa->count() }} siswa</p>
                             </div>
                         @endforeach
                     </div>
@@ -105,58 +97,59 @@
                     <div id="level-siswa-{{ $loop->parent->index }}-{{ $loop->index }}" class="level-siswa" style="display:none;">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Siswa &middot; Kelas {{ $kelas }}
                             &middot; {{ $tahunAjaran }}</p>
-                        <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[18px]">
+                        <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
                             @foreach($dataSiswa as $item)
-                                <div class="member-card siswa-card group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer bg-slate-200 border-[3px] border-slate-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                <div class="member-card siswa-card group relative bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5"
                                     data-nama="{{ strtolower($item->nama_siswa) }}" data-nis="{{ strtolower($item->nis) }}"
                                     onclick="window.location.href='{{ route('admin.arsip.show', $item->nis) }}'">
 
-                                    @if($item->foto)
-                                        <img src="{{ route('foto.siswa', $item->nis) }}" alt="{{ $item->nama_siswa }}"
-                                            class="absolute inset-0 w-full h-full object-cover grayscale-[35%]"
-                                            onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                                        <div
-                                            class="member-fallback hidden absolute inset-0 flex items-center justify-center font-extrabold text-4xl text-white bg-gradient-to-b from-slate-400 via-slate-600 to-slate-900">
-                                            {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
-                                        </div>
-                                    @else
-                                        <div
-                                            class="member-fallback absolute inset-0 flex items-center justify-center font-extrabold text-4xl text-white bg-gradient-to-b from-slate-400 via-slate-600 to-slate-900">
-                                            {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
-                                        </div>
-                                    @endif
+                                    <div class="relative aspect-square bg-slate-100">
+                                        @if($item->foto)
+                                            <img src="{{ route('foto.siswa', $item->nis) }}" alt="{{ $item->nama_siswa }}"
+                                                class="absolute inset-0 w-full h-full object-cover"
+                                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                            <div
+                                                class="member-fallback hidden absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-300 bg-slate-100">
+                                                {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
+                                            </div>
+                                        @else
+                                            <div
+                                                class="member-fallback absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-300 bg-slate-100">
+                                                {{ strtoupper(substr($item->nama_siswa, 0, 1)) }}
+                                            </div>
+                                        @endif
 
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent"></div>
+                                        <div
+                                            class="member-badge absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">
+                                            Arsip
+                                        </div>
 
-                                    <div
-                                        class="member-badge absolute top-2 left-2 text-[9.5px] font-extrabold text-slate-100 bg-slate-500/40 border border-slate-300/40 px-2 py-0.5 rounded-full">
-                                        Nonaktif
+                                        <div class="member-actions absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                            onclick="event.stopPropagation()">
+                                            <a href="{{ route('admin.arsip.show', $item->nis) }}" title="Lihat Arsip"
+                                                class="w-[26px] h-[26px] rounded-full flex items-center justify-center bg-white shadow border border-slate-100">
+                                                <i data-feather="eye" class="w-[13px] h-[13px] text-slate-600"></i>
+                                            </a>
+                                            <form action="{{ route('admin.siswa.destroy', $item->nis) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Aktifkan Kembali"
+                                                    onclick="return confirm('Aktifkan kembali akun siswa ini?')"
+                                                    class="w-[26px] h-[26px] rounded-full flex items-center justify-center bg-white shadow border border-slate-100">
+                                                    <i data-feather="refresh-cw" class="w-[13px] h-[13px] text-green-600"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
 
-                                    <div class="member-actions absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                                        onclick="event.stopPropagation()">
-                                        <a href="{{ route('admin.arsip.show', $item->nis) }}" title="Lihat Arsip"
-                                            class="w-[26px] h-[26px] rounded-full flex items-center justify-center bg-white/90 shadow">
-                                            <i data-feather="eye" class="w-[13px] h-[13px] text-slate-700"></i>
-                                        </a>
-                                        <form action="{{ route('admin.siswa.destroy', $item->nis) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" title="Aktifkan Kembali"
-                                                onclick="return confirm('Aktifkan kembali akun siswa ini?')"
-                                                class="w-[26px] h-[26px] rounded-full flex items-center justify-center bg-white/90 shadow">
-                                                <i data-feather="refresh-cw" class="w-[13px] h-[13px] text-green-600"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <div class="member-caption absolute inset-x-0 bottom-0 p-3">
-                                        <div class="member-name text-white font-extrabold text-[13px] leading-tight">{{ $item->nama_siswa }}
+                                    <div class="member-caption p-3">
+                                        <div class="member-name text-slate-900 font-bold text-[13px] leading-tight truncate">
+                                            {{ $item->nama_siswa }}
                                         </div>
-                                        <div class="member-sub text-white/75 text-[11px] mt-0.5">
+                                        <div class="member-sub text-slate-500 text-[11px] mt-0.5 truncate">
                                             NIS {{ $item->nis }}
                                             @if($item->user?->nonaktif_at)
-                                                &middot; Nonaktif {{ $item->user->nonaktif_at->format('d-m-Y') }}
+                                                &middot; {{ $item->user->nonaktif_at->format('d-m-Y') }}
                                             @endif
                                         </div>
                                     </div>
@@ -169,8 +162,11 @@
 
             <div id="level-search" style="display:none;">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Hasil Pencarian</p>
-                <div id="level-search-grid" class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-[18px]"></div>
-                <p id="search-empty" class="hidden text-center text-slate-500 py-8">Tidak ada siswa yang cocok.</p>
+                <div id="level-search-grid" class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4"></div>
+                <div id="search-empty" class="hidden bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                    <i data-feather="search" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+                    <p class="text-slate-500 font-medium">Tidak ada siswa yang cocok.</p>
+                </div>
             </div>
 
         </div>
@@ -201,7 +197,7 @@
         }
 
         const BREADCRUMB_ACTIVE = 'font-semibold text-slate-900 cursor-default';
-        const BREADCRUMB_LINK = 'font-semibold text-slate-600 hover:text-slate-900 hover:underline cursor-pointer';
+        const BREADCRUMB_LINK = 'font-semibold text-slate-500 hover:text-slate-900 hover:underline cursor-pointer';
 
         function setBreadcrumb(items) {
             const wrap = document.getElementById('breadcrumb');
@@ -246,8 +242,8 @@
         function openKelas(periodeIndex, kelasIndex, kelasLabel) {
             hideAllLevels();
             document.getElementById('level-siswa-' + periodeIndex + '-' + kelasIndex).style.display = '';
-            const periodeLabelEl = document.querySelectorAll('.spine-periode .spine-label')[periodeIndex];
-            const periodeLabel = periodeLabelEl ? periodeLabelEl.textContent.trim() : currentState.periodeLabel;
+            const periodeCard = document.querySelector('.periode-card[data-index="' + periodeIndex + '"]');
+            const periodeLabel = periodeCard ? periodeCard.dataset.label : currentState.periodeLabel;
             currentState = { level: 'kelas', periodeIndex, kelasIndex, periodeLabel, kelasLabel };
             setBreadcrumb([
                 { label: 'Arsip Siswa', onClick: goToRoot },
@@ -266,19 +262,20 @@
 
         function buildMemberCardHTML(s) {
             const fotoHtml = s.foto_url
-                ? `<img src="${s.foto_url}" alt="${s.nama}" class="absolute inset-0 w-full h-full object-cover grayscale-[35%]" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                       <div class="member-fallback hidden absolute inset-0 flex items-center justify-center font-extrabold text-4xl text-white bg-gradient-to-b from-slate-400 via-slate-600 to-slate-900">${s.nama.charAt(0).toUpperCase()}</div>`
-                : `<div class="member-fallback absolute inset-0 flex items-center justify-center font-extrabold text-4xl text-white bg-gradient-to-b from-slate-400 via-slate-600 to-slate-900">${s.nama.charAt(0).toUpperCase()}</div>`;
+                ? `<img src="${s.foto_url}" alt="${s.nama}" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                           <div class="member-fallback hidden absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-300 bg-slate-100">${s.nama.charAt(0).toUpperCase()}</div>`
+                : `<div class="member-fallback absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-300 bg-slate-100">${s.nama.charAt(0).toUpperCase()}</div>`;
 
             return `
-                    ${fotoHtml}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent"></div>
-                    <div class="absolute top-2 left-2 text-[9.5px] font-extrabold text-slate-100 bg-slate-500/40 border border-slate-300/40 px-2 py-0.5 rounded-full">Nonaktif</div>
-                    <div class="absolute inset-x-0 bottom-0 p-3">
-                        <div class="text-white font-extrabold text-[13px] leading-tight">${s.nama}</div>
-                        <div class="text-white/75 text-[11px] mt-0.5">NIS ${s.nis} &middot; ${s.kelas}${s.nonaktif_at ? ' &middot; Nonaktif ' + s.nonaktif_at : ''}</div>
-                    </div>
-                `;
+                        <div class="relative aspect-square bg-slate-100">
+                            ${fotoHtml}
+                            <div class="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">Arsip</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="text-slate-900 font-bold text-[13px] leading-tight truncate">${s.nama}</div>
+                            <div class="text-slate-500 text-[11px] mt-0.5 truncate">NIS ${s.nis} &middot; ${s.kelas}${s.nonaktif_at ? ' &middot; ' + s.nonaktif_at : ''}</div>
+                        </div>
+                    `;
         }
 
         function openFromQueryString() {
@@ -288,12 +285,9 @@
 
             if (!qPeriode) return false;
 
-            const periodeLabels = document.querySelectorAll('.spine-periode .spine-label');
-            let periodeIndex = -1;
-            periodeLabels.forEach((el, idx) => {
-                if (el.textContent.trim() === qPeriode) periodeIndex = idx;
-            });
-            if (periodeIndex === -1) return false;
+            const periodeCard = document.querySelector('.periode-card[data-label="' + CSS.escape(qPeriode) + '"]');
+            if (!periodeCard) return false;
+            const periodeIndex = periodeCard.dataset.index;
 
             if (!qKelas) {
                 openPeriode(periodeIndex, qPeriode);
@@ -303,17 +297,14 @@
                 return true;
             }
 
-            const kelasContainer = document.getElementById('level-kelas-' + periodeIndex);
-            const kelasLabels = kelasContainer.querySelectorAll('.spine-kelas .spine-label');
-            let kelasIndex = -1;
-            kelasLabels.forEach((el, idx) => {
-                if (el.textContent.trim().toLowerCase() === ('Kelas ' + qKelas).toLowerCase()) kelasIndex = idx;
-            });
+            const kelasCard = document.querySelector(
+                '.kelas-card[data-periode-index="' + periodeIndex + '"][data-label="' + CSS.escape(qKelas) + '"]'
+            );
 
-            if (kelasIndex === -1) {
+            if (!kelasCard) {
                 openPeriode(periodeIndex, qPeriode);
             } else {
-                openKelas(periodeIndex, kelasIndex, qKelas);
+                openKelas(periodeIndex, kelasCard.dataset.index, qKelas);
             }
 
             if (window.history.replaceState) {
@@ -368,7 +359,7 @@
 
                 hasil.forEach(s => {
                     const div = document.createElement('div');
-                    div.className = 'group relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer bg-slate-200 border-[3px] border-slate-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl';
+                    div.className = 'bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5';
                     div.onclick = () => window.location.href = s.show_url;
                     div.innerHTML = buildMemberCardHTML(s);
                     searchGrid.appendChild(div);

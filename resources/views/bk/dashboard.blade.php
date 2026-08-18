@@ -21,8 +21,7 @@
         $kategoriLabels = ($kategoriChart ?? collect())->pluck('kategori')->map(fn($item) => ucfirst($item))->values();
         $kategoriData = ($kategoriChart ?? collect())->pluck('total')->values();
     @endphp
-
-    {{-- Stat Cards --}}
+    
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 mb-6 sm:mb-7">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
             <div class="flex items-center justify-between mb-3">
@@ -34,7 +33,6 @@
             <p class="text-2xl sm:text-3xl font-extrabold text-slate-800">{{ $totalLaporan ?? 0 }}</p>
             <p class="text-xs text-slate-400 mt-1">Total Permasalahan Tercatat</p>
         </div>
-
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 flex items-center justify-center">
@@ -45,7 +43,6 @@
             <p class="text-2xl sm:text-3xl font-extrabold text-slate-800">{{ $monitoringAktif ?? 0 }}</p>
             <p class="text-xs text-slate-400 mt-1">Sedang Dalam Monitoring</p>
         </div>
-
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 sm:col-span-2 md:col-span-1">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-green-50 flex items-center justify-center">
@@ -57,8 +54,6 @@
             <p class="text-xs text-slate-400 mt-1">Permasalahan Selesai</p>
         </div>
     </div>
-
-    {{-- Grafik --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-7">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
             <h3 class="font-semibold text-slate-800 text-sm mb-1">Jenis Kelamin Siswa</h3>
@@ -71,15 +66,12 @@
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
             <h3 class="font-semibold text-slate-800 text-sm mb-1">Permasalahan Berdasarkan Kelas</h3>
             <p class="text-xs text-slate-400 mb-4">Kelas dengan jumlah laporan permasalahan terbanyak.</p>
-            {{-- Wrapper luar yang boleh di-scroll horizontal di HP --}}
             <div class="h-52 sm:h-64 overflow-x-auto">
-                {{-- Wrapper dalam: lebarnya diatur oleh JS sesuai jumlah kelas, supaya batang tidak gepeng --}}
                 <div id="kelasChartWrapper" class="h-full">
                     <canvas id="kelasChartCanvas"></canvas>
                 </div>
             </div>
         </div>
-
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 lg:col-span-2">
             <h3 class="font-semibold text-slate-800 text-sm mb-1">Kategori Permasalahan</h3>
             <p class="text-xs text-slate-400 mb-4">Jumlah laporan berdasarkan kategori permasalahan.</p>
@@ -90,8 +82,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Laporan Permasalahan Baru --}}
     @if($daftarLaporan->count() > 0)
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-4 sm:px-5 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -105,13 +95,10 @@
                     Lihat semua →
                 </a>
             </div>
-
             <div class="divide-y divide-slate-50">
                 @foreach($daftarLaporan as $laporan)
                     <a href="{{ route('bk.laporan.show', $laporan->laporan_id) }}"
                         class="px-4 sm:px-5 py-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 hover:bg-slate-50 transition-colors">
-
-                        {{-- Foto + Nama: selalu satu baris penuh di mobile --}}
                         <div class="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
                             <div
                                 class="w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 bg-blue-50 border border-slate-100">
@@ -124,7 +111,6 @@
                                     </div>
                                 @endif
                             </div>
-
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs text-slate-400">{{ optional($laporan->siswa)->kelas ?? '-' }}</p>
                                 <p class="font-semibold text-slate-800 text-sm truncate">
@@ -134,15 +120,11 @@
                                     {{ $laporan->judul_laporan ?? '-' }}
                                 </p>
                             </div>
-
-                            {{-- Panah: sembunyikan di mobile supaya tidak sempit, tampil lagi di sm ke atas --}}
                             <div
                                 class="hidden sm:flex flex-shrink-0 w-8 h-8 rounded-lg bg-blue-50 items-center justify-center text-blue-600">
                                 <i data-feather="arrow-right" class="w-4 h-4"></i>
                             </div>
                         </div>
-
-                        {{-- Badge kategori & status: baris sendiri di mobile, full width & rata kanan-kiri --}}
                         <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                             <span
                                 class="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full flex-shrink-0 truncate max-w-[55%] sm:max-w-none">
@@ -179,8 +161,6 @@
         const kategoriLabels = @json($kategoriLabels);
         const kategoriData = @json($kategoriData);
 
-        // Menghitung step sumbu Y yang "rapi" (1, 2, 5, 10, 20, 50, 100, dst)
-        // menyesuaikan otomatis dengan nilai data terbesar, supaya tidak muncul 0.2 / 0.4.
         function hitungStepRapi(nilaiMax) {
             if (!nilaiMax || nilaiMax <= 0) return 1;
 
@@ -197,12 +177,8 @@
             return stepRapi * magnitude;
         }
 
-        // Deteksi layar kecil supaya ukuran font chart ikut menyesuaikan.
         const isMobile = window.innerWidth < 640;
 
-        // Atur lebar minimum wrapper chart batang berdasarkan jumlah label,
-        // supaya di HP batangnya tidak gepeng dan bisa di-scroll horizontal
-        // kalau labelnya banyak. Di layar lebar, tetap mengikuti 100% container.
         function aturLebarWrapper(wrapperEl, jumlahLabel, lebarPerLabelMobile) {
             if (!wrapperEl) return;
             const lebarDibutuhkan = jumlahLabel * lebarPerLabelMobile;
@@ -218,8 +194,6 @@
             aturLebarWrapper(kategoriWrapper, kategoriLabels.length, 70);
         }
 
-        // Opsi bawaan untuk semua chart: legend & tooltip dimatikan.
-        // datalabels dimatikan di sini (default), lalu diaktifkan khusus untuk pie chart saja.
         const opsiUmum = {
             responsive: true,
             maintainAspectRatio: false,
@@ -317,7 +291,6 @@
             }
         });
 
-        // Kalau layar diputar/di-resize, sesuaikan ulang lebar wrapper & kelas mobile.
         window.addEventListener('resize', function () {
             const mobileSekarang = window.innerWidth < 640;
             if (mobileSekarang) {

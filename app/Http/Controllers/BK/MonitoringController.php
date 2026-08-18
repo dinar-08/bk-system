@@ -13,8 +13,15 @@ class MonitoringController extends Controller
 {
     public function index()
     {
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
+        // Laporan yang sudah masuk status "monitoring" selalu sudah punya
+        // guru BK penanggung jawab (nip). Beda dengan laporan "baru" yang
+        // memang jadi kolam bersama, di sini hanya guru BK yang menangani
+        // laporan tersebut yang boleh melihatnya.
         $laporan = Laporan::with(['siswa', 'guruBk', 'monitoring', 'pemanggilan'])
             ->where('status', 'monitoring')
+            ->where('nip', $guruBk->nip)
             ->latest()
             ->get();
 
@@ -23,6 +30,8 @@ class MonitoringController extends Controller
 
     public function show(string $id)
     {
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
         $laporan = Laporan::with([
             'siswa',
             'guruBk',
@@ -32,6 +41,10 @@ class MonitoringController extends Controller
         ])
             ->where('status', 'monitoring')
             ->findOrFail($id);
+
+        if ($laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses ke laporan ini.');
+        }
 
         return view('bk.monitoring.show', compact('laporan'));
     }
@@ -50,6 +63,14 @@ class MonitoringController extends Controller
             'status_perkembangan' => ['required', 'in:membaik,stabil,menurun'],
             'catatan_perkembangan' => ['required', 'string'],
         ]);
+
+        // Cegah guru BK lain menambah/mengubah catatan monitoring pada
+        // laporan yang bukan tanggung jawabnya (laporan sudah pernah
+        // masuk status "monitoring" sebelumnya dengan nip guru BK lain).
+        $laporanTerkait = Laporan::findOrFail($validated['laporan_id']);
+        if ($laporanTerkait->status === 'monitoring' && $laporanTerkait->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses ke laporan ini.');
+        }
 
         if (!empty($validated['monitoring_id'])) {
             $monitoring = Monitoring::where('monitoring_id', $validated['monitoring_id'])
@@ -117,7 +138,13 @@ class MonitoringController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $monitoring = Monitoring::findOrFail($id);
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
+        $monitoring = Monitoring::with('laporan')->findOrFail($id);
+
+        if ($monitoring->laporan && $monitoring->laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah data monitoring ini.');
+        }
 
         $validated = $request->validate([
             'tanggal_monitoring' => ['required', 'date'],
@@ -151,7 +178,15 @@ class MonitoringController extends Controller
 
     public function destroy(string $id)
     {
-        Monitoring::findOrFail($id)->delete();
+        $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
+
+        $monitoring = Monitoring::with('laporan')->findOrFail($id);
+
+        if ($monitoring->laporan && $monitoring->laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data monitoring ini.');
+        }
+
+        $monitoring->delete();
 
         return back()->with('success', 'Catatan monitoring berhasil dihapus.');
     }

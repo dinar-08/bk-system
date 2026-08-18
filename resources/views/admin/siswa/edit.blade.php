@@ -37,22 +37,32 @@
                 <p class="text-sm text-slate-500 mt-0.5">Perbarui informasi pribadi siswa.</p>
             </div>
             <div class="grid grid-cols-2 gap-5">
-                <div class="col-span-2">
+                <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto Siswa</label>
 
-                    <div
-                        class="w-24 h-24 rounded-2xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center mb-3 shadow-sm">
-                        @if($siswa->foto)
-                            <img src="{{ route('foto.siswa', $siswa->nis) }}" class="w-full h-full object-cover"
-                                alt="Foto Siswa">
-                        @else
-                            <i data-feather="user" class="w-8 h-8 text-blue-200"></i>
-                        @endif
-                    </div>
+                    <button type="button" onclick="document.getElementById('foto-input').click()"
+                        class="relative w-24 h-24 rounded-2xl overflow-hidden bg-blue-50 border border-slate-200 flex items-center justify-center shadow-sm group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-                    <input type="file" name="foto" accept="image/*"
-                        class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="text-xs text-slate-400 mt-1">Kosongkan jika tidak ingin mengubah foto.</p>
+                        <img id="foto-preview" src="{{ $siswa->foto ? route('foto.siswa', $siswa->nis) : '' }}"
+                            class="w-full h-full object-cover {{ $siswa->foto ? '' : 'hidden' }}"
+                            alt="Foto {{ $siswa->nama_siswa }}">
+
+                        <i id="foto-placeholder-icon" data-feather="camera"
+                            class="w-7 h-7 text-blue-300 {{ $siswa->foto ? 'hidden' : '' }}"></i>
+
+                        <div
+                            class="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-colors flex items-center justify-center">
+                            <i data-feather="camera"
+                                class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </button>
+
+                    <input type="file" name="foto" id="foto-input" accept="image/*" class="hidden"
+                        onchange="previewFoto(this)">
+                    <p class="text-xs text-slate-400 mt-1.5">Klik kotak foto untuk mengganti. Kosongkan jika tidak ingin
+                        mengubah.</p>
+                    @error('foto')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">NIS</label>
@@ -95,7 +105,7 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Wali</label>
-                    <input type="text" name="nama_ortu" value="{{ old('nama_ortu', $siswa->nama_ortu) }}"
+                    <input type="text" name="nama_ortu" value="{{ old('nama_ortu', $siswa->nama_ortu) }}" autocomplete="off"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500"
                         required>
                 </div>
@@ -104,15 +114,15 @@
                     <textarea name="alamat" rows="3"
                         class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('alamat', $siswa->alamat) }}</textarea>
                 </div>
-            </div>
-        </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password Baru</label>
-                <input type="password" name="password"
-                    class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
-                <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter jika diisi.</p>
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password Baru</label>
+                    <input type="text" name="username_hint" value="{{ $siswa->nis }}" autocomplete="username"
+                        class="hidden">
+                    <input type="password" name="password" autocomplete="new-password"
+                        class="w-full rounded-xl border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter jika diisi.</p>
+                </div>
             </div>
         </div>
 
@@ -128,5 +138,30 @@
         </div>
 
     </form>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        function previewFoto(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const preview = document.getElementById('foto-preview');
+            const placeholderIcon = document.getElementById('foto-placeholder-icon');
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholderIcon.classList.add('hidden');
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
 
 @endsection
