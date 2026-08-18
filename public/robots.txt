@@ -19,4 +19,4 @@ Disallow: /storage/
 Disallow: /push-subscription
 Disallow: /logout
 
-Sitemap: https://laporbu.my.id/sitemap.xml
+Sitemap: https://laporbubk.my.id/sitemap.xml
