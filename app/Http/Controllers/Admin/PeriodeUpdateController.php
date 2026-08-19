@@ -9,15 +9,25 @@ class PeriodeUpdateController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tahun_ajaran' => ['required', 'string', 'max:20'],
+            'tahun_ajaran' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:periode_update,tahun_ajaran',
+            ],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
+        ], [
+            'tahun_ajaran.unique' => 'Tahun ajaran tersebut sudah ada.',
+            'tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
         ]);
+
         PeriodeUpdate::create([
             ...$validated,
             'aktif' => true,
             'created_by' => auth()->id(),
         ]);
+
         return redirect()->route('admin.siswa.index')
             ->with('success', 'Periode update berhasil dibuat.');
     }

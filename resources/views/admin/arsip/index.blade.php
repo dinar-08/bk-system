@@ -41,7 +41,6 @@
         <div class="arsip-explorer">
 
             <div id="level-periode">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Pilih Tahun Ajaran</p>
                 <div class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
                     @foreach($arsipPerPeriode as $tahunAjaran => $data)
                         <div class="periode-card group relative bg-white rounded-2xl border border-slate-200 p-5 cursor-pointer transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5"
@@ -68,9 +67,6 @@
 
             @foreach($arsipPerPeriode as $tahunAjaran => $data)
                 <div id="level-kelas-{{ $loop->index }}" class="level-kelas" style="display:none;">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Pilih Kelas &middot;
-                        {{ $tahunAjaran }}
-                    </p>
                     <div class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
                         @foreach($data['kelas'] as $kelas => $dataSiswa)
                             <div class="kelas-card group relative bg-white rounded-2xl border border-slate-200 p-5 cursor-pointer transition-all duration-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5"
@@ -95,8 +91,6 @@
 
                 @foreach($data['kelas'] as $kelas => $dataSiswa)
                     <div id="level-siswa-{{ $loop->parent->index }}-{{ $loop->index }}" class="level-siswa" style="display:none;">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2.5">Siswa &middot; Kelas {{ $kelas }}
-                            &middot; {{ $tahunAjaran }}</p>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
                             @foreach($dataSiswa as $item)
                                 <div class="member-card siswa-card group relative bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5"

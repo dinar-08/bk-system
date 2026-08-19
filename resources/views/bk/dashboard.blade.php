@@ -7,8 +7,6 @@
 @section('content')
 
     @php
-        $daftarLaporan = ($laporanTerbaru ?? collect())->where('status', 'baru');
-
         $genderLabels = ($genderChart ?? collect())->map(function ($item) {
             return $item->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan';
         })->values();
@@ -21,7 +19,7 @@
         $kategoriLabels = ($kategoriChart ?? collect())->pluck('kategori')->map(fn($item) => ucfirst($item))->values();
         $kategoriData = ($kategoriChart ?? collect())->pluck('total')->values();
     @endphp
-    
+
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 mb-6 sm:mb-7">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
             <div class="flex items-center justify-between mb-3">
@@ -82,71 +80,6 @@
             </div>
         </div>
     </div>
-    @if($daftarLaporan->count() > 0)
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-4 sm:px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
-                    <h3 class="font-semibold text-slate-800 text-sm">Laporan Permasalahan Baru</h3>
-                </div>
-
-                <a href="{{ route('bk.laporan.index') }}"
-                    class="text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap">
-                    Lihat semua →
-                </a>
-            </div>
-            <div class="divide-y divide-slate-50">
-                @foreach($daftarLaporan as $laporan)
-                    <a href="{{ route('bk.laporan.show', $laporan->laporan_id) }}"
-                        class="px-4 sm:px-5 py-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 hover:bg-slate-50 transition-colors">
-                        <div class="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
-                            <div
-                                class="w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 bg-blue-50 border border-slate-100">
-                                @if(optional($laporan->siswa)->foto)
-                                    <img src="{{ route('foto.siswa', $laporan->siswa->nis) }}" class="w-full h-full object-cover"
-                                        alt="Foto Siswa">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-blue-50">
-                                        <i data-feather="user" class="w-6 h-6 text-blue-300"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-slate-400">{{ optional($laporan->siswa)->kelas ?? '-' }}</p>
-                                <p class="font-semibold text-slate-800 text-sm truncate">
-                                    {{ optional($laporan->siswa)->nama_siswa ?? '—' }}
-                                </p>
-                                <p class="text-xs text-slate-500 mt-0.5 truncate">
-                                    {{ $laporan->judul_laporan ?? '-' }}
-                                </p>
-                            </div>
-                            <div
-                                class="hidden sm:flex flex-shrink-0 w-8 h-8 rounded-lg bg-blue-50 items-center justify-center text-blue-600">
-                                <i data-feather="arrow-right" class="w-4 h-4"></i>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                            <span
-                                class="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full flex-shrink-0 truncate max-w-[55%] sm:max-w-none">
-                                {{ ucfirst($laporan->kategori ?? '-') }}
-                            </span>
-
-                            <span
-                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-50 border border-yellow-200 text-yellow-700 flex-shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
-                                Baru
-                            </span>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    @else
-        <div class="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center">
-            <i data-feather="inbox" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
-            <p class="text-slate-400 text-sm font-medium">Tidak ada laporan permasalahan baru masuk.</p>
-        </div>
-    @endif
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>

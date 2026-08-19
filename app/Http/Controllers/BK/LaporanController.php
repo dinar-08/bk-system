@@ -19,19 +19,10 @@ class LaporanController extends Controller
     {
         $guruBk = GuruBK::where('user_id', auth()->id())->firstOrFail();
 
-        // Laporan "baru" (belum ada yang menangani) tampil untuk SEMUA guru BK,
-        // supaya siapa saja bisa mengambil dan memverifikasinya.
-        // Laporan yang sudah masuk status "pemanggilan" hanya tampil untuk
-        // guru BK yang memverifikasinya (nip cocok) - guru BK lain tidak lagi
-        // melihat laporan yang sudah ditangani rekannya.
+        // Laporan langsung terkunci ke guru BK yang membuatnya sejak awal
+        // (nip diisi otomatis di store()), jadi cukup filter berdasarkan nip.
         $laporan = Laporan::with(['siswa', 'guruBk'])
-            ->where(function ($query) use ($guruBk) {
-                $query->where('status', 'baru')
-                    ->orWhere(function ($q) use ($guruBk) {
-                        $q->where('status', 'pemanggilan')
-                            ->where('nip', $guruBk->nip);
-                    });
-            })
+            ->where('nip', $guruBk->nip)
             ->latest()
             ->get();
 
@@ -95,8 +86,8 @@ class LaporanController extends Controller
         $laporan = Laporan::create([
             'nis' => $validated['nis'],
             'nip' => $guruBk->nip,
-            'tahun_ajaran' => $periodeAktif->tahun_ajaran, 
-            'kelas' => $siswa->kelas,                      
+            'tahun_ajaran' => $periodeAktif->tahun_ajaran,
+            'kelas' => $siswa->kelas,
             'judul_laporan' => $validated['judul_laporan'],
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
@@ -125,9 +116,9 @@ class LaporanController extends Controller
             'pemanggilan',
         ])->findOrFail($id);
 
-        // Laporan yang masih "baru" boleh dibuka siapa saja (untuk diverifikasi/diambil).
-        // Laporan yang sudah ditangani guru BK lain tidak boleh diakses.
-        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+        // Laporan sudah pasti milik satu guru BK sejak dibuat, jadi cukup
+        // cek kecocokan nip - tidak ada lagi pengecualian status "baru".
+        if ($laporan->nip !== $guruBk->nip) {
             abort(403, 'Anda tidak memiliki akses ke laporan ini.');
         }
 
@@ -140,10 +131,13 @@ class LaporanController extends Controller
 
         $laporan = Laporan::findOrFail($id);
 
-        // Cegah laporan yang sudah keburu diambil/diverifikasi guru BK lain
-        // diverifikasi ulang oleh guru BK yang berbeda.
+        // Hanya guru BK pembuat laporan yang boleh memprosesnya.
+        if ($laporan->nip !== $guruBk->nip) {
+            abort(403, 'Anda tidak memiliki akses untuk memproses laporan ini.');
+        }
+
         if ($laporan->status !== 'baru') {
-            abort(403, 'Laporan ini sudah diverifikasi oleh guru BK lain.');
+            abort(403, 'Laporan ini sudah diproses sebelumnya.');
         }
 
         $validated = $request->validate([
@@ -156,7 +150,6 @@ class LaporanController extends Controller
         ]);
 
         $laporan->update([
-            'nip' => $guruBk->nip,
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
             'status' => 'pemanggilan',
@@ -185,7 +178,7 @@ class LaporanController extends Controller
 
         $laporan = Laporan::with('siswa')->findOrFail($id);
 
-        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+        if ($laporan->nip !== $guruBk->nip) {
             abort(403, 'Anda tidak memiliki akses ke laporan ini.');
         }
 
@@ -200,10 +193,7 @@ class LaporanController extends Controller
 
         $laporan = Laporan::findOrFail($id);
 
-        // Laporan "baru" boleh diverifikasi (dan otomatis jadi milik) guru BK
-        // manapun yang pertama melakukannya. Laporan yang sudah ditangani
-        // guru BK lain tidak boleh diubah.
-        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+        if ($laporan->nip !== $guruBk->nip) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah laporan ini.');
         }
 
@@ -214,7 +204,6 @@ class LaporanController extends Controller
         ]);
 
         $laporan->update([
-            'nip' => $guruBk->nip,
             'kategori' => $validated['kategori'],
             'jenis_masalah' => $validated['jenis_masalah'],
             'status' => $validated['status'],
@@ -231,7 +220,7 @@ class LaporanController extends Controller
 
         $laporan = Laporan::findOrFail($id);
 
-        if ($laporan->status !== 'baru' && $laporan->nip !== $guruBk->nip) {
+        if ($laporan->nip !== $guruBk->nip) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus laporan ini.');
         }
 

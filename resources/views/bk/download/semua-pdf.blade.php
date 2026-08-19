@@ -150,14 +150,12 @@
         <thead>
             <tr>
                 <th style="width: 4%;">No</th>
-                <th style="width: 8%;">NIS</th>
-                <th style="width: 17%;">Nama Siswa</th>
-                <th style="width: 9%;">Guru BK</th>
-                <th style="width: 17%;">Judul Laporan</th>
-                <th style="width: 9%;">Kategori</th>
-                <th style="width: 9%;">Status</th>
-                <th style="width: 10%;">Tanggal Masuk</th>
-                <th style="width: 10%;">Tanggal Selesai</th>
+                <th style="width: 13%;">Guru BK</th>
+                <th style="width: 22%;">Judul Masalah</th>
+                <th style="width: 12%;">Kategori</th>
+                <th style="width: 12%;">Status</th>
+                <th style="width: 13%;">Tanggal Selesai</th>
+                <th style="width: 24%;">Hasil Evaluasi</th>
             </tr>
         </thead>
 
@@ -169,15 +167,15 @@
             @endphp
 
             @forelse($laporanPerKelas as $kelas => $dataKelas)
-                <td colspan="9">
-                    KELAS {{ $kelas }} ({{ $dataKelas->count() }} Kasus)
-                </td>
+                <tr class="kelas-row">
+                    <td colspan="7">
+                        KELAS {{ $kelas }} ({{ $dataKelas->count() }} Kasus)
+                    </td>
+                </tr>
 
                 @foreach($dataKelas as $i => $l)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ optional($l->siswa)->nis ?? '-' }}</td>
-                        <td>{{ optional($l->siswa)->nama_siswa ?? '-' }}</td>
                         <td>{{ optional($l->guruBk)->nama ?? '-' }}</td>
                         <td>{{ $l->judul_laporan ?? '-' }}</td>
                         <td>{{ ucfirst($l->kategori ?? '-') }}</td>
@@ -186,17 +184,17 @@
                                 {{ ucfirst($l->status ?? '-') }}
                             </span>
                         </td>
-                        <td>{{ optional($l->created_at)->format('d/m/Y') ?? '-' }}</td>
                         <td>
                             {{ optional($l->evaluasi)->tanggal_evaluasi
                     ? \Carbon\Carbon::parse($l->evaluasi->tanggal_evaluasi)->format('d/m/Y')
                     : '-' }}
                         </td>
+                        <td>{{ optional($l->evaluasi)->hasil_evaluasi ?? '-' }}</td>
                     </tr>
                 @endforeach
             @empty
                 <tr>
-                    <td colspan="9" style="text-align:center;">Tidak ada data riwayat.</td>
+                    <td colspan="7" style="text-align:center;">Tidak ada data riwayat.</td>
                 </tr>
             @endforelse
         </tbody>

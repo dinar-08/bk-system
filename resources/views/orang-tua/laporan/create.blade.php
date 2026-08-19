@@ -24,7 +24,6 @@
             </p>
         </div>
 
-        {{-- Data Siswa --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5 sm:mb-6">
             <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 sm:p-4">
                 <p class="text-xs text-slate-500 mb-1">Nama Siswa</p>
@@ -47,7 +46,6 @@
 
             <div class="space-y-5">
 
-                {{-- Judul --}}
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Laporan</label>
 
@@ -60,7 +58,6 @@
                     @enderror
                 </div>
 
-                {{-- Deskripsi --}}
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deskripsi Laporan</label>
 
@@ -72,7 +69,6 @@
                     @enderror
                 </div>
 
-                {{-- Bukti --}}
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti / Lampiran</label>
 
@@ -93,23 +89,19 @@
                         Format: JPG, PNG, PDF, MP3, MP4, MOV, WAV · Maks 50MB
                     </p>
 
-                    {{-- Preview Gambar --}}
                     <div id="previewWrapperImg" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
                         <img id="previewImg" src="" alt="Preview" class="w-full object-contain max-h-[500px] bg-slate-100">
                     </div>
 
-                    {{-- Preview Video --}}
                     <div id="previewWrapperVideo"
                         class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200 bg-black max-h-[500px] flex justify-center">
                         <video id="previewVideo" controls class="h-full max-h-[500px] w-auto object-cover"></video>
                     </div>
 
-                    {{-- Preview Audio --}}
                     <div id="previewWrapperAudio" class="hidden mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
                         <audio id="previewAudio" controls class="w-full"></audio>
                     </div>
 
-                    {{-- Preview PDF --}}
                     <div id="previewWrapperPdf" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
                         <iframe id="previewPdf" src="" class="w-full h-[500px]"></iframe>
                     </div>
@@ -146,7 +138,6 @@
                 pdf: document.getElementById('previewWrapperPdf'),
             };
 
-            // Sembunyikan semua preview & bersihkan src lama
             const hideAll = () => {
                 wrappers.img.classList.add('hidden');
                 wrappers.video.classList.add('hidden');

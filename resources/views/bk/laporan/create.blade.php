@@ -27,109 +27,130 @@
                 <div class="relative">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Siswa</label>
 
-                        <div id="nama_siswa" contenteditable="true" spellcheck="false"
-                            data-placeholder="contoh: Dinar"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 whitespace-pre-wrap break-words"
-                        >{{ old('nama_siswa') }}</div>
+                    <div id="nama_siswa" contenteditable="true" spellcheck="false" data-placeholder="contoh: Dinar"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 whitespace-pre-wrap break-words">{{ old('nama_siswa') }}</div>
 
-                        <input type="hidden" name="nis" id="nis" value="{{ old('nis') }}">
+                    <input type="hidden" name="nis" id="nis" value="{{ old('nis') }}">
 
-                        <div id="hasil_siswa"
-                            class="hidden absolute left-0 right-0 top-full -mt-px z-20 bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-lg overflow-hidden">
-                        </div>
-
-                        @error('nis')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                    <div id="hasil_siswa"
+                        class="hidden absolute left-0 right-0 top-full -mt-px z-20 bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-lg overflow-hidden">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kelas</label>
-
-                        <select id="kelas_siswa"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                            <option value="">Pilih kelas</option>
-                            @foreach($siswa->pluck('kelas')->unique()->sort() as $k)
-                                <option value="{{ $k }}" {{ old('kelas_siswa') == $k ? 'selected' : '' }}>{{ $k }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                            Kategori
-                        </label>
-
-                        <select name="kategori" id="kategori" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('kategori') border-red-300 @enderror">
-
-                            <option value="">Pilih kategori</option>
-
-                            @foreach ($kategori as $kat)
-                                <option value="{{ $kat }}" {{ old('kategori') == $kat ? 'selected' : '' }}>
-                                    {{ ucfirst($kat) }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                        @error('kategori')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-               
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jenis Masalah</label>
-                        <input type="text" name="jenis_masalah" value="{{ old('jenis_masalah') }}"
-                            placeholder="Contoh: Bolos, bertengkar, terlambat"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('jenis_masalah') border-red-300 @enderror">
-                        @error('jenis_masalah')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Laporan</label>
-                        <input type="text" name="judul_laporan" value="{{ old('judul_laporan') }}"
-                            placeholder="Contoh: Laporan Perilaku Siswa"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('judul_laporan') border-red-300 @enderror">
-                        @error('judul_laporan')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deskripsi Laporan</label>
-                        <textarea name="deskripsi" rows="5"
-                            placeholder="Tuliskan deskripsi permasalahan siswa secara lengkap..."
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none @error('deskripsi') border-red-300 @enderror">{{ old('deskripsi') }}</textarea>
-                        @error('deskripsi')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti / Lampiran</label>
-                        <label
-                            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                            <i data-feather="paperclip" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
-                            <span id="fileName" class="text-sm text-slate-400 truncate">Foto, PDF, atau rekaman
-                                audio/video</span>
-                            <input type="file" name="bukti" id="buktiInput" class="hidden"
-                                accept="image/*,.pdf,audio/*,video/*,.mp3,.mp4,.mov,.wav,.m4a,.ogg"
-                                onchange="previewBukti(this)">
-                        </label>
-                        <p class="text-xs text-slate-400 mt-1">Format: JPG, PNG, PDF, MP3, MP4, MOV, WAV · Maks 50MB</p>
-                        <div id="previewWrapper" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
-                            <img id="previewImg" src="" alt="Preview" class="w-full object-cover max-h-56">
-                        </div>
-                        @error('bukti')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
+                    @error('nis')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div
-                    class="mt-6 pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3
-                                                sticky bottom-0 -mx-4 sm:mx-0 px-4 sm:px-0 pb-4 sm:pb-0 bg-white sm:bg-transparent sm:static">
-                    <a href="{{ route('bk.laporan.index') }}"
-                        class="px-5 py-3 sm:py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors text-center w-full sm:w-auto">Batal</a>
-                    <button type="submit"
-                        class="px-5 py-3 sm:py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors w-full sm:w-auto">Simpan
-                        Laporan</button>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kelas</label>
+
+                    <select id="kelas_siswa"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">Pilih kelas</option>
+                        @foreach($siswa->pluck('kelas')->unique()->sort() as $k)
+                            <option value="{{ $k }}" {{ old('kelas_siswa') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                        @endforeach
+                    </select>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        Kategori
+                    </label>
+
+                    <select name="kategori" id="kategori" required
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('kategori') border-red-300 @enderror">
+
+                        <option value="">Pilih kategori</option>
+
+                        @foreach ($kategori as $kat)
+                            <option value="{{ $kat }}" {{ old('kategori') == $kat ? 'selected' : '' }}>
+                                {{ ucfirst($kat) }}
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                    @error('kategori')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jenis Masalah</label>
+                    <input type="text" name="jenis_masalah" value="{{ old('jenis_masalah') }}"
+                        placeholder="Contoh: Bolos, bertengkar, terlambat"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('jenis_masalah') border-red-300 @enderror">
+                    @error('jenis_masalah')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Laporan</label>
+                    <input type="text" name="judul_laporan" value="{{ old('judul_laporan') }}"
+                        placeholder="Contoh: Laporan Perilaku Siswa"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 @error('judul_laporan') border-red-300 @enderror">
+                    @error('judul_laporan')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deskripsi Laporan</label>
+                    <textarea name="deskripsi" rows="5"
+                        placeholder="Tuliskan deskripsi permasalahan siswa secara lengkap..."
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-base sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none @error('deskripsi') border-red-300 @enderror">{{ old('deskripsi') }}</textarea>
+                    @error('deskripsi')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Bukti / Lampiran</label>
+                    <label
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-colors">
+                        <i data-feather="paperclip" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+                        <span id="fileName" class="text-sm text-slate-400 truncate">Foto, PDF, atau rekaman
+                            audio/video</span>
+                        <input type="file" name="bukti" id="buktiInput" class="hidden"
+                            accept="image/*,.pdf,audio/*,video/*,.mp3,.mp4,.mov,.wav,.m4a,.ogg"
+                            onchange="previewBukti(this)">
+                    </label>
+                    <p class="text-xs text-slate-400 mt-1">Format: JPG, PNG, PDF, MP3, MP4, MOV, WAV · Maks 50MB</p>
+
+                    {{-- Preview Gambar --}}
+                    <div id="previewWrapperImg" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
+                        <img id="previewImg" src="" alt="Preview" class="w-full object-contain max-h-[500px] bg-slate-100">
+                    </div>
+
+                    {{-- Preview Video --}}
+                    <div id="previewWrapperVideo"
+                        class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200 bg-black max-h-[500px] flex justify-center">
+                        <video id="previewVideo" controls class="h-full max-h-[500px] w-auto object-cover"></video>
+                    </div>
+
+                    {{-- Preview Audio --}}
+                    <div id="previewWrapperAudio" class="hidden mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                        <audio id="previewAudio" controls class="w-full"></audio>
+                    </div>
+
+                    {{-- Preview PDF --}}
+                    <div id="previewWrapperPdf" class="hidden mt-3 rounded-xl overflow-hidden border border-slate-200">
+                        <iframe id="previewPdf" src="" class="w-full h-[500px]"></iframe>
+                    </div>
+
+                    @error('bukti')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div
+                class="mt-6 pt-5 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3
+                                                    sticky bottom-0 -mx-4 sm:mx-0 px-4 sm:px-0 pb-4 sm:pb-0 bg-white sm:bg-transparent sm:static">
+                <a href="{{ route('bk.laporan.index') }}"
+                    class="px-5 py-3 sm:py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors text-center w-full sm:w-auto">Batal</a>
+                <button type="submit"
+                    class="px-5 py-3 sm:py-2.5 bg-blue-700 text-white rounded-xl text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors w-full sm:w-auto">Simpan
+                    Laporan</button>
+            </div>
         </form>
     </div>
 
@@ -140,6 +161,11 @@
         const siswaIdInput = document.getElementById('nis');
         const hasilSiswa = document.getElementById('hasil_siswa');
         const formLaporan = document.getElementById('formLaporan');
+
+        // Bersihkan whitespace bawaan Blade/editor supaya placeholder muncul saat kosong
+        if (!namaInput.textContent.trim()) {
+            namaInput.textContent = '';
+        }
 
         function getNamaValue() {
             return namaInput.textContent;
@@ -190,12 +216,12 @@
             let hasil;
 
             if (kelas === '') {
-              
+
                 hasil = siswaData.filter(item =>
                     item.nama_siswa.toLowerCase().includes(nama)
                 );
             } else {
-              
+
                 hasil = siswaData.filter(item =>
                     item.kelas === kelas &&
                     item.nama_siswa.toLowerCase().includes(nama)
@@ -204,9 +230,9 @@
 
             if (hasil.length === 0) {
                 hasilSiswa.innerHTML = `
-                            <div class="px-4 py-3 text-xs text-red-500">
-                                ${kelas === '' ? 'Siswa tidak ditemukan.' : 'Siswa tidak ditemukan di kelas ini.'}
-                            </div>`;
+                                <div class="px-4 py-3 text-xs text-red-500">
+                                    ${kelas === '' ? 'Siswa tidak ditemukan.' : 'Siswa tidak ditemukan di kelas ini.'}
+                                </div>`;
                 bukaDropdown();
                 return;
             }
@@ -225,9 +251,9 @@
                 const identitas = kelas === '' ? `Kelas ${siswa.kelas}` : '';
 
                 item.innerHTML = `
-                                            <span class="font-medium text-slate-700 truncate">${siswa.nama_siswa}</span>
-                                            ${identitas ? `<span class="text-xs text-slate-400 flex-shrink-0">${identitas}</span>` : ''}
-                                        `;
+                                                <span class="font-medium text-slate-700 truncate">${siswa.nama_siswa}</span>
+                                                ${identitas ? `<span class="text-xs text-slate-400 flex-shrink-0">${identitas}</span>` : ''}
+                                            `;
 
                 item.onclick = function () {
                     pilihSiswa(siswa);
@@ -241,21 +267,54 @@
         function previewBukti(input) {
             const file = input.files[0];
 
-            if (file) {
-                document.getElementById('fileName').textContent = '✓ ' + file.name;
+            const wrappers = {
+                img: document.getElementById('previewWrapperImg'),
+                video: document.getElementById('previewWrapperVideo'),
+                audio: document.getElementById('previewWrapperAudio'),
+                pdf: document.getElementById('previewWrapperPdf'),
+            };
 
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
+            const hideAll = () => {
+                wrappers.img.classList.add('hidden');
+                wrappers.video.classList.add('hidden');
+                wrappers.audio.classList.add('hidden');
+                wrappers.pdf.classList.add('hidden');
 
-                    reader.onload = e => {
-                        document.getElementById('previewImg').src = e.target.result;
-                        document.getElementById('previewWrapper').classList.remove('hidden');
-                    };
+                document.getElementById('previewVideo').src = '';
+                document.getElementById('previewAudio').src = '';
+                document.getElementById('previewPdf').src = '';
+            };
 
-                    reader.readAsDataURL(file);
-                } else {
-                    document.getElementById('previewWrapper').classList.add('hidden');
-                }
+            if (!file) {
+                hideAll();
+                return;
+            }
+
+            document.getElementById('fileName').textContent = '✓ ' + file.name;
+            hideAll();
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    wrappers.img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+            } else if (file.type.startsWith('video/')) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewVideo').src = url;
+                wrappers.video.classList.remove('hidden');
+
+            } else if (file.type.startsWith('audio/')) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewAudio').src = url;
+                wrappers.audio.classList.remove('hidden');
+
+            } else if (file.type === 'application/pdf') {
+                const url = URL.createObjectURL(file);
+                document.getElementById('previewPdf').src = url;
+                wrappers.pdf.classList.remove('hidden');
             }
         }
 
