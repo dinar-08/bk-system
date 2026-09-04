@@ -167,6 +167,25 @@ class SiswaController extends Controller
             $sedangAktif = ($siswa->user->status_akun ?? 'aktif') === 'aktif';
             $statusBaru = $sedangAktif ? 'nonaktif' : 'aktif';
 
+            // Hanya cek kasus aktif kalau ini proses NONAKTIFKAN (bukan aktifkan lagi)
+            if ($statusBaru === 'nonaktif') {
+                $kasusAktif = Laporan::where('nis', $siswa->nis)
+                    ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
+                    ->get();
+
+                if ($kasusAktif->isNotEmpty()) {
+                    return redirect()->route('admin.siswa.index')
+                        ->with('error_nonaktifkan_siswa', [
+                            'nama' => $siswa->nama_siswa,
+                            'kelas' => $siswa->kelas,
+                            'kasus' => $kasusAktif->map(fn($laporan) => [
+                                'judul' => $laporan->judul_laporan,
+                                'status' => $laporan->status,
+                            ])->toArray(),
+                        ]);
+                }
+            }
+
             $siswa->user->update([
                 'status_akun' => $statusBaru,
                 'nonaktif_at' => $statusBaru === 'nonaktif' ? now() : null,
@@ -193,42 +212,54 @@ class SiswaController extends Controller
             ->where('kelas', $validated['kelas'])
             ->get();
 
-        $siswaIds = $siswaDikelas->pluck('nis');
+        $periodeTerkini = PeriodeUpdate::terkini();
+        $dilewati = [];
+        $jumlahBerhasil = 0;
 
-        $kasusAktif = Laporan::whereIn('nis', $siswaIds)
-            ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
-            ->with('siswa')
-            ->get();
+        foreach ($siswaDikelas as $item) {
+            // Lewati siswa yang memang sudah nonaktif duluan
+            if (!$item->user || ($item->user->status_akun ?? 'aktif') !== 'aktif') {
+                continue;
+            }
 
-        if ($kasusAktif->isNotEmpty()) {
-            return redirect()->route('admin.siswa.index')
-                ->with('error_nonaktifkan', [
-                    'kelas' => $validated['kelas'],
+            $kasusAktif = Laporan::where('nis', $item->nis)
+                ->whereIn('status', ['baru', 'pemanggilan', 'monitoring'])
+                ->get();
+
+            if ($kasusAktif->isNotEmpty()) {
+                $dilewati[] = [
+                    'nama' => $item->nama_siswa,
                     'kasus' => $kasusAktif->map(fn($laporan) => [
-                        'nama' => $laporan->siswa->nama_siswa ?? '-',
                         'judul' => $laporan->judul_laporan,
                         'status' => $laporan->status,
                     ])->toArray(),
-                ]);
-        }
-
-        $periodeTerkini = PeriodeUpdate::terkini();
-
-        foreach ($siswaDikelas as $item) {
-            if ($item->user) {
-                $item->user->update([
-                    'status_akun' => 'nonaktif',
-                    'nonaktif_at' => now(),
-                ]);
-
-                $item->update([
-                    'tahun_ajaran' => optional($periodeTerkini)->tahun_ajaran,
-                ]);
+                ];
+                continue;
             }
+
+            $item->user->update([
+                'status_akun' => 'nonaktif',
+                'nonaktif_at' => now(),
+            ]);
+
+            $item->update([
+                'tahun_ajaran' => optional($periodeTerkini)->tahun_ajaran,
+            ]);
+
+            $jumlahBerhasil++;
         }
 
-        return redirect()->route('admin.siswa.index')
-            ->with('success', 'Semua akun kelas ' . $validated['kelas'] . ' berhasil dinonaktifkan.');
+        $redirect = redirect()->route('admin.siswa.index')
+            ->with('success', $jumlahBerhasil . ' akun siswa kelas ' . $validated['kelas'] . ' berhasil dinonaktifkan.');
+
+        if (!empty($dilewati)) {
+            $redirect->with('info_nonaktifkan_kelas', [
+                'kelas' => $validated['kelas'],
+                'dilewati' => $dilewati,
+            ]);
+        }
+
+        return $redirect;
     }
 
     public function updateKelasMassal(Request $request)

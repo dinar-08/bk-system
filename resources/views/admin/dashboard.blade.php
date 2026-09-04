@@ -45,7 +45,45 @@
         })->values();
     @endphp
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-visible relative" id="periodeCard">
+            <div class="h-1.5 bg-indigo-500"></div>
+            <button type="button" id="periodeToggleBtn"
+                class="w-full p-4 sm:p-5 flex items-center justify-between gap-4 text-left focus:outline-none">
+                <div class="min-w-0">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Tahun Ajaran</p>
+                    <h2 class="mt-2 text-lg sm:text-2xl font-bold text-slate-900 whitespace-nowrap">
+                        {{ ($tahunAjaran ?? 'semua') === 'semua' ? 'Semua' : $tahunAjaran }}
+                    </h2>
+                    <p class="text-xs text-indigo-500 mt-0.5 flex items-center gap-1">
+                        Pilih periode
+                        <i data-feather="chevron-down" class="w-3 h-3"></i>
+                    </p>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                    <i data-feather="calendar" class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600"></i>
+                </div>
+            </button>
+
+            <form method="GET" action="{{ url()->current() }}" id="formPeriode">
+                <input type="hidden" name="tahun_ajaran" id="inputTahunAjaran" value="{{ $tahunAjaran ?? 'semua' }}">
+            </form>
+
+            <div id="periodeDropdown"
+                class="hidden absolute left-0 right-0 top-full mt-1 z-20 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 max-h-64 overflow-y-auto">
+                <button type="button" data-periode="semua"
+                    class="periode-option w-full text-left px-4 py-2 text-sm hover:bg-slate-50 {{ ($tahunAjaran ?? 'semua') == 'semua' ? 'font-semibold text-indigo-600' : 'text-slate-700' }}">
+                    Semua
+                </button>
+                @foreach (($daftarPeriode ?? collect()) as $periode)
+                    <button type="button" data-periode="{{ $periode }}"
+                        class="periode-option w-full text-left px-4 py-2 text-sm hover:bg-slate-50 {{ ($tahunAjaran ?? null) == $periode ? 'font-semibold text-indigo-600' : 'text-slate-700' }}">
+                        {{ $periode }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="h-1.5 bg-blue-500"></div>
@@ -183,6 +221,45 @@
             if (typeof feather !== 'undefined') {
                 feather.replace();
             }
+
+            // ==========================================
+            // Dropdown Periode / Tahun Ajaran
+            // ==========================================
+            const periodeCard = document.getElementById('periodeCard');
+            const toggleBtn = document.getElementById('periodeToggleBtn');
+            const dropdown = document.getElementById('periodeDropdown');
+            const inputTahunAjaran = document.getElementById('inputTahunAjaran');
+            const formPeriode = document.getElementById('formPeriode');
+
+            if (toggleBtn && dropdown && inputTahunAjaran && formPeriode) {
+                // buka/tutup dropdown saat card diklik
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                // pilih salah satu periode -> submit form GET dengan query tahun_ajaran
+                dropdown.querySelectorAll('.periode-option').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        inputTahunAjaran.value = this.dataset.periode;
+                        formPeriode.submit();
+                    });
+                });
+
+                // klik di luar card -> tutup dropdown
+                document.addEventListener('click', function (e) {
+                    if (periodeCard && !periodeCard.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+
+                // tombol Escape -> tutup dropdown
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            }
         });
 
         const genderLabels = @json($genderLabels);
@@ -249,11 +326,11 @@
             container.innerHTML = labels.map(function (label, i) {
                 const warna = colors[i] || '#94a3b8';
                 return `
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-sm shrink-0" style="background-color: ${warna}"></span>
-                                <span class="text-xs text-slate-600">${label}</span>
-                            </div>
-                        `;
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-3 h-3 rounded-sm shrink-0" style="background-color: ${warna}"></span>
+                                            <span class="text-xs text-slate-600">${label}</span>
+                                        </div>
+                                    `;
             }).join('');
         }
 

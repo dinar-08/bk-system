@@ -123,6 +123,9 @@ Route::middleware(['auth', 'role:admin', 'must.change.password'])->group(functio
     Route::patch('/admin/siswa/nonaktifkan-kelas', [SiswaController::class, 'nonaktifkanKelas'])
         ->name('admin.siswa.nonaktifkan-kelas');
 
+    Route::post('admin/siswa/nonaktifkan-kelas', [SiswaController::class, 'nonaktifkanKelas'])
+        ->name('admin.siswa.nonaktifkan-kelas');
+
     Route::patch('/admin/siswa/update-kelas-massal', [SiswaController::class, 'updateKelasMassal'])
         ->name('admin.siswa.update-kelas-massal');
 
@@ -135,9 +138,17 @@ Route::middleware(['auth', 'role:admin', 'must.change.password'])->group(functio
     Route::get('/admin/siswa-download', [SiswaController::class, 'download'])
         ->name('admin.siswa.download');
 
-    Route::resource('/admin/periode-update', PeriodeUpdateController::class)
-        ->only(['store', 'update', 'destroy'])
-        ->names('admin.periode-update');
+    Route::post('/admin/periode-update', [PeriodeUpdateController::class, 'store'])
+        ->name('admin.periode-update.store');
+
+    Route::patch('/admin/periode-update/{tahun_ajaran}', [PeriodeUpdateController::class, 'update'])
+        ->where('tahun_ajaran', '.*')
+        ->name('admin.periode-update.update');
+
+    Route::delete('/admin/periode-update/{tahun_ajaran}', [PeriodeUpdateController::class, 'destroy'])
+        ->where('tahun_ajaran', '.*')
+        ->name('admin.periode-update.destroy');
+
 });
 
 /*
